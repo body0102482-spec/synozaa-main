@@ -1,0 +1,305 @@
+=== bundle ===
+assets/index-Cc4VOf7v.js
+=== sync plan configs to catalog ===
+[
+  {
+    "plan": "FREE",
+    "priceEgp": 0,
+    "casesQuota": 3,
+    "durationMonths": 0,
+    "nameEn": "Free"
+  },
+  {
+    "plan": "PACKAGE_50",
+    "priceEgp": 150,
+    "casesQuota": 30,
+    "durationMonths": 2,
+    "nameEn": "Basic"
+  },
+  {
+    "plan": "PACKAGE_150",
+    "priceEgp": 300,
+    "casesQuota": 60,
+    "durationMonths": 4,
+    "nameEn": "Pro"
+  },
+  {
+    "plan": "PACKAGE_300",
+    "priceEgp": 500,
+    "casesQuota": 100,
+    "durationMonths": 6,
+    "nameEn": "Premium"
+  },
+  {
+    "plan": "INSTITUTION",
+    "priceEgp": 0,
+    "casesQuota": 999999,
+    "durationMonths": 0,
+    "nameEn": "Institution"
+  }
+]
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.14
+Local PM2 version: 7.0.1
+
+[PM2] Applying action restartProcessId on app [synoza](ids: [ 347 ])
+[PM2] [synoza](347) ✓
+┌─────┬──────────────────────────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id  │ name                                     │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├─────┼──────────────────────────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 101 │ a-plus-anmka-admin                       │ default     │ 16.0.10 │ fork    │ 88106    │ 3D     │ 17   │ online    │ 0%       │ 132.2mb  │ root     │ disabled │
+│ 82  │ a-plus-anmka-lms-backend                 │ default     │ 1.0.0   │ fork    │ 86885    │ 3D     │ 12   │ online    │ 0%       │ 81.9mb   │ root     │ disabled │
+│ 142 │ abo-gafaar-backend                       │ default     │ 1.0.0   │ cluster │ 91442    │ 3D     │ 18   │ online    │ 2.5%     │ 95.3mb   │ root     │ disabled │
+│ 141 │ abo-gafaar-frontend                      │ default     │ 16.2.6  │ cluster │ 91365    │ 3D     │ 32   │ online    │ 0%       │ 171.0mb  │ root     │ disabled │
+│ 11  │ aboelmaaty-lms                           │ default     │ N/A     │ fork    │ 124890   │ 3D     │ 11   │ online    │ 0%       │ 59.4mb   │ root     │ disabled │
+│ 10  │ aboelmaaty-lms-backend                   │ default     │ 0.39.0  │ fork    │ 124797   │ 3D     │ 14   │ online    │ 0%       │ 75.1mb   │ root     │ disabled │
+│ 12  │ aboelmaaty-student-portal                │ default     │ N/A     │ fork    │ 125131   │ 3D     │ 11   │ online    │ 0%       │ 58.7mb   │ root     │ disabled │
+│ 154 │ afaq-anmka-admin                         │ default     │ 0.39.0  │ cluster │ 92963    │ 3D     │ 34   │ online    │ 0%       │ 92.8mb   │ root     │ disabled │
+│ 155 │ afaq-anmka-lms-backend                   │ default     │ 1.0.0   │ fork    │ 92910    │ 3D     │ 23   │ online    │ 0%       │ 96.2mb   │ root     │ disabled │
+│ 156 │ afaq-anmka-student-portal                │ default     │ N/A     │ fork    │ 93013    │ 3D     │ 27   │ online    │ 0%       │ 58.2mb   │ root     │ disabled │
+│ 315 │ ahmed-zeyada-anmka-backend               │ default     │ 1.0.0   │ fork    │ 2698803  │ 3D     │ 15   │ online    │ 0%       │ 100.1mb  │ root     │ disabled │
+│ 352 │ ahmed-zeyada-anmka-com                   │ default     │ 16.0.10 │ fork    │ 4100067  │ 3m     │ 11   │ online    │ 0%       │ 193.4mb  │ root     │ disabled │
+│ 86  │ ahmedamin-anmka-com                      │ default     │ 0.39.0  │ fork    │ 87377    │ 3D     │ 11   │ online    │ 0%       │ 79.1mb   │ root     │ disabled │
+│ 68  │ ahmedamin-anmka-com-backend              │ default     │ 0.39.0  │ cluster │ 86053    │ 3D     │ 12   │ online    │ 2.5%     │ 59.6mb   │ root     │ disabled │
+│ 4   │ aielhejaz-api                            │ default     │ 1.0.0   │ fork    │ 124158   │ 3D     │ 13   │ online    │ 0%       │ 89.1mb   │ root     │ disabled │
+│ 5   │ aielhejaz-frontend                       │ default     │ N/A     │ fork    │ 124255   │ 3D     │ 13   │ online    │ 0%       │ 56.6mb   │ root     │ disabled │
+│ 62  │ aldwarglobal-ai-video-backend            │ default     │ 1.0.0   │ fork    │ 85654    │ 3D     │ 10   │ online    │ 2.5%     │ 63.3mb   │ root     │ disabled │
+│ 138 │ alisopaihy-anmka-backend                 │ default     │ 1.0.0   │ fork    │ 90992    │ 3D     │ 19   │ online    │ 2.5%     │ 90.2mb   │ root     │ disabled │
+│ 128 │ alisopaihy-anmka-com                     │ default     │ 0.39.0  │ cluster │ 90498    │ 3D     │ 27   │ online    │ 0%       │ 93.6mb   │ root     │ disabled │
+│ 195 │ alostaz-anmka-admin                      │ default     │ 0.39.0  │ cluster │ 3351247  │ 4D     │ 19   │ online    │ 0%       │ 93.0mb   │ root     │ disabled │
+│ 196 │ alostaz-anmka-lms-backend                │ default     │ 1.0.0   │ fork    │ 3351273  │ 4D     │ 16   │ online    │ 0%       │ 79.4mb   │ root     │ disabled │
+│ 197 │ alostaz-anmka-student-portal             │ default     │ N/A     │ fork    │ 3351388  │ 4D     │ 9    │ online    │ 0%       │ 58.1mb   │ root     │ disabled │
+│ 160 │ alphatech-backend                        │ default     │ 1.0.0   │ fork    │ 93834    │ 3D     │ 10   │ online    │ 0%       │ 53.4mb   │ root     │ disabled │
+│ 32  │ alsalam-mehani-anmka-com                 │ default     │ 16.0.10 │ cluster │ 83826    │ 3D     │ 19   │ online    │ 0%       │ 150.4mb  │ root     │ disabled │
+│ 36  │ alsalam-mehani-anmka-lms-backend         │ default     │ 1.0.0   │ fork    │ 84052    │ 3D     │ 11   │ online    │ 0%       │ 93.6mb   │ root     │ disabled │
+│ 303 │ anconeus-anmka-admin                     │ default     │ 0.39.0  │ fork    │ 3703857  │ 37m    │ 520  │ online    │ 0%       │ 91.1mb   │ root     │ disabled │
+│ 309 │ anconeus-anmka-lms-backend               │ default     │ 1.0.0   │ fork    │ 3597856  │ 47m    │ 42   │ online    │ 0%       │ 120.4mb  │ root     │ disabled │
+│ 302 │ anconeus-anmka-student-portal            │ default     │ 16.0.10 │ fork    │ 365198   │ 3D     │ 3    │ online    │ 0%       │ 64.5mb   │ root     │ disabled │
+│ 22  │ anmka                                    │ default     │ 0.39.0  │ fork    │ 2991030  │ 3D     │ 29   │ online    │ 0%       │ 43.5mb   │ root     │ disabled │
+│ 21  │ anmka-landing                            │ default     │ 0.39.0  │ fork    │ 2991117  │ 3D     │ 29   │ online    │ 0%       │ 43.4mb   │ root     │ disabled │
+│ 99  │ aydent-backend                           │ default     │ 1.0.0   │ fork    │ 88029    │ 3D     │ 10   │ online    │ 2.5%     │ 72.5mb   │ root     │ disabled │
+│ 100 │ aydent-frontend                          │ default     │ 0.1.0   │ fork    │ 88049    │ 3D     │ 11   │ online    │ 0%       │ 104.0mb  │ root     │ disabled │
+│ 285 │ beacon-anmka-admin                       │ default     │ 0.39.0  │ cluster │ 3354075  │ 4D     │ 4    │ online    │ 0%       │ 92.3mb   │ root     │ disabled │
+│ 286 │ beacon-anmka-lms-backend                 │ default     │ 1.0.0   │ cluster │ 3353789  │ 4D     │ 12   │ online    │ 0%       │ 110.0mb  │ root     │ disabled │
+│ 287 │ beacon-anmka-student-portal              │ default     │ N/A     │ fork    │ 3354201  │ 4D     │ 3    │ online    │ 0%       │ 58.6mb   │ root     │ disabled │
+│ 184 │ benaya-anmka-com                         │ default     │ 0.1.0   │ fork    │ 3350741  │ 4D     │ 355… │ online    │ 0%       │ 89.0mb   │ root     │ disabled │
+│ 90  │ benayaeg-com                             │ default     │ 0.1.0   │ cluster │ 87522    │ 3D     │ 10   │ online    │ 0%       │ 82.1mb   │ root     │ disabled │
+│ 217 │ beshrmakki-anmka-com                     │ default     │ 0.1.0   │ fork    │ 3352454  │ 4D     │ 15   │ online    │ 2.5%     │ 119.0mb  │ root     │ disabled │
+│ 47  │ bimaristan-anmka-admin                   │ default     │ 16.0.10 │ fork    │ 84637    │ 3D     │ 10   │ online    │ 2.5%     │ 175.9mb  │ root     │ disabled │
+│ 46  │ bimaristan-backend                       │ default     │ 1.0.0   │ cluster │ 84550    │ 3D     │ 10   │ online    │ 0%       │ 118.8mb  │ root     │ disabled │
+│ 72  │ bio-space-anmka-admin                    │ default     │ 0.39.0  │ cluster │ 86329    │ 3D     │ 10   │ online    │ 0%       │ 92.0mb   │ root     │ disabled │
+│ 73  │ bio-space-anmka-lms-backend              │ default     │ 0.39.0  │ fork    │ 86301    │ 3D     │ 10   │ online    │ 0%       │ 81.9mb   │ root     │ disabled │
+│ 74  │ bio-space-anmka-student-portal           │ default     │ 0.39.0  │ fork    │ 86410    │ 3D     │ 10   │ online    │ 0%       │ 58.3mb   │ root     │ disabled │
+│ 180 │ biology-anmka-admin                      │ default     │ 0.39.0  │ cluster │ 3350510  │ 4D     │ 109  │ online    │ 0%       │ 92.7mb   │ root     │ disabled │
+│ 181 │ biology-anmka-lms-backend                │ default     │ 1.0.0   │ fork    │ 3350486  │ 4D     │ 38   │ online    │ 0%       │ 80.7mb   │ root     │ disabled │
+│ 182 │ biology-anmka-student-portal             │ default     │ N/A     │ fork    │ 3350574  │ 4D     │ 18   │ online    │ 0%       │ 58.3mb   │ root     │ disabled │
+│ 163 │ bonegraft-backend                        │ default     │ 1.0.0   │ cluster │ 93923    │ 3D     │ 10   │ online    │ 0%       │ 134.5mb  │ root     │ disabled │
+│ 162 │ bonegraft-frontend                       │ default     │ 16.0.7  │ cluster │ 93857    │ 3D     │ 10   │ online    │ 0%       │ 134.9mb  │ root     │ disabled │
+│ 56  │ brainzy-school-backend                   │ default     │ 1.0.0   │ cluster │ 2599946  │ 3D     │ 25   │ online    │ 0%       │ 128.3mb  │ root     │ disabled │
+│ 55  │ brainzy-school-frontend                  │ default     │ 16.0.7  │ cluster │ 2857203  │ 3D     │ 32   │ online    │ 0%       │ 147.9mb  │ root     │ disabled │
+│ 15  │ builder-chatbot-api                      │ default     │ 1.0.0   │ cluster │ 125679   │ 3D     │ 11   │ online    │ 0%       │ 132.1mb  │ root     │ disabled │
+│ 16  │ builder-chatbot-web                      │ default     │ 14.0.4  │ cluster │ 125852   │ 3D     │ 11   │ online    │ 2.5%     │ 114.6mb  │ root     │ disabled │
+│ 139 │ bynazz-misk-api                          │ default     │ 1.0.0   │ fork    │ 91213    │ 3D     │ 10   │ online    │ 0%       │ 58.8mb   │ root     │ disabled │
+│ 270 │ centarytech-backend                      │ default     │ 1.0.0   │ cluster │ 3166068  │ 2D     │ 76   │ online    │ 2.5%     │ 153.3mb  │ root     │ disabled │
+│ 271 │ centarytech-frontend                     │ default     │ 0.1.0   │ cluster │ 3090710  │ 2D     │ 197  │ online    │ 2.5%     │ 379.3mb  │ root     │ disabled │
+│ 48  │ chatbot-backend                          │ default     │ 1.0.0   │ fork    │ 2426053  │ 2D     │ 12   │ online    │ 2.5%     │ 398.2mb  │ root     │ disabled │
+│ 19  │ chatbot-backend-anmka-sa                 │ default     │ 1.0.0   │ fork    │ 79202    │ 3D     │ 10   │ online    │ 0%       │ 104.0mb  │ root     │ disabled │
+│ 3   │ chatbot-frontend                         │ default     │ 14.0.4  │ fork    │ 1775717  │ 3h     │ 1166 │ online    │ 0%       │ 381.8mb  │ root     │ disabled │
+│ 20  │ chatbot-frontend-anmka-sa                │ default     │ 14.0.4  │ fork    │ 79755    │ 3D     │ 13   │ online    │ 0%       │ 267.4mb  │ root     │ disabled │
+│ 102 │ children-society-admin                   │ default     │ 16.0.10 │ fork    │ 88097    │ 3D     │ 22   │ online    │ 0%       │ 168.1mb  │ root     │ disabled │
+│ 111 │ children-society-admin-iso               │ default     │ 16.0.10 │ fork    │ 88840    │ 3D     │ 10   │ online    │ 2.5%     │ 104.0mb  │ root     │ disabled │
+│ 103 │ children-society-backend                 │ default     │ 1.0.0   │ fork    │ 88170    │ 3D     │ 17   │ online    │ 0%       │ 124.6mb  │ root     │ disabled │
+│ 112 │ children-society-backend-iso             │ default     │ 1.0.0   │ fork    │ 88890    │ 3D     │ 10   │ online    │ 0%       │ 100.8mb  │ root     │ disabled │
+│ 104 │ children-society-student-portal          │ default     │ N/A     │ fork    │ 88249    │ 3D     │ 11   │ online    │ 0%       │ 58.2mb   │ root     │ disabled │
+│ 311 │ coursatac-anmka-admin                    │ default     │ 16.0.10 │ fork    │ 2887437  │ 3D     │ 11   │ online    │ 0%       │ 134.0mb  │ root     │ disabled │
+│ 310 │ coursatac-anmka-lms-backend              │ default     │ 1.0.0   │ fork    │ 2887383  │ 3D     │ 11   │ online    │ 0%       │ 88.0mb   │ root     │ disabled │
+│ 58  │ demolms10-anmka-com                      │ default     │ 0.1.0   │ cluster │ 85336    │ 3D     │ 10   │ online    │ 0%       │ 84.8mb   │ root     │ disabled │
+│ 127 │ doctoramr-anmka-backend                  │ default     │ N/A     │ fork    │ 90346    │ 3D     │ 10   │ online    │ 0%       │ 25.9mb   │ root     │ disabled │
+│ 126 │ doctoramr-anmka-com                      │ default     │ 0.39.0  │ cluster │ 90345    │ 3D     │ 10   │ online    │ 0%       │ 93.1mb   │ root     │ disabled │
+│ 306 │ dokangi                                  │ default     │ N/A     │ fork    │ 3355395  │ 4D     │ 4    │ online    │ 2.5%     │ 187.2mb  │ root     │ disabled │
+│ 87  │ drchampions-academy-anmka-com            │ default     │ 0.39.0  │ fork    │ 87457    │ 3D     │ 10   │ online    │ 0%       │ 77.2mb   │ root     │ disabled │
+│ 57  │ drchampions-academy-anmka-com-backend    │ default     │ 1.0.0   │ fork    │ 85310    │ 3D     │ 14   │ online    │ 0%       │ 93.6mb   │ root     │ disabled │
+│ 28  │ dreamacademy-lms                         │ default     │ 16.0.10 │ fork    │ 83653    │ 3D     │ 10   │ online    │ 0%       │ 40.6mb   │ root     │ disabled │
+│ 27  │ dreamacademy-lms-backend                 │ default     │ 0.39.0  │ fork    │ 83559    │ 3D     │ 10   │ online    │ 0%       │ 81.7mb   │ root     │ disabled │
+│ 210 │ drx-miskwear-api                         │ default     │ 1.0.0   │ fork    │ 3351627  │ 4D     │ 13   │ online    │ 0%       │ 64.8mb   │ root     │ disabled │
+│ 261 │ e-anmka-backend                          │ default     │ 1.0.0   │ fork    │ 3943857  │ 16m    │ 350  │ online    │ 0%       │ 149.6mb  │ root     │ disabled │
+│ 88  │ e-anmka-frontend                         │ default     │ N/A     │ fork    │ 3943903  │ 16m    │ 1909 │ online    │ 0%       │ 64.4mb   │ root     │ disabled │
+│ 79  │ easymed-anmka-admin                      │ default     │ 0.39.0  │ cluster │ 86701    │ 3D     │ 10   │ online    │ 0%       │ 93.0mb   │ root     │ disabled │
+│ 80  │ easymed-anmka-lms-backend                │ default     │ 1.0.0   │ fork    │ 86578    │ 3D     │ 10   │ online    │ 0%       │ 76.0mb   │ root     │ disabled │
+│ 81  │ easymed-anmka-student-portal             │ default     │ N/A     │ fork    │ 86708    │ 3D     │ 10   │ online    │ 0%       │ 58.2mb   │ root     │ disabled │
+│ 59  │ ecomdemo-backend                         │ default     │ 0.39.0  │ fork    │ 85431    │ 3D     │ 10   │ online    │ 0%       │ 43.0mb   │ root     │ disabled │
+│ 308 │ ecosystem.anconeus-backend               │ default     │ 0.1.0   │ fork    │ 3355414  │ 4D     │ 1    │ online    │ 0%       │ 54.4mb   │ root     │ disabled │
+│ 304 │ edaa-anmka-com                           │ default     │ 0.39.0  │ fork    │ 3355288  │ 4D     │ 5    │ online    │ 2.5%     │ 42.0mb   │ root     │ disabled │
+│ 129 │ elbedaya-exam-backend                    │ default     │ 1.0.0   │ fork    │ 90432    │ 3D     │ 28   │ online    │ 0%       │ 92.2mb   │ root     │ disabled │
+│ 140 │ elbedaya-exam-frontend                   │ default     │ 1.0.0   │ cluster │ 91345    │ 3D     │ 47   │ online    │ 0%       │ 307.1mb  │ root     │ disabled │
+│ 313 │ elevora-backend                          │ default     │ 1.0.0   │ cluster │ 3355667  │ 4D     │ 13   │ online    │ 0%       │ 154.9mb  │ root     │ disabled │
+│ 312 │ elevora-frontend                         │ default     │ 16.0.7  │ cluster │ 3355628  │ 4D     │ 165  │ online    │ 0%       │ 294.4mb  │ root     │ disabled │
+│ 125 │ elite-pharma-anmka-com                   │ default     │ 16.0.10 │ fork    │ 89939    │ 3D     │ 19   │ online    │ 0%       │ 199.7mb  │ root     │ disabled │
+│ 116 │ elite-pharma-anmka-com-backend           │ default     │ 1.0.0   │ fork    │ 956028   │ 3D     │ 0    │ online    │ 0%       │ 179.2mb  │ root     │ disabled │
+│ 214 │ elostazz                                 │ default     │ 16.2.9  │ cluster │ 3352361  │ 4D     │ 1074 │ online    │ 0%       │ 137.9mb  │ root     │ disabled │
+│ 120 │ elsherifacademy-anmka-admin              │ default     │ 0.39.0  │ cluster │ 1721160  │ 3h     │ 78   │ online    │ 0%       │ 93.0mb   │ root     │ disabled │
+│ 121 │ elsherifacademy-anmka-lms-backend        │ default     │ 1.0.0   │ fork    │ 89399    │ 3D     │ 30   │ online    │ 0%       │ 108.3mb  │ root     │ disabled │
+│ 122 │ elsherifacademy-anmka-student-portal     │ default     │ N/A     │ fork    │ 89676    │ 3D     │ 10   │ online    │ 0%       │ 58.2mb   │ root     │ disabled │
+│ 339 │ elsouq-backend                           │ default     │ 1.0.0   │ fork    │ 647207   │ 3D     │ 16   │ online    │ 0%       │ 181.0mb  │ root     │ disabled │
+│ 251 │ english-master-admin                     │ default     │ 0.39.0  │ fork    │ 3352846  │ 4D     │ 8    │ online    │ 2.5%     │ 42.4mb   │ root     │ disabled │
+│ 250 │ english-master-backend                   │ default     │ 1.0.0   │ fork    │ 3352772  │ 4D     │ 13   │ online    │ 0%       │ 78.4mb   │ root     │ disabled │
+│ 252 │ english-master-frontend                  │ default     │ 0.39.0  │ fork    │ 3352904  │ 4D     │ 12   │ online    │ 0%       │ 42.2mb   │ root     │ disabled │
+│ 6   │ exam-backend                             │ default     │ 1.0.0   │ fork    │ 124382   │ 3D     │ 14   │ online    │ 0%       │ 56.9mb   │ root     │ disabled │
+│ 7   │ exam-frontend                            │ default     │ 0.39.0  │ fork    │ 124591   │ 3D     │ 14   │ online    │ 0%       │ 41.9mb   │ root     │ disabled │
+│ 216 │ falcon-backend                           │ default     │ 1.0.0   │ fork    │ 633771   │ 3D     │ 11   │ online    │ 0%       │ 73.8mb   │ root     │ disabled │
+│ 106 │ future-api                               │ default     │ 1.0.0   │ fork    │ 88219    │ 3D     │ 11   │ online    │ 0%       │ 76.6mb   │ root     │ disabled │
+│ 42  │ future-center-admin                      │ default     │ 0.1.0   │ fork    │ 84318    │ 3D     │ 10   │ online    │ 0%       │ 147.8mb  │ root     │ disabled │
+│ 37  │ future-center-backend                    │ default     │ 1.0.0   │ fork    │ 84161    │ 3D     │ 10   │ online    │ 0%       │ 113.4mb  │ root     │ disabled │
+│ 41  │ future-center-student                    │ default     │ 0.1.0   │ fork    │ 84330    │ 3D     │ 10   │ online    │ 0%       │ 131.8mb  │ root     │ disabled │
+│ 107 │ future-landscaping                       │ default     │ 16.0.10 │ fork    │ 88373    │ 3D     │ 10   │ online    │ 0%       │ 72.9mb   │ root     │ disabled │
+│ 349 │ gtsc-admin                               │ default     │ 0.39.0  │ fork    │ 3955282  │ 2D     │ 8    │ online    │ 0%       │ 33.4mb   │ root     │ disabled │
+│ 348 │ gtsc-backend                             │ default     │ 1.0.0   │ fork    │ 3881336  │ 2D     │ 8    │ online    │ 0%       │ 94.6mb   │ root     │ disabled │
+│ 350 │ gtsc-frontend                            │ default     │ 0.39.0  │ fork    │ 2663124  │ 3D     │ 0    │ online    │ 0%       │ 34.5mb   │ root     │ disabled │
+│ 179 │ h2-pis-anmka-com                         │ default     │ 0.39.0  │ fork    │ 3350328  │ 4D     │ 31   │ online    │ 0%       │ 42.8mb   │ root     │ disabled │
+│ 45  │ hijazoasis-frontend                      │ default     │ 0.39.0  │ fork    │ 84567    │ 3D     │ 10   │ online    │ 0%       │ 42.7mb   │ root     │ disabled │
+│ 356 │ home-4slug-api                           │ default     │ 1.0.0   │ cluster │ 3451201  │ 24h    │ 0    │ online    │ 0%       │ 131.8mb  │ root     │ disabled │
+│ 358 │ home-4slug-web                           │ default     │ N/A     │ fork    │ 3457239  │ 24h    │ 0    │ online    │ 0%       │ 87.2mb   │ root     │ disabled │
+│ 136 │ home-anmka-api                           │ default     │ 1.0.0   │ fork    │ 90866    │ 3D     │ 15   │ online    │ 0%       │ 147.8mb  │ root     │ disabled │
+│ 137 │ home-anmka-web                           │ default     │ N/A     │ fork    │ 91318    │ 3D     │ 14   │ online    │ 0%       │ 64.7mb   │ root     │ disabled │
+│ 51  │ horus-anmka-com                          │ default     │ 0.39.0  │ cluster │ 84860    │ 3D     │ 95   │ online    │ 0%       │ 92.8mb   │ root     │ disabled │
+│ 52  │ horus-anmka-lms-backend                  │ default     │ 1.0.0   │ cluster │ 84911    │ 3D     │ 27   │ online    │ 0%       │ 131.5mb  │ root     │ disabled │
+│ 236 │ iagrcp-backend                           │ default     │ N/A     │ fork    │ 3352717  │ 4D     │ 3    │ online    │ 0%       │ 81.4mb   │ root     │ disabled │
+│ 237 │ iagrcp-frontend                          │ default     │ 0.1.0   │ cluster │ 3352770  │ 4D     │ 3    │ online    │ 0%       │ 122.2mb  │ root     │ disabled │
+│ 113 │ interpretation-academy-admin             │ default     │ 16.0.10 │ fork    │ 88959    │ 3D     │ 10   │ online    │ 0%       │ 173.2mb  │ root     │ disabled │
+│ 114 │ interpretation-academy-backend           │ default     │ 0.39.0  │ fork    │ 4123054  │ 94s    │ 11   │ online    │ 0%       │ 125.6mb  │ root     │ disabled │
+│ 115 │ interpretation-academy-student-portal    │ default     │ 16.0.10 │ fork    │ 89056    │ 3D     │ 10   │ online    │ 0%       │ 71.4mb   │ root     │ disabled │
+│ 289 │ islam-mohamed-anmka-backend              │ default     │ 1.0.0   │ fork    │ 3202975  │ 80m    │ 18   │ online    │ 0%       │ 119.6mb  │ root     │ disabled │
+│ 288 │ islam-mohamed-anmka-com                  │ default     │ 0.39.0  │ cluster │ 3503309  │ 54m    │ 65   │ online    │ 0%       │ 92.1mb   │ root     │ disabled │
+│ 110 │ itcacademyy-lms                          │ default     │ 0.39.0  │ fork    │ 88939    │ 3D     │ 10   │ online    │ 0%       │ 27.2mb   │ root     │ disabled │
+│ 108 │ itcacademyy-lms-backend                  │ default     │ 0.39.0  │ fork    │ 88723    │ 3D     │ 10   │ online    │ 0%       │ 26.4mb   │ root     │ disabled │
+│ 109 │ itcacademyy-student-portal               │ default     │ 0.39.0  │ fork    │ 88651    │ 3D     │ 10   │ online    │ 0%       │ 26.3mb   │ root     │ disabled │
+│ 166 │ itradepro-api                            │ default     │ 1.0.0   │ fork    │ 94183    │ 3D     │ 10   │ online    │ 0%       │ 37.3mb   │ root     │ disabled │
+│ 135 │ kainosea-misk-api                        │ default     │ 1.0.0   │ fork    │ 90717    │ 3D     │ 10   │ online    │ 0%       │ 64.8mb   │ root     │ disabled │
+│ 67  │ karelian-backend                         │ default     │ N/A     │ cluster │ 4143519  │ 0      │ 143… │ stopped   │ 0%       │ 0b       │ root     │ disabled │
+│ 66  │ karelian-frontend                        │ default     │ N/A     │ cluster │ 4143506  │ 0      │ 143… │ stopped   │ 0%       │ 0b       │ root     │ disabled │
+│ 171 │ karidin-backend                          │ default     │ 1.0.0   │ cluster │ 94395    │ 3D     │ 10   │ online    │ 0%       │ 99.1mb   │ root     │ disabled │
+│ 170 │ karidin-frontend                         │ default     │ 16.0.7  │ cluster │ 94337    │ 3D     │ 10   │ online    │ 0%       │ 147.7mb  │ root     │ disabled │
+│ 149 │ kataketo-misk-api                        │ default     │ 1.0.0   │ fork    │ 92350    │ 3D     │ 10   │ online    │ 0%       │ 61.9mb   │ root     │ disabled │
+│ 65  │ kofaa-backend                            │ default     │ 1.0.0   │ cluster │ 85844    │ 3D     │ 11   │ online    │ 0%       │ 200.2mb  │ root     │ disabled │
+│ 64  │ kofaa-frontend                           │ default     │ 16.0.7  │ cluster │ 85757    │ 3D     │ 12   │ online    │ 0%       │ 401.3mb  │ root     │ disabled │
+│ 43  │ learning-arabic-backend                  │ default     │ 1.0.0   │ fork    │ 84383    │ 3D     │ 10   │ online    │ 0%       │ 84.7mb   │ root     │ disabled │
+│ 44  │ learning-arabic-lms                      │ default     │ 16.0.10 │ fork    │ 84479    │ 3D     │ 10   │ online    │ 0%       │ 128.3mb  │ root     │ disabled │
+│ 132 │ lepetitsavant-admin                      │ default     │ 0.39.0  │ cluster │ 90641    │ 3D     │ 35   │ online    │ 0%       │ 92.6mb   │ root     │ disabled │
+│ 133 │ lepetitsavant-lms-backend                │ default     │ 1.0.0   │ cluster │ 90600    │ 3D     │ 29   │ online    │ 2.5%     │ 140.4mb  │ root     │ disabled │
+│ 134 │ lepetitsavant-student-portal             │ default     │ N/A     │ fork    │ 90772    │ 3D     │ 12   │ online    │ 0%       │ 58.2mb   │ root     │ disabled │
+│ 359 │ lmsai-backend                            │ default     │ 1.0.0   │ fork    │ 3599416  │ 23h    │ 1    │ online    │ 0%       │ 223.8mb  │ root     │ disabled │
+│ 360 │ lmsai-frontend                           │ default     │ 16.0.7  │ fork    │ 3471267  │ 24h    │ 0    │ online    │ 2.5%     │ 217.0mb  │ root     │ disabled │
+│ 17  │ lthix-chatbot-backend                    │ default     │ 1.0.0   │ fork    │ 3483289  │ 3D     │ 12   │ online    │ 0%       │ 202.6mb  │ root     │ disabled │
+│ 18  │ lthix-chatbot-frontend                   │ default     │ 14.0.4  │ fork    │ 126428   │ 3D     │ 11   │ online    │ 2.5%     │ 280.6mb  │ root     │ disabled │
+│ 96  │ luvitramedia-anmka-com                   │ default     │ 0.39.0  │ cluster │ 87963    │ 3D     │ 10   │ online    │ 0%       │ 59.3mb   │ root     │ disabled │
+│ 188 │ master-pass-anmka-admin                  │ default     │ 0.39.0  │ fork    │ 3351009  │ 4D     │ 31   │ online    │ 0%       │ 78.7mb   │ root     │ disabled │
+│ 189 │ master-pass-anmka-lms-backend            │ default     │ 1.0.0   │ fork    │ 3351017  │ 4D     │ 29   │ online    │ 0%       │ 96.0mb   │ root     │ disabled │
+│ 190 │ master-pass-anmka-student-portal         │ default     │ 0.39.0  │ fork    │ 3351185  │ 4D     │ 11   │ online    │ 2.5%     │ 78.8mb   │ root     │ disabled │
+│ 164 │ medex-backend                            │ default     │ 1.0.0   │ cluster │ 94182    │ 3D     │ 15   │ online    │ 2.5%     │ 201.8mb  │ root     │ disabled │
+│ 168 │ medex-erp                                │ default     │ 0.39.0  │ fork    │ 0        │ 0      │ 710… │ errored   │ 0%       │ 0b       │ root     │ disabled │
+│ 169 │ medex-erp-anmka                          │ default     │ N/A     │ fork    │ 94387    │ 3D     │ 10   │ online    │ 0%       │ 58.4mb   │ root     │ disabled │
+│ 50  │ medex-frontend                           │ default     │ 16.0.7  │ cluster │ 84736    │ 3D     │ 17   │ online    │ 0%       │ 424.8mb  │ root     │ disabled │
+│ 92  │ medex2-anmka-admin                       │ default     │ 16.0.10 │ fork    │ 87695    │ 3D     │ 10   │ online    │ 0%       │ 111.3mb  │ root     │ disabled │
+│ 93  │ medex2-anmka-lms-backend                 │ default     │ 1.0.0   │ cluster │ 87823    │ 3D     │ 10   │ online    │ 0%       │ 97.5mb   │ root     │ disabled │
+│ 94  │ medex2-anmka-student-portal              │ default     │ 16.0.10 │ fork    │ 87840    │ 3D     │ 10   │ online    │ 0%       │ 74.8mb   │ root     │ disabled │
+│ 290 │ medzone-anmka-admin                      │ default     │ 0.39.0  │ fork    │ 1183972  │ 3D     │ 19   │ online    │ 2.5%     │ 78.2mb   │ root     │ disabled │
+│ 291 │ medzone-anmka-lms-backend                │ default     │ 1.0.0   │ fork    │ 3354712  │ 4D     │ 21   │ online    │ 0%       │ 121.0mb  │ root     │ disabled │
+│ 292 │ medzone-anmka-student-portal             │ default     │ 0.39.0  │ fork    │ 1022773  │ 3D     │ 4    │ online    │ 0%       │ 79.8mb   │ root     │ disabled │
+│ 263 │ mezat-admin                              │ default     │ 0.39.0  │ fork    │ 3353147  │ 4D     │ 34   │ online    │ 0%       │ 43.6mb   │ root     │ disabled │
+│ 262 │ mezat-backend                            │ default     │ 1.0.0   │ fork    │ 3353004  │ 4D     │ 54   │ online    │ 0%       │ 107.1mb  │ root     │ disabled │
+│ 264 │ mezat-frontend                           │ default     │ 0.39.0  │ fork    │ 3353112  │ 4D     │ 7    │ online    │ 2.5%     │ 42.7mb   │ root     │ disabled │
+│ 353 │ micromedic-anmka-admin                   │ default     │ 0.39.0  │ fork    │ 4052274  │ 2D     │ 0    │ online    │ 0%       │ 78.1mb   │ root     │ disabled │
+│ 354 │ micromedic-anmka-lms-backend             │ default     │ 1.0.0   │ fork    │ 4074317  │ 2D     │ 1    │ online    │ 0%       │ 103.8mb  │ root     │ disabled │
+│ 355 │ micromedic-anmka-student-portal          │ default     │ 0.39.0  │ fork    │ 4052293  │ 2D     │ 0    │ online    │ 0%       │ 78.9mb   │ root     │ disabled │
+│ 63  │ midnight-landscaping                     │ default     │ N/A     │ fork    │ 85804    │ 3D     │ 10   │ online    │ 0%       │ 58.0mb   │ root     │ disabled │
+│ 229 │ mig-anmka-admin                          │ default     │ 0.39.0  │ cluster │ 2405543  │ 2h     │ 28   │ online    │ 0%       │ 91.5mb   │ root     │ disabled │
+│ 199 │ mig-anmka-lms-backend                    │ default     │ 1.0.0   │ fork    │ 1983838  │ 3h     │ 314  │ online    │ 0%       │ 125.7mb  │ root     │ disabled │
+│ 200 │ mig-anmka-student-portal                 │ default     │ N/A     │ fork    │ 3351737  │ 4D     │ 7    │ online    │ 0%       │ 58.0mb   │ root     │ disabled │
+│ 295 │ milion-backend                           │ default     │ 1.0.0   │ cluster │ 3354996  │ 4D     │ 2    │ online    │ 0%       │ 113.8mb  │ root     │ disabled │
+│ 296 │ milion-frontend                          │ default     │ 0.1.0   │ fork    │ 3355166  │ 4D     │ 5    │ online    │ 2.5%     │ 166.6mb  │ root     │ disabled │
+│ 25  │ mindfuel-backend                         │ default     │ 0.39.0  │ fork    │ 83467    │ 3D     │ 12   │ online    │ 0%       │ 70.6mb   │ root     │ disabled │
+│ 26  │ mindfuel-frontend                        │ default     │ 0.1.0   │ fork    │ 83508    │ 3D     │ 11   │ online    │ 0%       │ 120.9mb  │ root     │ disabled │
+│ 130 │ miskwear-api                             │ default     │ 1.0.0   │ fork    │ 90508    │ 3D     │ 159  │ online    │ 0%       │ 64.4mb   │ root     │ disabled │
+│ 60  │ mohamedeldaly-anmka-com                  │ default     │ 0.39.0  │ fork    │ 85536    │ 3D     │ 21   │ online    │ 0%       │ 42.8mb   │ root     │ disabled │
+│ 117 │ monalegenady-anmka-admin                 │ default     │ 0.39.0  │ cluster │ 89273    │ 3D     │ 22   │ online    │ 0%       │ 93.2mb   │ root     │ disabled │
+│ 118 │ monalegenady-anmka-lms-backend           │ default     │ 0.39.0  │ fork    │ 89197    │ 3D     │ 136… │ online    │ 0%       │ 77.8mb   │ root     │ disabled │
+│ 119 │ monalegenady-anmka-student-portal        │ default     │ 0.39.0  │ fork    │ 89326    │ 3D     │ 11   │ online    │ 0%       │ 77.4mb   │ root     │ disabled │
+│ 147 │ motioncampplus-anmka-admin               │ default     │ 0.39.0  │ cluster │ 92294    │ 3D     │ 10   │ online    │ 0%       │ 93.0mb   │ root     │ disabled │
+│ 146 │ motioncampplus-anmka-lms-backend         │ default     │ 1.0.0   │ fork    │ 91738    │ 3D     │ 10   │ online    │ 0%       │ 87.7mb   │ root     │ disabled │
+│ 148 │ motioncampplus-anmka-student-portal      │ default     │ N/A     │ fork    │ 92145    │ 3D     │ 10   │ online    │ 0%       │ 58.4mb   │ root     │ disabled │
+│ 280 │ nawaabigh-anmka-admin                    │ default     │ 0.39.0  │ cluster │ 3353450  │ 4D     │ 5    │ online    │ 0%       │ 93.3mb   │ root     │ disabled │
+│ 281 │ nawaabigh-anmka-lms-backend              │ default     │ 1.0.0   │ cluster │ 3353416  │ 4D     │ 6    │ online    │ 0%       │ 123.9mb  │ root     │ disabled │
+│ 282 │ nawaabigh-anmka-student-portal           │ default     │ N/A     │ fork    │ 3353606  │ 4D     │ 3    │ online    │ 0%       │ 58.6mb   │ root     │ disabled │
+│ 9   │ ncadre-admin                             │ default     │ N/A     │ fork    │ 124755   │ 3D     │ 13   │ online    │ 0%       │ 58.8mb   │ root     │ disabled │
+│ 8   │ ncadre-api                               │ default     │ N/A     │ fork    │ 124647   │ 3D     │ 16   │ online    │ 0%       │ 87.5mb   │ root     │ disabled │
+│ 361 │ nova-backend                             │ default     │ 1.0.0   │ fork    │ 2399315  │ 2h     │ 1    │ online    │ 0%       │ 149.8mb  │ root     │ disabled │
+│ 213 │ nova-frontend                            │ default     │ 14.0.4  │ fork    │ 2617690  │ 2h     │ 139  │ online    │ 0%       │ 110.2mb  │ root     │ disabled │
+│ 175 │ ophthalearnhub-anmka-admin               │ default     │ 0.39.0  │ cluster │ 3350173  │ 4D     │ 9    │ online    │ 0%       │ 94.1mb   │ root     │ disabled │
+│ 177 │ ophthalearnhub-anmka-lms-backend         │ default     │ 1.0.0   │ fork    │ 3350192  │ 4D     │ 9    │ online    │ 0%       │ 75.9mb   │ root     │ disabled │
+│ 176 │ ophthalearnhub-anmka-student-portal      │ default     │ 16.0.10 │ fork    │ 3350116  │ 4D     │ 9    │ online    │ 0%       │ 74.9mb   │ root     │ disabled │
+│ 78  │ pds-anmka-backend                        │ default     │ 1.0.0   │ cluster │ 86488    │ 3D     │ 10   │ online    │ 0%       │ 96.5mb   │ root     │ disabled │
+│ 77  │ pds-anmka-frontend                       │ default     │ 16.0.7  │ cluster │ 86504    │ 3D     │ 10   │ online    │ 0%       │ 157.9mb  │ root     │ disabled │
+│ 124 │ physics-code-anmka-backend               │ default     │ 1.0.0   │ cluster │ 89894    │ 3D     │ 10   │ online    │ 0%       │ 92.8mb   │ root     │ disabled │
+│ 123 │ physics-code-anmka-frontend              │ default     │ 16.0.7  │ cluster │ 89643    │ 3D     │ 10   │ online    │ 0%       │ 106.7mb  │ root     │ disabled │
+│ 157 │ platform-books-anmka-admin               │ default     │ 0.39.0  │ cluster │ 93167    │ 3D     │ 23   │ online    │ 0%       │ 92.9mb   │ root     │ disabled │
+│ 159 │ platform-books-anmka-lms-backend         │ default     │ 1.0.0   │ fork    │ 93727    │ 3D     │ 27   │ online    │ 0%       │ 96.9mb   │ root     │ disabled │
+│ 158 │ platform-books-anmka-student-portal      │ default     │ N/A     │ fork    │ 93633    │ 3D     │ 19   │ online    │ 0%       │ 58.1mb   │ root     │ disabled │
+│ 71  │ rakny-anmka-com                          │ default     │ 0.39.0  │ cluster │ 86250    │ 3D     │ 10   │ online    │ 0%       │ 58.9mb   │ root     │ disabled │
+│ 23  │ realstate-chatbot-backend                │ default     │ 1.0.0   │ fork    │ 81481    │ 3D     │ 10   │ online    │ 0%       │ 102.5mb  │ root     │ disabled │
+│ 24  │ realstate-chatbot-frontend               │ default     │ 14.0.4  │ fork    │ 81934    │ 3D     │ 10   │ online    │ 2.5%     │ 68.1mb   │ root     │ disabled │
+│ 34  │ rigtech-admin                            │ default     │ 0.39.0  │ fork    │ 84002    │ 3D     │ 10   │ online    │ 0%       │ 42.9mb   │ root     │ disabled │
+│ 35  │ rigtech-backend                          │ default     │ 1.0.0   │ fork    │ 695950   │ 3D     │ 14   │ online    │ 0%       │ 86.4mb   │ root     │ disabled │
+│ 33  │ rigtech-frontend                         │ default     │ 0.39.0  │ fork    │ 83903    │ 3D     │ 10   │ online    │ 0%       │ 42.2mb   │ root     │ disabled │
+│ 152 │ rober-admin                              │ default     │ 0.39.0  │ cluster │ 806868   │ 3D     │ 26   │ online    │ 0%       │ 58.9mb   │ root     │ disabled │
+│ 150 │ rober-backend                            │ default     │ 1.0.0   │ cluster │ 92501    │ 3D     │ 26   │ online    │ 0%       │ 128.0mb  │ root     │ disabled │
+│ 151 │ rober-frontend                           │ default     │ 0.39.0  │ cluster │ 314479   │ 3D     │ 14   │ online    │ 0%       │ 58.4mb   │ root     │ disabled │
+│ 178 │ row-needed                               │ default     │ N/A     │ fork    │ 3350394  │ 4D     │ 12   │ online    │ 0%       │ 33.8mb   │ root     │ disabled │
+│ 97  │ saddamelsentihi-anmka-frontend           │ default     │ N/A     │ cluster │ 4143540  │ 0s     │ 159… │ online    │ 0%       │ 0b       │ root     │ disabled │
+│ 70  │ salehfarid-anmka-com-backend             │ default     │ 1.0.0   │ cluster │ 86153    │ 3D     │ 10   │ online    │ 0%       │ 91.1mb   │ root     │ disabled │
+│ 69  │ salehfarid-anmka-com-frontend            │ default     │ 16.0.7  │ cluster │ 86067    │ 3D     │ 10   │ online    │ 0%       │ 107.8mb  │ root     │ disabled │
+│ 283 │ sales-anmka-whatsapp-bot                 │ default     │ 1.0.0   │ fork    │ 3353531  │ 4D     │ 5    │ online    │ 0%       │ 70.9mb   │ root     │ disabled │
+│ 53  │ samurai-city-anmka-admin                 │ default     │ 0.39.0  │ cluster │ 85020    │ 3D     │ 10   │ online    │ 0%       │ 93.6mb   │ root     │ disabled │
+│ 54  │ samurai-city-anmka-lms-backend           │ default     │ 1.0.0   │ cluster │ 85084    │ 3D     │ 10   │ online    │ 0%       │ 98.0mb   │ root     │ disabled │
+│ 61  │ scholigo-backend                         │ default     │ 1.0.0   │ cluster │ 85579    │ 3D     │ 10   │ online    │ 0%       │ 119.6mb  │ root     │ disabled │
+│ 49  │ scholigo-frontend                        │ default     │ 0.1.0   │ fork    │ 84689    │ 3D     │ 11   │ online    │ 0%       │ 158.0mb  │ root     │ disabled │
+│ 76  │ seruma-ai-video-backend                  │ default     │ 1.0.0   │ fork    │ 86462    │ 3D     │ 10   │ online    │ 0%       │ 84.3mb   │ root     │ disabled │
+│ 75  │ seruma-anmka-com-frontend                │ default     │ 0.39.0  │ fork    │ 86438    │ 3D     │ 10   │ online    │ 0%       │ 43.9mb   │ root     │ disabled │
+│ 13  │ smarthome-backend                        │ default     │ 1.0.0   │ fork    │ 125317   │ 3D     │ 11   │ online    │ 0%       │ 51.2mb   │ root     │ disabled │
+│ 14  │ smarthome-frontend                       │ default     │ N/A     │ fork    │ 125582   │ 3D     │ 11   │ online    │ 0%       │ 57.1mb   │ root     │ disabled │
+│ 278 │ spark-academy-api                        │ default     │ 1.0.0   │ fork    │ 904028   │ 3D     │ 33   │ online    │ 2.5%     │ 69.5mb   │ root     │ disabled │
+│ 83  │ sphinx-one-anmka-com-backend             │ default     │ 1.0.0   │ fork    │ 86981    │ 3D     │ 23   │ online    │ 0%       │ 77.2mb   │ root     │ disabled │
+│ 84  │ sphinx-one-anmka-com-frontend            │ default     │ 0.39.0  │ fork    │ 4108398  │ 2D     │ 41   │ online    │ 0%       │ 36.6mb   │ root     │ disabled │
+│ 95  │ stp-anmka-admin                          │ default     │ 16.0.10 │ fork    │ 87908    │ 3D     │ 20   │ online    │ 0%       │ 107.7mb  │ root     │ disabled │
+│ 1   │ stp-anmka-lms-backend                    │ default     │ 0.39.0  │ fork    │ 123984   │ 3D     │ 28   │ online    │ 0%       │ 92.3mb   │ root     │ disabled │
+│ 2   │ stp-anmka-student-portal                 │ default     │ N/A     │ fork    │ 124075   │ 3D     │ 17   │ online    │ 0%       │ 58.7mb   │ root     │ disabled │
+│ 232 │ strategic-backend                        │ default     │ 1.0.0   │ cluster │ 3352527  │ 4D     │ 9    │ online    │ 0%       │ 96.9mb   │ root     │ disabled │
+│ 233 │ strategic-frontend                       │ default     │ 16.0.7  │ cluster │ 3352674  │ 4D     │ 1694 │ online    │ 0%       │ 118.5mb  │ root     │ disabled │
+│ 39  │ studify-anmka-com-admin                  │ default     │ 16.0.10 │ fork    │ 84251    │ 3D     │ 18   │ online    │ 0%       │ 134.3mb  │ root     │ disabled │
+│ 38  │ studify-anmka-com-backend                │ default     │ 1.0.0   │ cluster │ 84141    │ 3D     │ 21   │ online    │ 0%       │ 103.9mb  │ root     │ disabled │
+│ 40  │ studify-anmka-com-student                │ default     │ 16.0.10 │ fork    │ 84263    │ 3D     │ 14   │ online    │ 0%       │ 114.1mb  │ root     │ disabled │
+│ 167 │ styleup                                  │ default     │ N/A     │ fork    │ 4140685  │ 14s    │ 97   │ online    │ 0%       │ 48.9mb   │ root     │ disabled │
+│ 85  │ styleup-ai-video-backend                 │ default     │ 1.0.0   │ fork    │ 87191    │ 3D     │ 10   │ online    │ 0%       │ 98.4mb   │ root     │ disabled │
+│ 91  │ styleup-anmka-com-frontend               │ default     │ 0.39.0  │ fork    │ 87638    │ 3D     │ 10   │ online    │ 0%       │ 25.9mb   │ root     │ disabled │
+│ 347 │ synoza                                   │ default     │ 1.0.0   │ fork    │ 4143534  │ 0s     │ 7    │ online    │ 0%       │ 45.6mb   │ root     │ disabled │
+│ 153 │ tbl-backend                              │ default     │ 1.0.0   │ fork    │ 92795    │ 3D     │ 4024 │ online    │ 0%       │ 374.6mb  │ root     │ disabled │
+│ 143 │ thebrand-anmka-admin                     │ default     │ 0.39.0  │ cluster │ 91606    │ 3D     │ 10   │ online    │ 0%       │ 93.1mb   │ root     │ disabled │
+│ 144 │ thebrand-anmka-lms-backend               │ default     │ 1.0.0   │ fork    │ 91576    │ 3D     │ 11   │ online    │ 0%       │ 91.3mb   │ root     │ disabled │
+│ 145 │ thebrand-anmka-student-portal            │ default     │ N/A     │ fork    │ 91708    │ 3D     │ 10   │ online    │ 0%       │ 58.0mb   │ root     │ disabled │
+│ 0   │ vip-erp-backend                          │ default     │ 1.0.0   │ fork    │ 123996   │ 3D     │ 138  │ online    │ 0%       │ 50.9mb   │ root     │ disabled │
+│ 30  │ vip-erp-backend-dev                      │ default     │ 1.0.0   │ fork    │ 83776    │ 3D     │ 125  │ online    │ 0%       │ 51.0mb   │ root     │ disabled │
+│ 29  │ vip-erp-frontend                         │ default     │ 16.1.6  │ fork    │ 83714    │ 3D     │ 504  │ online    │ 0%       │ 124.1mb  │ root     │ disabled │
+│ 31  │ vip-erp-frontend-dev                     │ default     │ 16.1.6  │ fork    │ 83800    │ 3D     │ 446  │ online    │ 0%       │ 165.8mb  │ root     │ disabled │
+│ 172 │ vipacademy-anmka-admin                   │ default     │ 16.0.10 │ fork    │ 94483    │ 3D     │ 34   │ online    │ 0%       │ 114.0mb  │ root     │ disabled │
+│ 174 │ vipacademy-anmka-lms-backend             │ default     │ 1.0.0   │ fork    │ 3350067  │ 4D     │ 30   │ online    │ 0%       │ 92.1mb   │ root     │ disabled │
+│ 173 │ vipacademy-anmka-student-portal          │ default     │ 16.0.10 │ fork    │ 3349970  │ 4D     │ 27   │ online    │ 0%       │ 83.1mb   │ root     │ disabled │
+│ 293 │ wael-ali-api                             │ default     │ 1.0.0   │ fork    │ 4065469  │ 2D     │ 32   │ online    │ 0%       │ 40.3mb   │ root     │ disabled │
+│ 259 │ wasla-anmka-com-backend                  │ default     │ 1.0.0   │ fork    │ 3352910  │ 4D     │ 30   │ online    │ 0%       │ 79.5mb   │ root     │ disabled │
+│ 317 │ wasla-anmka-com-frontend                 │ default     │ 0.39.0  │ fork    │ 4123935  │ 90s    │ 27   │ online    │ 0%       │ 52.1mb   │ root     │ disabled │
+└─────┴──────────────────────────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+{"pong":true,"latencyMs":0,"serverTime":"2026-07-19T13:18:58.381Z"}
+BUNDLE_HAS: Start for Free
+BUNDLE_HAS: EXAM NIGHT PLAN
+
+EXIT=0

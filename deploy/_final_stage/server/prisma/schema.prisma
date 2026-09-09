@@ -1,0 +1,558 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum SubscriptionPlan {
+  FREE
+  PACKAGE_50
+  PACKAGE_150
+  PACKAGE_300
+  INSTITUTION
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+}
+
+enum PaymentProductType {
+  SUBSCRIPTION_PLAN
+  QBANK_MODULE
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum MessageRole {
+  STUDENT
+  PATIENT
+  EXAMINER
+  SYSTEM
+}
+
+enum Language {
+  AR
+  EN
+  AUTO
+}
+
+enum KnowledgeType {
+  QUESTION
+  TOPIC
+  GUIDELINE
+  TEACHING
+}
+
+enum AiKnowledgeRole {
+  PATIENT
+  EXAMINER
+}
+
+enum AiKnowledgeKind {
+  PROMPT
+  FILE
+  MEDIA
+}
+
+model KnowledgeCategory {
+  id          String              @id @default(cuid())
+  parentId    String?
+  nameEn      String
+  nameAr      String
+  description String?             @db.Text
+  sortOrder   Int                 @default(0)
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  parent      KnowledgeCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    KnowledgeCategory[] @relation("CategoryTree")
+  items       KnowledgeItem[]
+  aiKnowledge AiKnowledgeEntry[]
+  cases       Case[]
+}
+
+/// Admin-managed AI knowledge for patient/examiner behaviour (prompt, file, or media).
+model AiKnowledgeEntry {
+  id           String          @id @default(cuid())
+  role         AiKnowledgeRole
+  kind         AiKnowledgeKind
+  titleEn      String
+  titleAr      String          @default("")
+  content      String          @default("") @db.LongText
+  fileUrl      String?
+  fileName     String?
+  mimeType     String?
+  categoryId   String?
+  caseId       String?
+  isActive     Boolean         @default(true)
+  sortOrder    Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  category     KnowledgeCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  case         Case?              @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@index([role, isActive])
+  @@index([categoryId, role])
+  @@index([caseId, role])
+}
+
+model KnowledgeItem {
+  id         String            @id @default(cuid())
+  categoryId String
+  titleEn    String
+  titleAr    String
+  content    String            @db.Text
+  type       KnowledgeType     @default(QUESTION)
+  isActive   Boolean           @default(true)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  category   KnowledgeCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  university    String?
+  universityId  String?
+  studentId     String?           @unique
+  avatarUrl     String?
+  role          Role           @default(STUDENT)
+  isActive      Boolean        @default(true)
+  emailVerified Boolean        @default(false)
+  preferredLang String         @default("en")
+  totalXp       Float          @default(0)
+  academicYear  String?
+  lastSeenAt    DateTime?
+  otpCode       String?
+  otpExpires    DateTime?
+  resetToken    String?
+  resetExpires  DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sessions      Session[]
+  subscriptions Subscription[]
+  caseAccess    CaseAccess[]
+  auditLogs     AuditLog[]
+  paymentOrders      PaymentOrder[]
+  qbankModuleAccess  QbankModuleEntitlement[]
+  aiUsageLogs        AiUsageLog[]
+  partnerUniversity  PartnerUniversity? @relation(fields: [universityId], references: [id], onDelete: SetNull)
+
+  @@index([universityId])
+}
+
+model Specialty {
+  id          String   @id @default(cuid())
+  nameEn      String
+  nameAr      String
+  description String?  @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cases       Case[]
+}
+
+model DifficultyLevel {
+  id        String   @id @default(cuid())
+  nameEn    String
+  nameAr    String
+  level     Int      @unique
+  color     String   @default("#3B82F6")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cases     Case[]
+}
+
+model Case {
+  id                  String          @id @default(cuid())
+  titleEn             String
+  titleAr             String
+  specialtyId         String
+  difficultyId        String
+  categoryId          String?
+  patientName         String
+  patientAge          Int
+  patientGender       String
+  patientNationality  String
+  chiefComplaint      String            @db.Text
+  medicalHistory      String            @db.Text
+  medicationHistory   String            @db.Text
+  surgicalHistory     String            @db.Text
+  familyHistory       String            @db.Text
+  socialHistory       String            @db.Text
+  physicalExam        String            @db.Text
+  labResults          String            @db.LongText
+  examImages          String            @default("[]") @db.LongText
+  finalDiagnosis      String            @db.Text
+  teachingPoints      String            @db.Text
+  evaluationRubric    String            @db.Text
+  vitalSigns          String            @db.Text
+  examinerQuestions   String            @default("[]") @db.LongText
+  stationConfig       String            @default("{}") @db.Text
+  patientPersonality  String?           @db.Text
+  scenarioPrompt      String            @db.Text
+  isPublished         Boolean           @default(true)
+  isFreeTier          Boolean           @default(false)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  specialty           Specialty       @relation(fields: [specialtyId], references: [id])
+  difficulty          DifficultyLevel @relation(fields: [difficultyId], references: [id])
+  category            KnowledgeCategory? @relation(fields: [categoryId], references: [id])
+  sessions            Session[]
+  caseAccess          CaseAccess[]
+  aiKnowledge         AiKnowledgeEntry[]
+  universityOverrides CaseUniversityOverride[]
+}
+
+model CaseUniversityOverride {
+  id            String            @id @default(cuid())
+  caseId        String
+  universityId  String
+  stationConfig String            @default("{}") @db.Text
+  isActive      Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  case          Case              @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  university    PartnerUniversity @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@unique([caseId, universityId])
+  @@index([universityId])
+}
+
+model Session {
+  id                    String        @id @default(cuid())
+  userId                String
+  caseId                String
+  status                SessionStatus @default(IN_PROGRESS)
+  currentStage          String        @default("history")
+  activeManeuver        String?
+  completedManeuvers    String        @default("[]") @db.Text
+  resolvedStationConfig String        @default("{}") @db.Text
+  language              Language      @default(AUTO)
+  startedAt          DateTime      @default(now())
+  completedAt        DateTime?
+  durationSeconds    Int           @default(0)
+  aiPromptTokens     Int           @default(0)
+  aiCompletionTokens Int           @default(0)
+  aiTotalTokens      Int           @default(0)
+  user               User          @relation(fields: [userId], references: [id])
+  case               Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  messages           Message[]
+  result             Result?
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  sessionId String
+  role      MessageRole
+  content   String      @db.Text
+  stage     String      @default("history")
+  createdAt DateTime    @default(now())
+  session   Session     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Result {
+  id                  String   @id @default(cuid())
+  sessionId           String   @unique
+  totalScore          Float
+  communicationScore  Float
+  historyTakingScore  Float
+  clinicalReasonScore Float
+  organizationScore   Float
+  closingScore        Float
+  strengths           String   @db.Text
+  weaknesses          String   @db.Text
+  missedQuestions     String   @db.Text
+  clinicalErrors      String   @db.Text
+  recommendations     String   @db.Text
+  idealApproach       String   @db.Text
+  fullReport          String   @db.LongText
+  xpBreakdown         String   @default("[]") @db.Text
+  xpCalculated        Float    @default(0)
+  xpAwarded           Float    @default(0)
+  xpIsRepeat          Boolean  @default(false)
+  xpApplied           Boolean  @default(false)
+  xpRankSnapshot      String   @default("{}") @db.Text
+  createdAt           DateTime @default(now())
+  session             Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id         String             @id @default(cuid())
+  userId     String
+  plan       SubscriptionPlan   @default(FREE)
+  status     SubscriptionStatus @default(ACTIVE)
+  casesQuota Int                @default(0)
+  priceEgp   Int?
+  startDate  DateTime           @default(now())
+  endDate    DateTime?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  user       User               @relation(fields: [userId], references: [id])
+}
+
+model CaseAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  caseId    String
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  case      Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, caseId])
+}
+
+model PaymentOrder {
+  id              String              @id @default(cuid())
+  userId          String
+  productType     PaymentProductType  @default(SUBSCRIPTION_PLAN)
+  plan            SubscriptionPlan?
+  qbankTermId     String?
+  qbankModuleId   String?
+  amountEgp       Int
+  status          PaymentStatus       @default(PENDING)
+  provider        String              @default("paymob")
+  merchantOrderId String              @unique
+  providerOrderId String?
+  transactionId   String?
+  paidAt          DateTime?
+  failureReason   String?             @db.Text
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
+
+model QbankModuleEntitlement {
+  id        String   @id @default(cuid())
+  userId    String
+  termId    String
+  moduleId  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, termId, moduleId])
+  @@index([userId, termId])
+}
+
+model QbankTerm {
+  id        String        @id
+  titleEn   String
+  titleAr   String
+  sortOrder Int           @default(0)
+  isActive  Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  modules   QbankModule[]
+}
+
+model QbankModule {
+  id          String          @id
+  termId      String
+  nameEn      String
+  nameAr      String
+  specialtyEn String
+  specialtyAr String
+  subjects    String          @default("[]") @db.Text
+  free        Boolean         @default(false)
+  bundled     Boolean         @default(false)
+  priceEgp    Int             @default(50)
+  sortOrder   Int             @default(0)
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  term         QbankTerm               @relation(fields: [termId], references: [id], onDelete: Cascade)
+  questions    QbankQuestion[]
+  universities QbankModuleUniversity[]
+
+  @@index([termId, isActive])
+}
+
+model QbankModuleUniversity {
+  id           String            @id @default(cuid())
+  moduleId     String
+  universityId String
+  module       QbankModule       @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  university   PartnerUniversity @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, universityId])
+  @@index([universityId])
+}
+
+model QbankChapter {
+  id        String          @id @default(cuid())
+  nameEn    String          @unique
+  nameAr    String?
+  sortOrder Int             @default(0)
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  questions QbankQuestion[]
+}
+
+model QbankReference {
+  id        String          @id @default(cuid())
+  nameEn    String          @unique
+  nameAr    String?
+  sortOrder Int             @default(0)
+  isActive  Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  questions QbankQuestion[]
+}
+
+model QbankQuestion {
+  id           String         @id @default(cuid())
+  moduleId     String
+  chapterId    String
+  referenceId  String
+  text         String         @db.Text
+  options      String         @db.Text
+  correctIndex Int
+  explanation  String?        @db.Text
+  subjectTags  String?        @db.Text
+  isPublished  Boolean        @default(true)
+  sortOrder    Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  module       QbankModule    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  chapter      QbankChapter   @relation(fields: [chapterId], references: [id])
+  reference    QbankReference @relation(fields: [referenceId], references: [id])
+
+  @@index([moduleId, isPublished])
+  @@index([chapterId, referenceId])
+}
+
+model AISettings {
+  id                     String   @id @default(cuid())
+  provider               String   @default("mock")
+  patientModel           String   @default("gpt-realtime-mini")
+  examinerModel          String   @default("gpt-realtime-mini")
+  temperature            Float    @default(0.7)
+  maxTokens              Int      @default(1024)
+  systemPromptAr         String?  @db.Text
+  systemPromptEn         String?  @db.Text
+  patientSystemPromptAr  String?  @db.Text
+  patientSystemPromptEn  String?  @db.Text
+  examinerSystemPromptAr String?  @db.Text
+  examinerSystemPromptEn String?  @db.Text
+  maxContextMessages     Int      @default(12)
+  updatedAt              DateTime @updatedAt
+}
+
+model AiUsageLog {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+  userId           String?
+  sessionId        String?
+  feature          String
+  model            String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  estimatedCostUsd Float    @default(0)
+  success          Boolean  @default(true)
+  error            String?  @db.Text
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([feature, createdAt])
+  @@index([userId, createdAt])
+}
+
+model PlanConfig {
+  id             String           @id @default(cuid())
+  plan           SubscriptionPlan @unique
+  nameEn         String
+  nameAr         String
+  priceEgp       Float
+  casesQuota     Int
+  durationMonths Int
+  isActive       Boolean          @default(true)
+  sortOrder      Int              @default(0)
+  updatedAt      DateTime         @updatedAt
+}
+
+model AiCostRate {
+  id               String   @id @default(cuid())
+  model            String   @unique
+  inputPer1MUsd    Float
+  outputPer1MUsd   Float
+  updatedAt        DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String?
+  entityId  String?
+  details   String?  @db.Text
+  ipAddress String?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  valueEn   String   @db.Text
+  valueAr   String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model PartnerUniversity {
+  id           String                  @id @default(cuid())
+  nameEn       String
+  nameAr       String
+  logoUrl      String?
+  website      String?
+  sortOrder    Int                     @default(0)
+  isActive     Boolean                 @default(true)
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+  users                   User[]
+  qbankModules              QbankModuleUniversity[]
+  caseUniversityOverrides   CaseUniversityOverride[]
+}
+
+model SiteSettings {
+  id              String   @id @default("default")
+  footerTaglineEn String   @default("AI-Powered OSCE Medical Training Platform")
+  footerTaglineAr String   @default("منصة التدريب الطبي بالذكاء الاصطناعي - OSCE")
+  contactPhone    String   @default("01024828652")
+  contactEmail    String?
+  ctaTitleEn      String   @default("Ready to practice?")
+  ctaTitleAr      String   @default("جاهز للتدريب؟")
+  ctaSubtitleEn   String   @default("Join Synoza and start your OSCE training today.")
+  ctaSubtitleAr   String   @default("انضم إلى Synoza وابدأ تدريب OSCE اليوم.")
+  updatedAt       DateTime @updatedAt
+}

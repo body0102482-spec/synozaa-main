@@ -1,0 +1,12 @@
+{
+  "_comment": "مثال body لـ PUT /api/admin/cases/:caseId/university-overrides/:universityId — أو من UI: University OSCE flow overrides",
+  "stationConfig": {
+    "enabledManeuvers": ["inspection", "palpation"],
+    "enableHistoryExaminer": false,
+    "enableInvestigations": false,
+    "maneuverOpeningMessages": {
+      "inspection": "For Cairo University OSCE format: describe only inspection findings in 2 minutes. Focus on precordium and JVP.",
+      "palpation": "Palpation only — apex and thrills. No need to mention auscultation findings yet."
+    }
+  }
+}

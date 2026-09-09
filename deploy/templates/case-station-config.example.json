@@ -1,0 +1,12 @@
+{
+  "_comment": "ده شكل stationConfig اللي بيتخزن جوه الحالة. في الأدمن بتملاه من الفورم — مش لازم تكتبه يدوي إلا لو seed/script.",
+  "enabledManeuvers": ["inspection", "palpation", "auscultation"],
+  "enableHistoryExaminer": true,
+  "enableInvestigations": true,
+  "stageOrder": ["history", "examination", "investigations", "diagnosis"],
+  "maneuverOpeningMessages": {
+    "inspection": "I am evaluating your clinical Inspection. Look at the patient and images carefully. Describe what you see in the precordium, neck veins, and any signs of heart failure.",
+    "palpation": "Now palpate systematically. Describe the apex beat, thrills, and heaves. Tell me what you would expect in aortic stenosis.",
+    "auscultation": "Auscultate in all valve areas with the patient sitting forward and in left lateral position. Characterize each murmur: timing, site, radiation, and effect of maneuvers."
+  }
+}

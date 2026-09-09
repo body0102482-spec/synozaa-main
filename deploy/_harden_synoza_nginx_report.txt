@@ -1,0 +1,58 @@
+=== type ===
+-rw-r----- 1 root adminanmkavps 2102 Jul 19 14:39 /etc/nginx/conf.d/domains/synoza.anmka.com.ssl.conf
+-rw-r----- 1 root adminanmkavps 2102 Jul 19 14:39 /home/adminanmkavps/conf/web/synoza.anmka.com/nginx.ssl.conf
+=== verify ===
+HTTP/2 200 
+server: nginx
+date: Sun, 19 Jul 2026 12:41:22 GMT
+content-type: text/html; charset=UTF-8
+content-length: 923
+content-security-policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: cross-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+<title>Synoza | OSCE Training Platform</title>
+
+ERR:
+nginx: [warn] duplicate MIME type "text/html" in /home/adminanmkavps/conf/web/lmsai.anmka.com/nginx.conf_perf:16
+nginx: [warn] duplicate MIME type "text/html" in /home/adminanmkavps/conf/web/lmsai.anmka.com/nginx.ssl.conf_perf:16
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/anmka.sa/ssl/anmka.sa.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/offer.anmka.com/ssl/offer.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/scholigo.anmka.com/ssl/scholigo.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/vip-erp.anmka.com/ssl/vip-erp.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/demolms10.anmka.com/ssl/demolms10.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/dreem.anmka.com/ssl/dreem.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/masar-academy.anmka.com/ssl/masar-academy.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/medex-erp.anmka.com/ssl/medex-erp.anmka.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/pink-eg.com/ssl/pink-eg.com.pem"
+nginx: [warn] "ssl_stapling" ignored, no OCSP responder URL in the certificate "/home/adminanmkavps/conf/web/synoza.anmka.com/ssl/synoza.anmka.com.pem"
+nginx: [warn] conflicting server name "milion.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "anconeus.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "*.centarytech.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "*.centarytech.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "milion.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "offer.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "sales.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "scholigo.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "vip-erp.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "*.e.anmka.com" on 77.237.232.181:80, ignored
+nginx: [warn] conflicting server name "anconeus.anmka.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "anmka.sa" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "www.anmka.sa" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "*.centarytech.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "*.centarytech.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "milion.anmka.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "offer.anmka.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "scholigo.anmka.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "vip-erp.anmka.com" on 77.237.232.181:443, ignored
+nginx: [warn] conflicting server name "*.e.anmka.com" on 77.237.232.181:443, ignored
+nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+nginx: configuration file /etc/nginx/nginx.conf test is successful
+
+EXIT=0

@@ -1,0 +1,45 @@
+=== local dist markers ===
+assets/index-b4X6vlso.js
+/home/adminanmkavps/synoza.anmka.com/client/dist/assets/index-b4X6vlso.js
+has Start for Free true
+has EXAM NIGHT true
+has PURCHASE BASIC false
+has Get Basic Plan true
+
+=== nginx domains mentioning synoza/med ===
+/etc/nginx/conf.d/domains/ahmed-sherif.anmka.com.conf
+/etc/nginx/conf.d/domains/ahmed-sherif.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/ahmed-zeyada.anmka.com.conf
+/etc/nginx/conf.d/domains/ahmed-zeyada.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/ahmedamin.anmka.com.conf
+/etc/nginx/conf.d/domains/ahmedamin.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/easymed.anmka.com.conf
+/etc/nginx/conf.d/domains/easymed.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/islam-mohamed.anmka.com.conf
+/etc/nginx/conf.d/domains/islam-mohamed.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/luvitramedia.anmka.com.conf
+/etc/nginx/conf.d/domains/luvitramedia.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/medex-erp.anmka.com.conf
+/etc/nginx/conf.d/domains/medex-erp.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/medex.anmka.com.conf
+/etc/nginx/conf.d/domains/medex.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/medex2.anmka.com.conf
+/etc/nginx/conf.d/domains/medex2.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/medsynoza.com.conf
+/etc/nginx/conf.d/domains/medsynoza.com.conf
+/etc/nginx/conf.d/domains/medsynoza.com.ssl.conf
+/etc/nginx/conf.d/domains/medsynoza.com.ssl.conf
+/etc/nginx/conf.d/domains/medzone.anmka.com.conf
+/etc/nginx/conf.d/domains/medzone.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/micromedic.anmka.com.conf
+/etc/nginx/conf.d/domains/micromedic.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/mohamedeldaly.anmka.com.conf
+/etc/nginx/conf.d/domains/mohamedeldaly.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/mohamedsalah.anmka.com.conf
+/etc/nginx/conf.d/domains/mohamedsalah.anmka.com.ssl.conf
+/etc/nginx/conf.d/domains/synoza.anmka.com.conf
+/etc/nginx/conf.d/domains/synoza.anmka.com.ssl.conf
+
+ERR:
+bash: -c: line 11: syntax error near unexpected token `2'
+bash: -c: line 11: `for f in /etc/nginx/conf.d/domains/*synoza* /etc/nginx/conf.d/domains/medsynoza* /etc/nginx/conf.d/domains/med.synoza* /etc/nginx/conf.d/*.synoza* 2>/dev/null; do'

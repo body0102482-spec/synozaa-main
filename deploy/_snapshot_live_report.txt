@@ -1,0 +1,67 @@
+Dumping live adminanmkavps_synoza -> /root/synoza-backups/synoza-BEFORE-any-restore-20260715-212203.sql.gz
+-rw-r--r-- 1 root root 218K Jul 15 21:22 /root/synoza-backups/synoza-BEFORE-any-restore-20260715-212203.sql.gz
+==== recent files in /root/synoza-backups ====
+total 876K
+-rw-r--r--  1 root root 213K Jul 14 09:27 synoza-20260714-072722.sql.gz
+-rw-r--r--  1 root root 213K Jul 14 09:46 synoza-predeploy-20260714-074619.sql.gz
+-rw-r--r--  1 root root 213K Jul 14 10:05 synoza-predeploy-20260714-080504.sql.gz
+drwx------ 48 root root 4.0K Jul 15 20:24 ..
+drwxr-xr-x  2 root root 4.0K Jul 15 21:22 .
+-rw-r--r--  1 root root 218K Jul 15 21:22 synoza-BEFORE-any-restore-20260715-212203.sql.gz
+==== search dumps modified since Jul 14 ====
+/root/synoza-backups/synoza-20260714-072722.sql.gz
+/root/synoza-backups/synoza-predeploy-20260714-074619.sql.gz
+/root/synoza-backups/synoza-predeploy-20260714-080504.sql.gz
+/root/synoza-backups/synoza-BEFORE-any-restore-20260715-212203.sql.gz
+/tmp/theboutiqueline-deploy-20260714/backups/tbl-db-20260610-073625.sql.gz
+==== pm2 last restarts / deploy clues ====
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.14
+Local PM2 version: 7.0.1
+
+ Describing process with id 344 - name synoza 
+┌───────────────────┬───────────────────────────────────────────────────────────┐
+│ status            │ online                                                    │
+│ name              │ synoza                                                    │
+│ namespace         │ default                                                   │
+│ version           │ 1.0.0                                                     │
+│ restarts          │ 1                                                         │
+│ uptime            │ 7h                                                        │
+│ script path       │ /home/adminanmkavps/synoza.anmka.com/server/dist/index.js │
+│ script args       │ N/A                                                       │
+│ error log path    │ /root/.pm2/logs/synoza-error-344.log                      │
+│ out log path      │ /root/.pm2/logs/synoza-out-344.log                        │
+│ pid path          │ /root/.pm2/pids/synoza-344.pid                            │
+│ interpreter       │ node                                                      │
+│ interpreter args  │ N/A                                                       │
+│ script id         │ 344                                                       │
+│ exec cwd          │ /home/adminanmkavps/synoza.anmka.com/server               │
+│ exec mode         │ fork_mode                                                 │
+│ node.js version   │ 20.18.2                                                   │
+│ node env          │ production                                                │
+│ watch & reload    │ ✘                                                         │
+│ unstable restarts │ 0                                                         │
+│ created at        │ 2026-07-15T12:05:00.599Z                                  │
+└───────────────────┴───────────────────────────────────────────────────────────┘
+ Actions available 
+┌────────────────────────┐
+│ km:heapdump            │
+│ km:cpu:profiling:start │
+│ km:cpu:profiling:stop  │
+│ km:heap:sampling:start │
+│ km:heap:sampling:stop  │
+└────────────────────────┘
+ Trigger via: pm2 trigger synoza <action_name>
+
+-rw-r--r-- 1 197609 197609 935 Jul 14 16:58 /home/adminanmkavps/synoza.anmka.com/server/.env
+  File: /home/adminanmkavps/synoza.anmka.com/server/package.json
+  Size: 1291      	Blocks: 8          IO Block: 4096   regular file
+Device: 803h/2051d	Inode: 70430978    Links: 1
+Access: (0644/-rw-r--r--)  Uid: (197609/ UNKNOWN)   Gid: (197609/ UNKNOWN)
+Access: 2026-07-15 20:17:53.512776911 +0200
+Modify: 2026-07-06 13:06:37.000000000 +0200
+Change: 2026-07-14 16:58:28.451220503 +0200
+ Birth: 2026-07-14 16:58:28.451220503 +0200
+==== DONE SNAPSHOT ==== /root/synoza-backups/synoza-BEFORE-any-restore-20260715-212203.sql.gz

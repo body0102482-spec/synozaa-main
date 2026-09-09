@@ -1,0 +1,128 @@
+import api from './api';
+import { shouldForceArabicTranscription } from './arabicSttFix';
+
+/** Text-only turns (browser STT already done) — AI reply only. */
+export const TEXT_TURN_TIMEOUT_MS = 30_000;
+/** Audio turns — Whisper transcription + AI reply. */
+export const VOICE_TURN_TIMEOUT_MS = 60_000;
+
+export interface VoiceTurnMeta {
+  endpoint: 'chat' | 'examiner';
+  stage: string;
+  maneuverId?: string;
+}
+
+export interface VoiceTurnResponse {
+  transcript: string;
+  studentMessage: {
+    id: string;
+    role: string;
+    content: string;
+    stage: string;
+    createdAt: string;
+  };
+  replyMessage: {
+    id: string;
+    role: string;
+    content: string;
+    stage: string;
+    createdAt: string;
+  };
+  audioBase64?: string;
+  audioFormat?: string;
+  latencyMs?: number;
+  firstResponseMs?: number | null;
+}
+
+export async function postTextTurn(
+  sessionId: string,
+  transcript: string,
+  meta: VoiceTurnMeta,
+  sessionLang = 'AR',
+  language = 'ar-EG',
+): Promise<VoiceTurnResponse> {
+  const expectArabic = shouldForceArabicTranscription(sessionLang);
+  const requestLanguage =
+    sessionLang === 'AUTO' ? 'auto' : expectArabic ? 'ar-EG' : language.startsWith('en') ? 'en-US' : language;
+
+  const res = await api.post<VoiceTurnResponse>(
+    `/sessions/${sessionId}/voice-turn`,
+    {
+      transcript,
+      endpoint: meta.endpoint,
+      stage: meta.stage,
+      maneuverId: meta.maneuverId,
+      language: requestLanguage,
+      forceArabic: expectArabic,
+      sessionLang,
+    },
+    { timeout: TEXT_TURN_TIMEOUT_MS },
+  );
+
+  return res.data;
+}
+
+export async function postVoiceTurn(
+  sessionId: string,
+  blob: Blob,
+  language: string,
+  sessionLang: string,
+  meta: VoiceTurnMeta,
+  recordingMeta?: { durationMs: number; speechDurationMs: number },
+): Promise<VoiceTurnResponse> {
+  const recordingFinishedAt = performance.now();
+  const expectArabic = shouldForceArabicTranscription(sessionLang);
+  const audioBase64 = await blobToBase64(blob);
+  const requestLanguage =
+    sessionLang === 'AUTO' ? 'auto' : expectArabic ? 'ar-EG' : language;
+
+  const requestSentAt = performance.now();
+  const res = await api.post<VoiceTurnResponse>(
+    `/sessions/${sessionId}/voice-turn`,
+    {
+      audioBase64,
+      mimeType: blob.type || 'audio/webm',
+      language: requestLanguage,
+      forceArabic: expectArabic,
+      sessionLang,
+      endpoint: meta.endpoint,
+      stage: meta.stage,
+      maneuverId: meta.maneuverId,
+      recordingDurationMs: recordingMeta?.durationMs,
+      speechDurationMs: recordingMeta?.speechDurationMs,
+    },
+    { timeout: VOICE_TURN_TIMEOUT_MS },
+  );
+
+  if (res.data.audioBase64) {
+    const completedAt = performance.now();
+    console.info('[voice/openrouter-audio]', {
+      recordingFinishedToRequestMs: Math.round(requestSentAt - recordingFinishedAt),
+      requestToFirstResponseMs: res.data.firstResponseMs,
+      requestToCompleteMs: res.data.latencyMs,
+      totalVoiceTurnMs: Math.round(completedAt - recordingFinishedAt),
+    });
+  }
+  return res.data;
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== 'string') {
+        reject(new Error('read-failed'));
+        return;
+      }
+      const base64 = result.split(',')[1];
+      if (!base64) {
+        reject(new Error('read-failed'));
+        return;
+      }
+      resolve(base64);
+    };
+    reader.onerror = () => reject(new Error('read-failed'));
+    reader.readAsDataURL(blob);
+  });
+}

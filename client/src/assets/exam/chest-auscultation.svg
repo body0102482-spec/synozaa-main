@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" fill="none">
+  <rect width="640" height="420" fill="#0f172a"/>
+  <ellipse cx="320" cy="210" rx="180" ry="220" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <circle cx="290" cy="195" r="12" fill="#7c2d12" opacity="0.7"/>
+  <text x="290" y="199" fill="#fed7aa" font-size="10" font-family="Arial" text-anchor="middle">A2</text>
+  <circle cx="350" cy="210" r="12" fill="#1d4ed8" opacity="0.7"/>
+  <text x="350" y="214" fill="#bfdbfe" font-size="10" font-family="Arial" text-anchor="middle">P2</text>
+  <circle cx="310" cy="250" r="12" fill="#15803d" opacity="0.7"/>
+  <text x="310" y="254" fill="#bbf7d0" font-size="10" font-family="Arial" text-anchor="middle">M</text>
+  <circle cx="380" cy="240" r="12" fill="#a16207" opacity="0.7"/>
+  <text x="380" y="244" fill="#fef08a" font-size="10" font-family="Arial" text-anchor="middle">T</text>
+  <text x="320" y="310" fill="#94a3b8" font-size="14" font-family="Arial" text-anchor="middle">Auscultation — Valve Areas</text>
+  <text x="320" y="332" fill="#64748b" font-size="11" font-family="Arial" text-anchor="middle">Aortic, Pulmonary, Mitral, Tricuspid</text>
+</svg>

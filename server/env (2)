@@ -1,0 +1,51 @@
+# Server
+PORT=5001
+NODE_ENV=development
+JWT_SECRET=change-this-to-a-long-random-secret-key-1234567890
+JWT_EXPIRES_IN=365d
+CLIENT_URL=http://localhost:5173
+
+# Database — SQLite (default) OR MySQL
+DATABASE_URL="file:./dev.db"
+
+# AI Provider (openai | gemini | mock | openrouter)
+AI_PROVIDER=openrouter
+# OpenRouter
+OPENROUTER_API_KEY=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
+OPENROUTER_FALLBACK_MODEL=qwen/qwen3.7-flash
+OPENAI_API_KEY=your-openai-api-key-here
+OPENAI_MODEL=google/gemini-2.5-flash-Lite
+OPENAI_PATIENT_MODEL=google/gemini-2.5-flash-Lite
+OPENAI_EXAMINER_MODEL=google/gemini-2.5-flash-Lite
+# Speech-to-text: openai (recommended) | local (on-server Whisper; needs working ffmpeg)
+# On Windows, prefer openai — bundled ffmpeg-static often fails with spawn EFTYPE.
+STT_PROVIDER=openai
+# LOCAL_WHISPER_MODEL=Xenova/whisper-small
+# Optional: path to a working ffmpeg binary if using STT_PROVIDER=local
+# FFMPEG_PATH=C:\ffmpeg\bin\ffmpeg.exe
+OPENAI_WHISPER_MODEL=gpt-4o-transcribe
+
+# Admin seed credentials
+ADMIN_EMAIL=admin@synoza.com
+ADMIN_PASSWORD=Asdfghjkl@@@@@
+
+# SMTP (email verification OTP)
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_USER=your-smtp-user@example.com
+SMTP_PASS=your-smtp-password
+SMTP_FROM=your-smtp-from@example.com
+SMTP_FROM_NAME=Synoza
+
+# Payment gateway (Paymob Accept — Egypt)
+# Payment gateway (Kashier / كاشير — Egypt)
+PAYMENT_PROVIDER=kashier
+PAYMENT_CALLBACK_BASE_URL=https://sy-back-production-064e.up.railway.app
+CLIENT_URL=https://sy-front-alpha.vercel.app,http://localhost:5173
+
+KASHIER_MID=MID-48146-678
+KASHIER_API_KEY=036af1fb-deb4-47df-9508-d5cc25b7706e
+KASHIER_SECRET_KEY=06c7f5903c86064c3ab0c1d0632c1013$dff329b1a6092d95fd2fcf0013e95f083549a828382fbe19f9be3622bdd72b3d4d8389b28ecc2d21a29c2bdc80abfc7b
+KASHIER_MODE=live
+KASHIER_CURRENCY=EGP
+KASHIER_ALLOWED_METHODS=card,wallet,bank_installments

@@ -1,0 +1,108 @@
+=== /root/synoza-backups/synoza-20260714-072722.sql.gz ===
+User: 0
+Case: 0
+Session: 0
+Message: 0
+Result: 0
+Subscription: 0
+QbankQuestion: 0
+KnowledgeItem: 0
+KnowledgeCategory: 0
+PaymentOrder: 0
+AiUsageLog: 0
+CaseAccess: 0
+QbankModule: 0
+QbankChapter: 0
+Specialty: 0
+TOTAL_TABLES 25 TOTAL_ROWS_EST 0
+
+=== /root/synoza-backups/synoza-predeploy-20260714-074619.sql.gz ===
+User: 0
+Case: 0
+Session: 0
+Message: 0
+Result: 0
+Subscription: 0
+QbankQuestion: 0
+KnowledgeItem: 0
+KnowledgeCategory: 0
+PaymentOrder: 0
+AiUsageLog: 0
+CaseAccess: 0
+QbankModule: 0
+QbankChapter: 0
+Specialty: 0
+TOTAL_TABLES 25 TOTAL_ROWS_EST 0
+
+=== /root/synoza-backups/synoza-predeploy-20260714-080504.sql.gz ===
+User: 0
+Case: 0
+Session: 0
+Message: 0
+Result: 0
+Subscription: 0
+QbankQuestion: 0
+KnowledgeItem: 0
+KnowledgeCategory: 0
+PaymentOrder: 0
+AiUsageLog: 0
+CaseAccess: 0
+QbankModule: 0
+QbankChapter: 0
+Specialty: 0
+TOTAL_TABLES 25 TOTAL_ROWS_EST 0
+
+==== TEMP DB RESTORE COMPARE ====
+import_rc 0
+TEMP DB COUNTS:
+User	15
+Case	19
+Session	163
+Message	1816
+Result	20
+Subscription	153
+QbankQuestion	208
+KnowledgeItem	3
+KnowledgeCategory	8
+PaymentOrder	30
+AiUsageLog	131
+
+TEMP USERS:
+admin@synoza.com	ADMIN	2026-06-21 15:22:58.024
+student@synoza.com	STUDENT	2026-06-21 15:22:58.837
+omarattia388@gmail.com	STUDENT	2026-06-21 16:47:26.611
+test@synoza.com	STUDENT	2026-06-22 11:25:52.199
+amrzeina8@gmail.com	STUDENT	2026-06-22 12:54:33.836
+omarattia368@gmail.com	STUDENT	2026-06-22 21:28:50.407
+body0102482@gmail.com	STUDENT	2026-06-23 12:12:45.977
+shreifnasser96@gmail.com	STUDENT	2026-06-23 14:24:33.682
+student2@synoza.com	STUDENT	2026-06-24 14:07:08.684
+student.basic@synoza.com	STUDENT	2026-06-24 14:07:09.533
+student.pro@synoza.com	STUDENT	2026-06-24 14:07:10.440
+student.premium@synoza.com	STUDENT	2026-06-24 14:07:11.312
+mahmoudnasser01024@gmail.com	STUDENT	2026-07-01 06:07:50.521
+nemo0102482@gmail.com	STUDENT	2026-07-12 14:19:33.249
+essamloay2@gmail.com	STUDENT	2026-07-13 13:19:52.781
+
+TEMP CASES:
+Ascites	2026-07-14 00:27:35.834
+Rheumatic Triple Valve Disease (MS, TR & TS)	2026-07-13 23:38:41.405
+MR + AR + Thalassemia Major	2026-07-13 23:38:26.043
+Chronic Mitral Regurgitation	2026-07-13 23:38:09.509
+Classic Mitral Stenosis	2026-07-13 23:37:34.405
+Chronic Heart Failure	2026-07-13 23:37:16.708
+AS + MR (Aortic Stenosis & Mitral Regurgitation)	2026-07-13 23:36:55.250
+VSD (Ventricular Septal Defect)	2026-07-13 23:36:23.171
+Chronic Stable Angina	2026-07-13 23:22:20.021
+Prosthetic Valve Replacement	2026-07-13 23:18:34.041
+Pulmonary Hypertension	2026-07-13 22:57:55.487
+Portal Hypertension	2026-07-13 20:36:27.559
+Peptic Ulcer Disease	2026-07-13 16:13:43.781
+Liver Cirrhosis (Decompensated)	2026-07-13 16:08:06.562
+Bilharziasis (Schistosomiasis)	2026-07-13 15:55:59.475
+Irritable Bowel Syndrome	2026-07-13 15:25:06.578
+Hepatocellular Carcinoma	2026-07-13 15:13:43.050
+Gastroesophageal Reflux Disease (GERD)	2026-07-13 15:10:37.716
+Chronic Viral Hepatitis	2026-07-13 14:59:50.167
+
+TEMP_DB_KEPT synoza_restore_compare_tmp

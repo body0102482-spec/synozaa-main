@@ -1,0 +1,165 @@
+============================================================
+>>> pm2 list
+         │ default     │ 1.0.0   │ fork    │ 904028   │ 3D     │ 33   │ online    │ 0%       │ 68.6mb   │ root     │ disabled │
+│ 83  │ sphinx-one-anmka-com-backend             │ default     │ 1.0.0   │ fork    │ 86981    │ 3D     │ 23   │ online    │ 0%       │ 77.7mb   │ root     │ disabled │
+│ 84  │ sphinx-one-anmka-com-frontend            │ default     │ 0.39.0  │ fork    │ 4108398  │ 2D     │ 41   │ online    │ 0%       │ 36.6mb   │ root     │ disabled │
+│ 95  │ stp-anmka-admin                          │ default     │ 16.0.10 │ fork    │ 87908    │ 3D     │ 20   │ online    │ 0%       │ 108.1mb  │ root     │ disabled │
+│ 1   │ stp-anmka-lms-backend                    │ default     │ 0.39.0  │ fork    │ 123984   │ 3D     │ 28   │ online    │ 0%       │ 92.3mb   │ root     │ disabled │
+│ 2   │ stp-anmka-student-portal                 │ default     │ N/A     │ fork    │ 124075   │ 3D     │ 17   │ online    │ 0%       │ 58.9mb   │ root     │ disabled │
+│ 232 │ strategic-backend                        │ default     │ 1.0.0   │ cluster │ 3352527  │ 4D     │ 9    │ online    │ 0%       │ 96.2mb   │ root     │ disabled │
+│ 233 │ strategic-frontend                       │ default     │ 16.0.7  │ cluster │ 3352674  │ 4D     │ 1694 │ online    │ 0%       │ 123.3mb  │ root     │ disabled │
+│ 39  │ studify-anmka-com-admin                  │ default     │ 16.0.10 │ fork    │ 84251    │ 3D     │ 18   │ online    │ 0%       │ 133.6mb  │ root     │ disabled │
+│ 38  │ studify-anmka-com-backend                │ default     │ 1.0.0   │ cluster │ 84141    │ 3D     │ 21   │ online    │ 0%       │ 104.4mb  │ root     │ disabled │
+│ 40  │ studify-anmka-com-student                │ default     │ 16.0.10 │ fork    │ 84263    │ 3D     │ 14   │ online    │ 0%       │ 113.4mb  │ root     │ disabled │
+│ 167 │ styleup                                  │ default     │ N/A     │ fork    │ 4127671  │ 2D     │ 96   │ online    │ 0%       │ 135.1mb  │ root     │ disabled │
+│ 85  │ styleup-ai-video-backend                 │ default     │ 1.0.0   │ fork    │ 87191    │ 3D     │ 10   │ online    │ 4.5%     │ 97.9mb   │ root     │ disabled │
+│ 91  │ styleup-anmka-com-frontend               │ default     │ 0.39.0  │ fork    │ 87638    │ 3D     │ 10   │ online    │ 0%       │ 26.1mb   │ root     │ disabled │
+│ 347 │ synoza                                   │ default     │ 1.0.0   │ fork    │ 1877536  │ 2h     │ 4    │ online    │ 0%       │ 114.1mb  │ root     │ disabled │
+│ 153 │ tbl-backend                              │ default     │ 1.0.0   │ fork    │ 92795    │ 3D     │ 4024 │ online    │ 0%       │ 378.1mb  │ root     │ disabled │
+│ 143 │ thebrand-anmka-admin                     │ default     │ 0.39.0  │ cluster │ 91606    │ 3D     │ 10   │ online    │ 4.5%     │ 93.0mb   │ root     │ disabled │
+│ 144 │ thebrand-anmka-lms-backend               │ default     │ 1.0.0   │ fork    │ 91576    │ 3D     │ 11   │ online    │ 0%       │ 91.7mb   │ root     │ disabled │
+│ 145 │ thebrand-anmka-student-portal            │ default     │ N/A     │ fork    │ 91708    │ 3D     │ 10   │ online    │ 0%       │ 58.3mb   │ root     │ disabled │
+│ 0   │ vip-erp-backend                          │ default     │ 1.0.0   │ fork    │ 123996   │ 3D     │ 138  │ online    │ 0%       │ 51.8mb   │ root     │ disabled │
+│ 30  │ vip-erp-backend-dev                      │ default     │ 1.0.0   │ fork    │ 83776    │ 3D     │ 125  │ online    │ 0%       │ 50.4mb   │ root     │ disabled │
+│ 29  │ vip-erp-frontend                         │ default     │ 16.1.6  │ fork    │ 83714    │ 3D     │ 504  │ online    │ 0%       │ 124.2mb  │ root     │ disabled │
+│ 31  │ vip-erp-frontend-dev                     │ default     │ 16.1.6  │ fork    │ 83800    │ 3D     │ 446  │ online    │ 0%       │ 165.9mb  │ root     │ disabled │
+│ 172 │ vipacademy-anmka-admin                   │ default     │ 16.0.10 │ fork    │ 94483    │ 3D     │ 34   │ online    │ 0%       │ 113.6mb  │ root     │ disabled │
+│ 174 │ vipacademy-anmka-lms-backend             │ default     │ 1.0.0   │ fork    │ 3350067  │ 4D     │ 30   │ online    │ 0%       │ 91.7mb   │ root     │ disabled │
+│ 173 │ vipacademy-anmka-student-portal          │ default     │ 16.0.10 │ fork    │ 3349970  │ 4D     │ 27   │ online    │ 0%       │ 83.9mb   │ root     │ disabled │
+│ 293 │ wael-ali-api                             │ default     │ 1.0.0   │ fork    │ 4065469  │ 2D     │ 32   │ online    │ 0%       │ 40.2mb   │ root     │ disabled │
+│ 259 │ wasla-anmka-com-backend                  │ default     │ 1.0.0   │ fork    │ 3352910  │ 4D     │ 30   │ online    │ 0%       │ 80.2mb   │ root     │ disabled │
+│ 317 │ wasla-anmka-com-frontend                 │ default     │ 0.39.0  │ fork    │ 3297864  │ 32m    │ 26   │ online    │ 0%       │ 50.1mb   │ root     │ disabled │
+└─────┴──────────────────────────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+
+============================================================
+>>> ss -lntp | grep -E '5099|5100' || true
+LISTEN 0      511                 *:5099             *:*    users:(("node /home/admi",pid=1877536,fd=20))                                                                                                                                                                                                                                                                                                                                                                                                             
+
+============================================================
+>>> ls -la /home/adminanmkavps/conf/web/synoza.anmka.com/ || true
+total 44
+drwxr-xr-x   3 root root           4096 Jul 18 04:47 .
+drwxr-x--x 180 root root          12288 Jul 18 15:08 ..
+-rw-r-----   1 root adminanmkavps  1801 Jul 18 04:47 nginx.conf
+-rw-r--r--   1 root root            159 Jun 21 17:03 nginx.conf_letsencrypt
+-rw-r-----   1 root adminanmkavps    38 Jul 18 04:47 nginx.forcessl.conf
+-rw-r-----   1 root adminanmkavps    65 Jul 18 04:47 nginx.hsts.conf
+-rw-r-----   1 root adminanmkavps  2363 Jul 18 04:47 nginx.ssl.conf
+lrwxrwxrwx   1 root root             68 Jun 21 17:03 nginx.ssl.conf_letsencrypt -> /home/adminanmkavps/conf/web/synoza.anmka.com/nginx.conf_letsencrypt
+drwxr-xr-x   2 root root           4096 Jun 21 17:04 ssl
+
+============================================================
+>>> grep -n 'proxy_pass\|root\|location\|server_name' /home/adminanmkavps/conf/web/synoza.anmka.com/nginx.ssl.conf 2>/dev/null || echo NO_SSL_CONF
+9:	server_name synoza.anmka.com ;
+10:	root        /home/adminanmkavps/web/synoza.anmka.com/public_html;
+28:	location ~ /\.(?!well-known\/) {
+33:	location / {
+34:		location ~* ^.+\.(jpeg|jpg|png|webp|gif|bmp|ico|svg|css|js)$ {
+39:		location ~ [^/]\.php(/|$) {
+46:			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+54:	location /error/ {
+58:	location /vstats/ {
+
+============================================================
+>>> grep -n 'proxy_pass\|root\|location\|server_name' /home/adminanmkavps/conf/web/synoza.anmka.com/nginx.conf 2>/dev/null || echo NO_HTTP_CONF
+9:	server_name synoza.anmka.com ;
+10:	root        /home/adminanmkavps/web/synoza.anmka.com/public_html;
+18:	location ~ /\.(?!well-known\/) {
+23:	location / {
+24:		location ~* ^.+\.(jpeg|jpg|png|webp|gif|bmp|ico|svg|css|js)$ {
+29:		location ~ [^/]\.php(/|$) {
+35:			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+43:	location /error/ {
+47:	location /vstats/ {
+
+============================================================
+>>> ls -la /home/adminanmkavps/web/synoza.anmka.com/public_html/ 2>/dev/null | head -20
+total 16
+drwxr-x--x 2 adminanmkavps www-data      4096 Jun 21 17:02 .
+drwxr-x--x 8 adminanmkavps adminanmkavps 4096 Jul 18 04:47 ..
+-rw-r--r-- 1 adminanmkavps adminanmkavps 2496 Jun 21 17:02 index.html
+-rw-r--r-- 1 adminanmkavps adminanmkavps   66 Jun 21 17:02 robots.txt
+
+============================================================
+>>> head -c 500 /home/adminanmkavps/web/synoza.anmka.com/public_html/index.html 2>/dev/null || true
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Coming Soon</title>
+		<style>
+			body {
+				background-color: #f5f5f5;
+				margin-top: 8%;
+				color: #5d5d5d;
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+					"Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+					"Noto Color Emoji";
+				text-shadow: 0px 1px
+============================================================
+>>> ls -la /home/adminanmkavps/synoza.anmka.com/ 2>/dev/null | head -20
+total 452
+drwxr-xr-x   5        197609        197609   4096 Jul 15 22:19 .
+drwxr-x--x+ 28 root          root            4096 Jul 14 10:05 ..
+drwxrwxrwx   4 root          root            4096 Jul 19 12:04 client
+drwxr-xr-x   2        197609        197609   4096 Jul 15 22:19 deploy
+-rw-r--r--   1        197609        197609    371 Jul 15 20:51 ecosystem.config.cjs
+drwxrwxrwx   7 root          root            4096 Jul 19 12:04 server
+-rw-r--r--   1        197609        197609     83 Jul 15 22:19 start.sh
+-rw-r--r--   1 adminanmkavps adminanmkavps 210343 Jun 21 17:21 synoza-deploy.tar.gz
+-rw-r--r--   1 adminanmkavps adminanmkavps 219630 Jun 21 17:17 synoza-deploy.zip
+
+============================================================
+>>> curl -sI http://127.0.0.1:5099/ | head -15 || true
+HTTP/1.1 200 OK
+Content-Security-Policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: cross-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: https://medsynoza.com
+Vary: Origin
+
+============================================================
+>>> curl -sI https://synoza.anmka.com/ | head -15 || true
+HTTP/2 200 
+server: nginx
+date: Sun, 19 Jul 2026 12:38:28 GMT
+content-type: text/html; charset=utf-8
+content-length: 2496
+last-modified: Sun, 21 Jun 2026 15:02:55 GMT
+vary: Accept-Encoding
+etag: "6a37fd1f-9c0"
+strict-transport-security: max-age=31536000;
+accept-ranges: bytes
+
+
+============================================================
+>>> curl -sI https://medsynoza.com/ | head -15 || true
+HTTP/2 200 
+server: nginx
+date: Sun, 19 Jul 2026 12:38:28 GMT
+content-type: text/html; charset=UTF-8
+content-length: 923
+content-security-policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: cross-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+
+============================================================
+>>> grep -n 'proxy_pass\|root\|server_name' /home/adminanmkavps/conf/web/medsynoza.com/nginx.ssl.conf 2>/dev/null | head -40 || true

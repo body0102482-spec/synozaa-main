@@ -1,0 +1,20 @@
+=== DATABASE_URL style (redacted) ===
+DATABASE_URL="mysql://adminanmkavps_synoza:***@localhost:3306/adminanmkavps_synoza"
+
+=== schema provider ===
+  provider = "prisma-client-js"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  provider        String              @default("paymob")
+  providerOrderId String?
+  provider               String   @default("mock")
+
+=== migration history table ===
+migrations_query_error 
+Invalid `prisma.$queryRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1146`. Message: `Table 'adminanmkavps_synoza._prisma_migrations' doesn't exist`
+mysql_user_universityId []
+mysql_CaseUniversityOverride []
+mysql_QbankModuleUniversity []

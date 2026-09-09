@@ -1,0 +1,114 @@
+==== LIVE COUNTS ====
+User 15
+Case 19
+Session 167
+Message 1853
+Result 21
+Subscription 153
+QbankQuestion 208
+KnowledgeItem 3
+KnowledgeCategory 8
+PaymentOrder 30
+==== LIVE USERS ====
+2026-06-21T15:22:58.024Z | ADMIN | admin@synoza.com | Synoza | Admin
+2026-06-21T15:22:58.837Z | STUDENT | student@synoza.com | Mohamed | Ali
+2026-06-21T16:47:26.611Z | STUDENT | omarattia388@gmail.com | Mahmoud | Nasser
+2026-06-22T11:25:52.199Z | STUDENT | test@synoza.com | Test | Student
+2026-06-22T12:54:33.836Z | STUDENT | amrzeina8@gmail.com | Zeinaamrmostafa | Mostaf
+2026-06-22T21:28:50.407Z | STUDENT | omarattia368@gmail.com | j | j
+2026-06-23T12:12:45.977Z | STUDENT | body0102482@gmail.com | om | ar
+2026-06-23T14:24:33.682Z | STUDENT | shreifnasser96@gmail.com | na | ss
+2026-06-24T14:07:08.684Z | STUDENT | student2@synoza.com | Sara | Hassan
+2026-06-24T14:07:09.533Z | STUDENT | student.basic@synoza.com | Omar | Khaled
+2026-06-24T14:07:10.440Z | STUDENT | student.pro@synoza.com | Nour | Adel
+2026-06-24T14:07:11.312Z | STUDENT | student.premium@synoza.com | Youssef | Mahmoud
+2026-07-01T06:07:50.521Z | STUDENT | mahmoudnasser01024@gmail.com | AL | I
+2026-07-12T14:19:33.249Z | STUDENT | nemo0102482@gmail.com | ابراهيم | علي
+2026-07-13T13:19:52.781Z | STUDENT | essamloay2@gmail.com | Loay | Essam
+==== LIVE MAX TIMESTAMPS ====
+User.max 2026-07-13T13:19:52.781Z
+Session.max 2026-07-14T14:32:06.956Z
+Case.maxUpdated 2026-07-14T16:30:56.314Z
+Qbank.max 2026-07-12T11:44:03.382Z
+
+==== OTHER BACKUP LOCATIONS ====
+/root/synoza-backups/synoza-20260714-072722.sql.gz
+/root/synoza-backups/synoza-predeploy-20260714-074619.sql.gz
+/root/synoza-backups/synoza-predeploy-20260714-080504.sql.gz
+/home/adminanmkavps/web/udecideegy.com/public_html/u996301192_w6wos.20260117204555.sql.gz
+/home/adminanmkavps/web/shefosquad.com/public_html/u996301192_ZbLO0.20260117204555.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/pre-feed-import-20260707-010245.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/tbl-db-20260610-073504.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/pre-product-restore-20260707-025031.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/tbl-db-20260610-073612.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/tbl-db-20260610-073545.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/pre-restore-products-20260706-234600.sql.gz
+/home/adminanmkavps/backups/theboutiqueline/tbl-db-20260610-073625.sql.gz
+/home/adminanmkavps/synoza.anmka.com/synoza-deploy.tar.gz
+==== BACKUP ANALYZE ====
+--- FILE /root/synoza-backups/synoza-20260714-072722.sql.gz ---
+size 218030
+approx: {'User': 1, 'Case': 1, 'Session': 1, 'Message': 1, 'Result': 1, 'Subscription': 1, 'QbankQuestion': 1, 'KnowledgeItem': 1, 'PaymentOrder': 1, 'KnowledgeCategory': 1}
+all_tables: [('AISettings', 1), ('AiCostRate', 1), ('AiUsageLog', 1), ('AuditLog', 1), ('Case', 1), ('CaseAccess', 1), ('DifficultyLevel', 1), ('KnowledgeCategory', 1), ('KnowledgeItem', 1), ('Message', 1), ('PartnerUniversity', 1), ('PaymentOrder', 1), ('PlanConfig', 1), ('QbankChapter', 1), ('QbankModule', 1), ('QbankModuleEntitlement', 1), ('QbankQuestion', 1), ('QbankReference', 1), ('QbankTerm', 1), ('Result', 1), ('Session', 1), ('SiteSettings', 1), ('Specialty', 1), ('Subscription', 1), ('User', 1)]
+emails:
+admin@synoza.com
+amrzeina8@gmail.com
+body0102482@gmail.com
+essamloay2@gmail.com
+mahmoudnasser01024@gmail.com
+nemo0102482@gmail.com
+omarattia368@gmail.com
+omarattia388@gmail.com
+shreifnasser96@gmail.com
+student.basic@synoza.com
+student.premium@synoza.com
+student.pro@synoza.com
+student2@synoza.com
+student@synoza.com
+test@synoza.com
+--- FILE /root/synoza-backups/synoza-predeploy-20260714-074619.sql.gz ---
+size 218038
+approx: {'User': 1, 'Case': 1, 'Session': 1, 'Message': 1, 'Result': 1, 'Subscription': 1, 'QbankQuestion': 1, 'KnowledgeItem': 1, 'PaymentOrder': 1, 'KnowledgeCategory': 1}
+all_tables: [('AISettings', 1), ('AiCostRate', 1), ('AiUsageLog', 1), ('AuditLog', 1), ('Case', 1), ('CaseAccess', 1), ('DifficultyLevel', 1), ('KnowledgeCategory', 1), ('KnowledgeItem', 1), ('Message', 1), ('PartnerUniversity', 1), ('PaymentOrder', 1), ('PlanConfig', 1), ('QbankChapter', 1), ('QbankModule', 1), ('QbankModuleEntitlement', 1), ('QbankQuestion', 1), ('QbankReference', 1), ('QbankTerm', 1), ('Result', 1), ('Session', 1), ('SiteSettings', 1), ('Specialty', 1), ('Subscription', 1), ('User', 1)]
+emails:
+admin@synoza.com
+amrzeina8@gmail.com
+body0102482@gmail.com
+essamloay2@gmail.com
+mahmoudnasser01024@gmail.com
+nemo0102482@gmail.com
+omarattia368@gmail.com
+omarattia388@gmail.com
+shreifnasser96@gmail.com
+student.basic@synoza.com
+student.premium@synoza.com
+student.pro@synoza.com
+student2@synoza.com
+student@synoza.com
+test@synoza.com
+--- FILE /root/synoza-backups/synoza-predeploy-20260714-080504.sql.gz ---
+size 218034
+approx: {'User': 1, 'Case': 1, 'Session': 1, 'Message': 1, 'Result': 1, 'Subscription': 1, 'QbankQuestion': 1, 'KnowledgeItem': 1, 'PaymentOrder': 1, 'KnowledgeCategory': 1}
+all_tables: [('AISettings', 1), ('AiCostRate', 1), ('AiUsageLog', 1), ('AuditLog', 1), ('Case', 1), ('CaseAccess', 1), ('DifficultyLevel', 1), ('KnowledgeCategory', 1), ('KnowledgeItem', 1), ('Message', 1), ('PartnerUniversity', 1), ('PaymentOrder', 1), ('PlanConfig', 1), ('QbankChapter', 1), ('QbankModule', 1), ('QbankModuleEntitlement', 1), ('QbankQuestion', 1), ('QbankReference', 1), ('QbankTerm', 1), ('Result', 1), ('Session', 1), ('SiteSettings', 1), ('Specialty', 1), ('Subscription', 1), ('User', 1)]
+emails:
+admin@synoza.com
+amrzeina8@gmail.com
+body0102482@gmail.com
+essamloay2@gmail.com
+mahmoudnasser01024@gmail.com
+nemo0102482@gmail.com
+omarattia368@gmail.com
+omarattia388@gmail.com
+shreifnasser96@gmail.com
+student.basic@synoza.com
+student.premium@synoza.com
+student.pro@synoza.com
+student2@synoza.com
+student@synoza.com
+test@synoza.com
+
+total 60G
+drwxr-xr-x  2 root      root          4.0K Jul 15 06:08 .
+drwxr-xr-x 24 root      root          4.0K Jun 24 20:55 ..
+-rw-r-----  1 hestiaweb adminanmkavps  60G Feb 12 06:10 adminanmkavps.2026-02-12_06-01-28.tar
+-rw-rw----  1 root      root          5.1K Feb 12 06:10 adminanmkavps.log

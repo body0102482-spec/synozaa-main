@@ -1,0 +1,552 @@
+==== CASE MEDIA CHECK ====
+
+CASE | Portal Hypertension | updated=2026-07-14T16:30:56.314Z | items=3
+  MISSING | /exam/cases/portal-hypertension/Portal-Hypertension.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/portal-hypertension/Portal-Hypertension.png | /home/adminanmkavps/synoza-media/public/exam/cases/portal-hypertension/Portal-Hypertension.png | /home/adminanmkavps/synoza-media/cases/Portal-Hypertension.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/portal-hypertension/Portal-Hypertension.png
+  MISSING | /ascites_distended_abdomen.everted_umbilicus.jpg
+     tried: /home/adminanmkavps/synoza-media/ascites_distended_abdomen.everted_umbilicus.jpg | /home/adminanmkavps/synoza-media/exam/ascites_distended_abdomen.everted_umbilicus.jpg | /home/adminanmkavps/synoza-media/public/ascites_distended_abdomen.everted_umbilicus.jpg | /home/adminanmkavps/synoza-media/cases/ascites_distended_abdomen.everted_umbilicus.jpg
+  MISSING | /spleen palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/exam/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/public/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/cases/spleen palpation.mp4
+
+CASE | Peptic Ulcer Disease | updated=2026-07-14T16:21:23.949Z | items=2
+  MISSING | /exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png | /home/adminanmkavps/synoza-media/public/exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png | /home/adminanmkavps/synoza-media/cases/Peptic-Ulcer-Disease.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png
+  MISSING | /liver palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/liver palpation.mp4 | /home/adminanmkavps/synoza-media/exam/liver palpation.mp4 | /home/adminanmkavps/synoza-media/public/liver palpation.mp4 | /home/adminanmkavps/synoza-media/cases/liver palpation.mp4
+
+CASE | Liver Cirrhosis (Decompensated) | updated=2026-07-14T16:14:42.383Z | items=6
+  MISSING | /exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png | /home/adminanmkavps/synoza-media/public/exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png | /home/adminanmkavps/synoza-media/cases/Liver-Cirrhosis--Decompensated-.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png
+  MISSING | /bilateral_pitting_edema_leg.jpg
+     tried: /home/adminanmkavps/synoza-media/bilateral_pitting_edema_leg.jpg | /home/adminanmkavps/synoza-media/exam/bilateral_pitting_edema_leg.jpg | /home/adminanmkavps/synoza-media/public/bilateral_pitting_edema_leg.jpg | /home/adminanmkavps/synoza-media/cases/bilateral_pitting_edema_leg.jpg
+  MISSING | /Jaundice_.jpg
+     tried: /home/adminanmkavps/synoza-media/Jaundice_.jpg | /home/adminanmkavps/synoza-media/exam/Jaundice_.jpg | /home/adminanmkavps/synoza-media/public/Jaundice_.jpg | /home/adminanmkavps/synoza-media/cases/Jaundice_.jpg
+  MISSING | /leukonychia_hand.jpg
+     tried: /home/adminanmkavps/synoza-media/leukonychia_hand.jpg | /home/adminanmkavps/synoza-media/exam/leukonychia_hand.jpg | /home/adminanmkavps/synoza-media/public/leukonychia_hand.jpg | /home/adminanmkavps/synoza-media/cases/leukonychia_hand.jpg
+  MISSING | /palmar_erythema_hand.jpg
+     tried: /home/adminanmkavps/synoza-media/palmar_erythema_hand.jpg | /home/adminanmkavps/synoza-media/exam/palmar_erythema_hand.jpg | /home/adminanmkavps/synoza-media/public/palmar_erythema_hand.jpg | /home/adminanmkavps/synoza-media/cases/palmar_erythema_hand.jpg
+  MISSING | /spleen palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/exam/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/public/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/cases/spleen palpation.mp4
+
+CASE | Irritable Bowel Syndrome | updated=2026-07-14T16:07:56.579Z | items=2
+  MISSING | /exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png | /home/adminanmkavps/synoza-media/public/exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png | /home/adminanmkavps/synoza-media/cases/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png
+  MISSING | /liver palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/liver palpation.mp4 | /home/adminanmkavps/synoza-media/exam/liver palpation.mp4 | /home/adminanmkavps/synoza-media/public/liver palpation.mp4 | /home/adminanmkavps/synoza-media/cases/liver palpation.mp4
+
+CASE | Hepatocellular Carcinoma | updated=2026-07-14T16:01:25.919Z | items=4
+  MISSING | /exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png | /home/adminanmkavps/synoza-media/public/exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png | /home/adminanmkavps/synoza-media/cases/Hepatocellular-Carcinoma.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png
+  MISSING | /ascites_distended_abdomen.everted_umbilicus.jpg
+     tried: /home/adminanmkavps/synoza-media/ascites_distended_abdomen.everted_umbilicus.jpg | /home/adminanmkavps/synoza-media/exam/ascites_distended_abdomen.everted_umbilicus.jpg | /home/adminanmkavps/synoza-media/public/ascites_distended_abdomen.everted_umbilicus.jpg | /home/adminanmkavps/synoza-media/cases/ascites_distended_abdomen.everted_umbilicus.jpg
+  MISSING | /liver palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/liver palpation.mp4 | /home/adminanmkavps/synoza-media/exam/liver palpation.mp4 | /home/adminanmkavps/synoza-media/public/liver palpation.mp4 | /home/adminanmkavps/synoza-media/cases/liver palpation.mp4
+  MISSING | /spleen palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/exam/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/public/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/cases/spleen palpation.mp4
+
+CASE | Gastroesophageal Reflux Disease (GERD) | updated=2026-07-14T15:51:41.680Z | items=1
+  MISSING | /exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png | /home/adminanmkavps/synoza-media/public/exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png | /home/adminanmkavps/synoza-media/cases/Gastroesophageal-Reflux-Disease--GERD.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png
+
+CASE | Chronic Viral Hepatitis | updated=2026-07-14T15:41:54.042Z | items=3
+  MISSING | /exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png | /home/adminanmkavps/synoza-media/cases/Chronic-Viral-Hepatitis.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png
+  MISSING | /palmar_erythema_hand.jpg
+     tried: /home/adminanmkavps/synoza-media/palmar_erythema_hand.jpg | /home/adminanmkavps/synoza-media/exam/palmar_erythema_hand.jpg | /home/adminanmkavps/synoza-media/public/palmar_erythema_hand.jpg | /home/adminanmkavps/synoza-media/cases/palmar_erythema_hand.jpg
+  MISSING | /liver palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/liver palpation.mp4 | /home/adminanmkavps/synoza-media/exam/liver palpation.mp4 | /home/adminanmkavps/synoza-media/public/liver palpation.mp4 | /home/adminanmkavps/synoza-media/cases/liver palpation.mp4
+
+CASE | Bilharziasis (Schistosomiasis) | updated=2026-07-14T15:35:40.915Z | items=3
+  MISSING | /exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png | /home/adminanmkavps/synoza-media/public/exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png | /home/adminanmkavps/synoza-media/cases/Bilharziasis.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png
+  MISSING | /liver palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/liver palpation.mp4 | /home/adminanmkavps/synoza-media/exam/liver palpation.mp4 | /home/adminanmkavps/synoza-media/public/liver palpation.mp4 | /home/adminanmkavps/synoza-media/cases/liver palpation.mp4
+  MISSING | /spleen palpation.mp4
+     tried: /home/adminanmkavps/synoza-media/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/exam/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/public/spleen palpation.mp4 | /home/adminanmkavps/synoza-media/cases/spleen palpation.mp4
+
+CASE | Ascites | updated=2026-07-14T00:27:35.834Z | items=3
+  MISSING | /exam/cases/ascites/ASCITES.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/ascites/ASCITES.png | /home/adminanmkavps/synoza-media/public/exam/cases/ascites/ASCITES.png | /home/adminanmkavps/synoza-media/cases/ASCITES.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/ascites/ASCITES.png
+  MISSING | /exam/cases/ascites/ASCITES-PALPATION.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/ascites/ASCITES-PALPATION.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/ascites/ASCITES-PALPATION.mp4 | /home/adminanmkavps/synoza-media/cases/ASCITES-PALPATION.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/ascites/ASCITES-PALPATION.mp4
+  MISSING | /exam/cases/ascites/ASCITES-PERCUSSION.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/ascites/ASCITES-PERCUSSION.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/ascites/ASCITES-PERCUSSION.mp4 | /home/adminanmkavps/synoza-media/cases/ASCITES-PERCUSSION.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/ascites/ASCITES-PERCUSSION.mp4
+
+CASE | Rheumatic Triple Valve Disease (MS, TR & TS) | updated=2026-07-13T23:38:41.405Z | items=5
+  MISSING | /exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png | /home/adminanmkavps/synoza-media/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png | /home/adminanmkavps/synoza-media/cases/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png
+  MISSING | /exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.mp4 | /home/adminanmkavps/synoza-media/cases/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.mp4
+  MISSING | /exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/MS.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/MS.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/MS.mp3 | /home/adminanmkavps/synoza-media/cases/MS.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/MS.mp3
+  MISSING | /exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/TR.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/TR.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/TR.mp3 | /home/adminanmkavps/synoza-media/cases/TR.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/TR.mp3
+  MISSING | /exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/5836913327987166802.jpg
+
+CASE | MR + AR + Thalassemia Major | updated=2026-07-13T23:38:26.043Z | items=5
+  MISSING | /exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png | /home/adminanmkavps/synoza-media/public/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png | /home/adminanmkavps/synoza-media/cases/MR---AR---Thalassemia-Major.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png
+  MISSING | /exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.mp4 | /home/adminanmkavps/synoza-media/cases/MR---AR---Thalassemia-Major.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.mp4
+  MISSING | /exam/cases/mr-ar-thalassemia-major/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/mr-ar-thalassemia-major/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/mr-ar-thalassemia-major/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/cases/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/mr-ar-thalassemia-major/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+  MISSING | /exam/cases/mr-ar-thalassemia-major/Aortic-Regurgitation--normal-speed-MP3_160K-.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/mr-ar-thalassemia-major/Aortic-Regurgitation--normal-speed-MP3_160K-.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/mr-ar-thalassemia-major/Aortic-Regurgitation--normal-speed-MP3_160K-.mp3 | /home/adminanmkavps/synoza-media/cases/Aortic-Regurgitation--normal-speed-MP3_160K-.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/mr-ar-thalassemia-major/Aortic-Regurgitation--normal-speed-MP3_160K-.mp3
+  MISSING | /exam/cases/mr-ar-thalassemia-major/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/mr-ar-thalassemia-major/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/mr-ar-thalassemia-major/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/mr-ar-thalassemia-major/5836913327987166802.jpg
+
+CASE | Chronic Mitral Regurgitation | updated=2026-07-13T23:38:09.509Z | items=4
+  MISSING | /exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png | /home/adminanmkavps/synoza-media/cases/Chronic-Mitral-Regurgitation.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png
+  MISSING | /exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.mp4 | /home/adminanmkavps/synoza-media/cases/Chronic-Mitral-Regurgitation.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.mp4
+  MISSING | /exam/cases/chronic-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/cases/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+  MISSING | /exam/cases/chronic-mitral-regurgitation/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-mitral-regurgitation/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-mitral-regurgitation/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-mitral-regurgitation/5836913327987166802.jpg
+
+CASE | Classic Mitral Stenosis | updated=2026-07-13T23:37:34.405Z | items=4
+  MISSING | /exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png | /home/adminanmkavps/synoza-media/public/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png | /home/adminanmkavps/synoza-media/cases/Classic-Mitral-Stenosis2.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png
+  MISSING | /exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis.mp4 | /home/adminanmkavps/synoza-media/cases/Classic-Mitral-Stenosis.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis.mp4
+  MISSING | /exam/cases/classic-mitral-stenosis/MS.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/classic-mitral-stenosis/MS.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/classic-mitral-stenosis/MS.mp3 | /home/adminanmkavps/synoza-media/cases/MS.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/classic-mitral-stenosis/MS.mp3
+  MISSING | /exam/cases/classic-mitral-stenosis/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/classic-mitral-stenosis/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/classic-mitral-stenosis/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/classic-mitral-stenosis/5836913327987166802.jpg
+
+CASE | Chronic Heart Failure | updated=2026-07-13T23:37:16.708Z | items=5
+  MISSING | /exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png | /home/adminanmkavps/synoza-media/cases/Chronic-Heart-Failure--HFrEF-.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png
+  MISSING | /exam/cases/chronic-heart-failure/chronic-heart-failure.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-heart-failure/chronic-heart-failure.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-heart-failure/chronic-heart-failure.mp4 | /home/adminanmkavps/synoza-media/cases/chronic-heart-failure.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-heart-failure/chronic-heart-failure.mp4
+  MISSING | /exam/cases/chronic-heart-failure/S3_Heart_Sound_S3_Gallop_Heart_Auscultation_Episode_9MP3_160K2_1.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-heart-failure/S3_Heart_Sound_S3_Gallop_Heart_Auscultation_Episode_9MP3_160K2_1.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-heart-failure/S3_Heart_Sound_S3_Gallop_Heart_Auscultation_Episode_9MP3_160K2_1.mp3 | /home/adminanmkavps/synoza-media/cases/S3_Heart_Sound_S3_Gallop_Heart_Auscultation_Episode_9MP3_160K2_1.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-heart-failure/S3_Heart_Sound_S3_Gallop_Heart_Auscultation_Episode_9MP3_160K2_1.mp3
+  MISSING | /exam/cases/chronic-heart-failure/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-heart-failure/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-heart-failure/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/cases/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-heart-failure/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+  MISSING | /exam/cases/chronic-heart-failure/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-heart-failure/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-heart-failure/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-heart-failure/5836913327987166802.jpg
+
+CASE | AS + MR (Aortic Stenosis & Mitral Regurgitation) | updated=2026-07-13T23:36:55.250Z | items=5
+  OK | /exam/cases/as-mr/inspection.png
+     AT /home/adminanmkavps/synoza-media/exam/cases/as-mr/inspection.png
+  OK | /exam/cases/as-mr/palpation.mp4
+     AT /home/adminanmkavps/synoza-media/exam/cases/as-mr/palpation.mp4
+  MISSING | /exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/AS---PULMONARY-STENOSIS.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/AS---PULMONARY-STENOSIS.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/AS---PULMONARY-STENOSIS.mp3 | /home/adminanmkavps/synoza-media/cases/AS---PULMONARY-STENOSIS.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/AS---PULMONARY-STENOSIS.mp3
+  MISSING | /exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza-media/cases/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3
+  MISSING | /exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/5836913327987166802.jpg
+
+CASE | VSD (Ventricular Septal Defect) | updated=2026-07-13T23:36:23.171Z | items=4
+  MISSING | /exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png | /home/adminanmkavps/synoza-media/public/exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png | /home/adminanmkavps/synoza-media/cases/VSD--Ventricular-Septal-Defect-.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png
+  MISSING | /exam/cases/vsd-ventricular-septal-defect/video5954128306499494169.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/vsd-ventricular-septal-defect/video5954128306499494169.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/vsd-ventricular-septal-defect/video5954128306499494169.mp4 | /home/adminanmkavps/synoza-media/cases/video5954128306499494169.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/vsd-ventricular-septal-defect/video5954128306499494169.mp4
+  MISSING | /exam/cases/vsd-ventricular-septal-defect/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/vsd-ventricular-septal-defect/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/vsd-ventricular-septal-defect/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/vsd-ventricular-septal-defect/5836913327987166802.jpg
+  MISSING | /exam/cases/vsd-ventricular-septal-defect/Ventricular-Septal-Defect--VSD----Heart-Auscultation---Episode-11-MP3_160K--2-.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/vsd-ventricular-septal-defect/Ventricular-Septal-Defect--VSD----Heart-Auscultation---Episode-11-MP3_160K--2-.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/vsd-ventricular-septal-defect/Ventricular-Septal-Defect--VSD----Heart-Auscultation---Episode-11-MP3_160K--2-.mp3 | /home/adminanmkavps/synoza-media/cases/Ventricular-Septal-Defect--VSD----Heart-Auscultation---Episode-11-MP3_160K--2-.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/vsd-ventricular-septal-defect/Ventricular-Septal-Defect--VSD----Heart-Auscultation---Episode-11-MP3_160K--2-.mp3
+
+CASE | Chronic Stable Angina | updated=2026-07-13T23:22:20.021Z | items=4
+  MISSING | /exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png | /home/adminanmkavps/synoza-media/cases/Chronic-Stable-Angina.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png
+  MISSING | /exam/cases/chronic-stable-angina/Chronic-Stable-Angina.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.mp4 | /home/adminanmkavps/synoza-media/cases/Chronic-Stable-Angina.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.mp4
+  MISSING | /exam/cases/chronic-stable-angina/NORMAL-HEART-SOUND.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-stable-angina/NORMAL-HEART-SOUND.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-stable-angina/NORMAL-HEART-SOUND.mp3 | /home/adminanmkavps/synoza-media/cases/NORMAL-HEART-SOUND.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-stable-angina/NORMAL-HEART-SOUND.mp3
+  MISSING | /exam/cases/chronic-stable-angina/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/chronic-stable-angina/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/chronic-stable-angina/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/chronic-stable-angina/5836913327987166802.jpg
+
+CASE | Prosthetic Valve Replacement | updated=2026-07-13T23:18:34.041Z | items=4
+  MISSING | /exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png | /home/adminanmkavps/synoza-media/public/exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png | /home/adminanmkavps/synoza-media/cases/Prosthetic-Valve-Replacement.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png
+  MISSING | /exam/cases/prosthetic-valve-replacement/video5954128306499494155.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/prosthetic-valve-replacement/video5954128306499494155.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/prosthetic-valve-replacement/video5954128306499494155.mp4 | /home/adminanmkavps/synoza-media/cases/video5954128306499494155.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/prosthetic-valve-replacement/video5954128306499494155.mp4
+  MISSING | /exam/cases/prosthetic-valve-replacement/Prosthetic_Mitral_Valve_Closing_Click_normal_speedMP3_160K.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/prosthetic-valve-replacement/Prosthetic_Mitral_Valve_Closing_Click_normal_speedMP3_160K.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/prosthetic-valve-replacement/Prosthetic_Mitral_Valve_Closing_Click_normal_speedMP3_160K.mp3 | /home/adminanmkavps/synoza-media/cases/Prosthetic_Mitral_Valve_Closing_Click_normal_speedMP3_160K.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/prosthetic-valve-replacement/Prosthetic_Mitral_Valve_Closing_Click_normal_speedMP3_160K.mp3
+  MISSING | /exam/cases/prosthetic-valve-replacement/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/prosthetic-valve-replacement/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/prosthetic-valve-replacement/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/prosthetic-valve-replacement/5836913327987166802.jpg
+
+CASE | Pulmonary Hypertension | updated=2026-07-13T22:57:55.487Z | items=4
+  MISSING | /exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png
+     tried: /home/adminanmkavps/synoza-media/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png | /home/adminanmkavps/synoza-media/public/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png | /home/adminanmkavps/synoza-media/cases/Pulmonary-Hypertension.png | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png
+  MISSING | /exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.mp4
+     tried: /home/adminanmkavps/synoza-media/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.mp4 | /home/adminanmkavps/synoza-media/public/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.mp4 | /home/adminanmkavps/synoza-media/cases/Pulmonary-Hypertension.mp4 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.mp4
+  MISSING | /exam/cases/pulmonary-hypertension/TR.mp3
+     tried: /home/adminanmkavps/synoza-media/exam/cases/pulmonary-hypertension/TR.mp3 | /home/adminanmkavps/synoza-media/public/exam/cases/pulmonary-hypertension/TR.mp3 | /home/adminanmkavps/synoza-media/cases/TR.mp3 | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/pulmonary-hypertension/TR.mp3
+  MISSING | /exam/cases/pulmonary-hypertension/5836913327987166802.jpg
+     tried: /home/adminanmkavps/synoza-media/exam/cases/pulmonary-hypertension/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/public/exam/cases/pulmonary-hypertension/5836913327987166802.jpg | /home/adminanmkavps/synoza-media/cases/5836913327987166802.jpg | /home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/pulmonary-hypertension/5836913327987166802.jpg
+
+==== SUMMARY ====
+present 2 missing 69
+MISSING_JSON_START
+[
+  {
+    "title": "Portal Hypertension",
+    "url": "/exam/cases/portal-hypertension/Portal-Hypertension.png"
+  },
+  {
+    "title": "Portal Hypertension",
+    "url": "/ascites_distended_abdomen.everted_umbilicus.jpg"
+  },
+  {
+    "title": "Portal Hypertension",
+    "url": "/spleen palpation.mp4"
+  },
+  {
+    "title": "Peptic Ulcer Disease",
+    "url": "/exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png"
+  },
+  {
+    "title": "Peptic Ulcer Disease",
+    "url": "/liver palpation.mp4"
+  },
+  {
+    "title": "Liver Cirrhosis (Decompensated)",
+    "url": "/exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png"
+  },
+  {
+    "title": "Liver Cirrhosis (Decompensated)",
+    "url": "/bilateral_pitting_edema_leg.jpg"
+  },
+  {
+    "title": "Liver Cirrhosis (Decompensated)",
+    "url": "/Jaundice_.jpg"
+  },
+  {
+    "title": "Liver Cirrhosis (Decompensated)",
+    "url": "/leukonychia_hand.jpg"
+  },
+  {
+    "title": "Liver Cirrhosis (Decompensated)",
+    "url": "/palmar_erythema_hand.jpg"
+  },
+  {
+    "title": "Liver Cirrhosis (Decompensated)",
+    "url": "/spleen palpation.mp4"
+  },
+  {
+    "title": "Irritable Bowel Syndrome",
+    "url": "/exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png"
+  },
+  {
+    "title": "Irritable Bowel Syndrome",
+    "url": "/liver palpation.mp4"
+  },
+  {
+    "title": "Hepatocellular Carcinoma",
+    "url": "/exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png"
+  },
+  {
+    "title": "Hepatocellular Carcinoma",
+    "url": "/ascites_distended_abdomen.everted_umbilicus.jpg"
+  },
+  {
+    "title": "Hepatocellular Carcinoma",
+    "url": "/liver palpation.mp4"
+  },
+  {
+    "title": "Hepatocellular Carcinoma",
+    "url": "/spleen palpation.mp4"
+  },
+  {
+    "title": "Gastroesophageal Reflux Disease (GERD)",
+    "url": "/exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png"
+  },
+  {
+    "title": "Chronic Viral Hepatitis",
+    "url": "/exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png"
+  },
+  {
+    "title": "Chronic Viral Hepatitis",
+    "url": "/palmar_erythema_hand.jpg"
+  },
+  {
+    "title": "Chronic Viral Hepatitis",
+    "url": "/liver palpation.mp4"
+  },
+  {
+    "title": "Bilharziasis (Schistosomiasis)",
+    "url": "/exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png"
+  },
+  {
+    "title": "Bilharziasis (Schistosomiasis)",
+    "url": "/liver palpation.mp4"
+  },
+  {
+    "title": "Bilharziasis (Schistosomiasis)",
+    "url": "/spleen palpation.mp4"
+  },
+  {
+    "title": "Ascites",
+    "url": "/exam/cases/ascites/ASCITES.png"
+  },
+  {
+    "title": "Ascites",
+    "url": "/exam/cases/ascites/ASCITES-PALPATION.mp4"
+  },
+  {
+    "title": "Ascites",
+    "url": "/exam/cases/ascites/ASCITES-PERCUSSION.mp4"
+  },
+  {
+    "title": "Rheumatic Triple Valve Disease (MS, TR & TS)",
+    "url": "/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png"
+  },
+  {
+    "title": "Rheumatic Triple Valve Disease (MS, TR & TS)",
+    "url": "/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.mp4"
+  },
+  {
+    "title": "Rheumatic Triple Valve Disease (MS, TR & TS)",
+    "url": "/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/MS.mp3"
+  },
+  {
+    "title": "Rheumatic Triple Valve Disease (MS, TR & TS)",
+    "url": "/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/TR.mp3"
+  },
+  {
+    "title": "Rheumatic Triple Valve Disease (MS, TR & TS)",
+    "url": "/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/5836913327987166802.jpg"
+  },
+  {
+    "title": "MR + AR + Thalassemia Major",
+    "url": "/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png"
+  },
+  {
+    "title": "MR + AR + Thalassemia Major",
+    "url": "/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.mp4"
+  },
+  {
+    "title": "MR + AR + Thalassemia Major",
+    "url": "/exam/cases/mr-ar-thalassemia-major/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3"
+  },
+  {
+    "title": "MR + AR + Thalassemia Major",
+    "url": "/exam/cases/mr-ar-thalassemia-major/Aortic-Regurgitation--normal-speed-MP3_160K-.mp3"
+  },
+  {
+    "title": "MR + AR + Thalassemia Major",
+    "url": "/exam/cases/mr-ar-thalassemia-major/5836913327987166802.jpg"
+  },
+  {
+    "title": "Chronic Mitral Regurgitation",
+    "url": "/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png"
+  },
+  {
+    "title": "Chronic Mitral Regurgitation",
+    "url": "/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.mp4"
+  },
+  {
+    "title": "Chronic Mitral Regurgitation",
+    "url": "/exam/cases/chronic-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3"
+  },
+  {
+    "title": "Chronic Mitral Regurgitation",
+    "url": "/exam/cases/chronic-mitral-regurgitation/5836913327987166802.jpg"
+  },
+  {
+    "title": "Classic Mitral Stenosis",
+    "url": "/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png"
+  },
+  {
+    "title": "Classic Mitral Stenosis",
+    "url": "/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis.mp4"
+  },
+  {
+    "title": "Classic Mitral Stenosis",
+    "url": "/exam/cases/classic-mitral-stenosis/MS.mp3"
+  },
+  {
+    "title": "Classic Mitral Stenosis",
+    "url": "/exam/cases/classic-mitral-stenosis/5836913327987166802.jpg"
+  },
+  {
+    "title": "Chronic Heart Failure",
+    "url": "/exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png"
+  },
+  {
+    "title": "Chronic Heart Failure",
+    "url": "/exam/cases/chronic-heart-failure/chronic-heart-failure.mp4"
+  },
+  {
+    "title": "Chronic Heart Failure",
+    "url": "/exam/cases/chronic-heart-failure/S3_Heart_Sound_S3_Gallop_Heart_Auscultation_Episode_9MP3_160K2_1.mp3"
+  },
+  {
+    "title": "Chronic Heart Failure",
+    "url": "/exam/cases/chronic-heart-failure/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3"
+  },
+  {
+    "title": "Chronic Heart Failure",
+    "url": "/exam/cases/chronic-heart-failure/5836913327987166802.jpg"
+  },
+  {
+    "title": "AS + MR (Aortic Stenosis & Mitral Regurgitation)",
+    "url": "/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/AS---PULMONARY-STENOSIS.mp3"
+  },
+  {
+    "title": "AS + MR (Aortic Stenosis & Mitral Regurgitation)",
+    "url": "/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/Mitral_Regurgitation_MR_Heart_Auscultation_Episode_4MP3_160K2.mp3"
+  },
+  {
+    "title": "AS + MR (Aortic Stenosis & Mitral Regurgitation)",
+    "url": "/exam/cases/as-mr-aortic-stenosis-mitral-regurgitation/5836913327987166802.jpg"
+  },
+  {
+    "title": "VSD (Ventricular Septal Defect)",
+    "url": "/exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png"
+  },
+  {
+    "title": "VSD (Ventricular Septal Defect)",
+    "url": "/exam/cases/vsd-ventricular-septal-defect/video5954128306499494169.mp4"
+  },
+  {
+    "title": "VSD (Ventricular Septal Defect)",
+    "url": "/exam/cases/vsd-ventricular-septal-defect/5836913327987166802.jpg"
+  },
+  {
+    "title": "VSD (Ventricular Septal Defect)",
+    "url": "/exam/cases/vsd-ventricular-septal-defect/Ventricular-Septal-Defect--VSD----Heart-Auscultation---Episode-11-MP3_160K--2-.mp3"
+  },
+  {
+    "title": "Chronic Stable Angina",
+    "url": "/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png"
+  },
+  {
+    "title": "Chronic Stable Angina",
+    "url": "/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.mp4"
+  },
+  {
+    "title": "Chronic Stable Angina",
+    "url": "/exam/cases/chronic-stable-angina/NORMAL-HEART-SOUND.mp3"
+  },
+  {
+    "title": "Chronic Stable Angina",
+    "url": "/exam/cases/chronic-stable-angina/5836913327987166802.jpg"
+  },
+  {
+    "title": "Prosthetic Valve Replacement",
+    "url": "/exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png"
+  },
+  {
+    "title": "Prosthetic Valve Replacement",
+    "url": "/exam/cases/prosthetic-valve-replacement/video5954128306499494155.mp4"
+  },
+  {
+    "title": "Prosthetic Valve Replacement",
+    "url": "/exam/cases/prosthetic-valve-replacement/Prosthetic_Mitral_Valve_Closing_Click_normal_speedMP3_160K.mp3"
+  },
+  {
+    "title": "Prosthetic Valve Replacement",
+    "url": "/exam/cases/prosthetic-valve-replacement/5836913327987166802.jpg"
+  },
+  {
+    "title": "Pulmonary Hypertension",
+    "url": "/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png"
+  },
+  {
+    "title": "Pulmonary Hypertension",
+    "url": "/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.mp4"
+  },
+  {
+    "title": "Pulmonary Hypertension",
+    "url": "/exam/cases/pulmonary-hypertension/TR.mp3"
+  },
+  {
+    "title": "Pulmonary Hypertension",
+    "url": "/exam/cases/pulmonary-hypertension/5836913327987166802.jpg"
+  }
+]
+MISSING_JSON_END
+
+==== MEDIA DIRS ====
+total 12K
+drwxr-xr-x   3 root root 4.0K Jul 14 10:05 .
+drwxr-x--x+ 28 root root 4.0K Jul 14 10:05 ..
+drwxr-xr-x   3 root root 4.0K Jul 14 10:05 exam
+total 12K
+drwxr-xr-x 3 root   root   4.0K Jul 14 10:05 .
+drwxr-xr-x 3 root   root   4.0K Jul 14 10:05 ..
+drwxr-xr-x 3 197609 197609 4.0K Jul 14 16:57 cases
+total 12K
+drwxr-xr-x 3 197609 197609 4.0K Jul 14 16:57 .
+drwxr-xr-x 3 root   root   4.0K Jul 14 10:05 ..
+drwxr-xr-x 2 197609 197609 4.0K Jul 14 16:57 as-mr
+---- case folders in persistent media ----
+/home/adminanmkavps/synoza-media/exam/cases
+/home/adminanmkavps/synoza-media/exam/cases/as-mr
+---- files per case folder ----
+/home/adminanmkavps/synoza-media/exam/cases/as-mr/auscultation-as.mpeg
+/home/adminanmkavps/synoza-media/exam/cases/as-mr/inspection.png
+/home/adminanmkavps/synoza-media/exam/cases/as-mr/auscultation-mr.mpeg
+/home/adminanmkavps/synoza-media/exam/cases/as-mr/palpation.mp4
+==== packaged public exam ====
+/home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr/auscultation-as.mpeg
+/home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr/inspection.png
+/home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr/auscultation-mr.mpeg
+/home/adminanmkavps/synoza.anmka.com/client/public/exam/cases/as-mr/palpation.mp4
+==== du ====
+5.6M	/home/adminanmkavps/synoza-media
+5.6M	/home/adminanmkavps/synoza-media/exam/cases/as-mr
+==== ENV ====
+DATABASE_URL="mysql://***:***@localhost:3306/adminanmkavps_synoza"
+SYNOZA_EXAM_MEDIA_ROOT=/home/adminanmkavps/synoza-media/exam
+==== TMP leftovers ====
+-rw-r--r-- 1 root   root    12M Jul 14 16:58 /tmp/synoza-deploy.tar.gz
+-rw-r--r-- 1 root   root    824 Jul  7 11:01 /tmp/synoza-remote-install.sh
+-rw-r--r-- 1 root   root    20K Jul  6 09:24 /tmp/synoza-server-hotfix.tar.gz
+-rw-r--r-- 1 root   root    935 Jul 14 16:58 /tmp/synoza-server.env.bak
+-rw-r--r-- 1 root   root    840 Jul  6 16:57 /tmp/synoza.env.bak
+
+/tmp/synoza-exam-cases.bak:
+total 284K
+drwxr-xr-x   3 197609 197609 4.0K Jul 14 09:45 .
+drwxrwxrwt 329 root   root   272K Jul 15 21:32 ..
+drwxr-xr-x   2 197609 197609 4.0K Jul 14 09:45 as-mr
+/tmp/synoza-exam-cases.bak
+/tmp/synoza-exam-cases.bak
+
+==== TEMP DB vs LIVE examImages length ====
+AS + MR (Aortic Stenosis & Mitral Regurgitation)	709	[{"url":"/exam/cases/as-mr/inspection.png","maneuver":"inspection","mediaType":"image"},{"url":"/exam/cases/as-mr/palpation.mp4","maneuver":"palpation","mediaType":"video"},{"url":
+Ascites	481	[{"url":"/exam/cases/ascites/ASCITES.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"url":"/exam/cases/ascites/A
+Bilharziasis (Schistosomiasis)	408	[{"url":"/exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"u
+Chronic Heart Failure	902	[{"url":"/exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"i
+Chronic Mitral Regurgitation	706	[{"url":"/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaTy
+Chronic Stable Angina	586	[{"url":"/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{
+Chronic Viral Hepatitis	442	[{"url":"/exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image
+Classic Mitral Stenosis	618	[{"url":"/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"imag
+Gastroesophageal Reflux Disease (GERD)	146	[{"url":"/exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png","maneuver":"inspection","mediaType":"image"}]
+Hepatocellular Carcinoma	583	[{"url":"/exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"ima
+Irritable Bowel Syndrome	315	[{"url":"/exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","
+Liver Cirrhosis (Decompensated)	881	[{"url":"/exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","med
+MR + AR + Thalassemia Major	866	[{"url":"/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"i
+Peptic Ulcer Disease	292	[{"url":"/exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"u
+Portal Hypertension	458	[{"url":"/exam/cases/portal-hypertension/Portal-Hypertension.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"url
+Prosthetic Valve Replacement	612	[{"url":"/exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaTy
+Pulmonary Hypertension	588	[{"url":"/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"}
+Rheumatic Triple Valve Disease (MS, TR & TS)	893	[{"url":"/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","mane
+VSD (Ventricular Septal Defect)	646	[{"url":"/exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","med
+---- LIVE ----
+AS + MR (Aortic Stenosis & Mitral Regurgitation)	709	[{"url":"/exam/cases/as-mr/inspection.png","maneuver":"inspection","mediaType":"image"},{"url":"/exam/cases/as-mr/palpation.mp4","maneuver":"palpation","mediaType":"video"},{"url":
+Ascites	481	[{"url":"/exam/cases/ascites/ASCITES.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"url":"/exam/cases/ascites/A
+Bilharziasis (Schistosomiasis)	408	[{"url":"/exam/cases/bilharziasis-schistosomiasis/Bilharziasis.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"u
+Chronic Heart Failure	902	[{"url":"/exam/cases/chronic-heart-failure/Chronic-Heart-Failure--HFrEF-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"i
+Chronic Mitral Regurgitation	706	[{"url":"/exam/cases/chronic-mitral-regurgitation/Chronic-Mitral-Regurgitation.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaTy
+Chronic Stable Angina	586	[{"url":"/exam/cases/chronic-stable-angina/Chronic-Stable-Angina.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{
+Chronic Viral Hepatitis	442	[{"url":"/exam/cases/chronic-viral-hepatitis/Chronic-Viral-Hepatitis.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image
+Classic Mitral Stenosis	618	[{"url":"/exam/cases/classic-mitral-stenosis/Classic-Mitral-Stenosis2.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"imag
+Gastroesophageal Reflux Disease (GERD)	146	[{"url":"/exam/cases/gastroesophageal-reflux-disease-gerd/Gastroesophageal-Reflux-Disease--GERD.png","maneuver":"inspection","mediaType":"image"}]
+Hepatocellular Carcinoma	583	[{"url":"/exam/cases/hepatocellular-carcinoma/Hepatocellular-Carcinoma.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"ima
+Irritable Bowel Syndrome	315	[{"url":"/exam/cases/irritable-bowel-syndrome/ChatGPT-Image-Jul-13--2026--06_20_15-PM.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","
+Liver Cirrhosis (Decompensated)	881	[{"url":"/exam/cases/liver-cirrhosis-decompensated/Liver-Cirrhosis--Decompensated-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","med
+MR + AR + Thalassemia Major	866	[{"url":"/exam/cases/mr-ar-thalassemia-major/MR---AR---Thalassemia-Major.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"i
+Peptic Ulcer Disease	292	[{"url":"/exam/cases/peptic-ulcer-disease/Peptic-Ulcer-Disease.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"u
+Portal Hypertension	458	[{"url":"/exam/cases/portal-hypertension/Portal-Hypertension.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"},{"url
+Prosthetic Valve Replacement	612	[{"url":"/exam/cases/prosthetic-valve-replacement/Prosthetic-Valve-Replacement.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaTy
+Pulmonary Hypertension	588	[{"url":"/exam/cases/pulmonary-hypertension/Pulmonary-Hypertension.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","mediaType":"image"}
+Rheumatic Triple Valve Disease (MS, TR & TS)	893	[{"url":"/exam/cases/rheumatic-triple-valve-disease-ms-tr-ts/Rheumatic-Triple-Valve-Disease--MS--TR---TS-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","mane
+VSD (Ventricular Septal Defect)	646	[{"url":"/exam/cases/vsd-ventricular-septal-defect/VSD--Ventricular-Septal-Defect-.png","caption":"Inspection finding","captionAr":"نتيجة الفحص البصري","maneuver":"inspection","med

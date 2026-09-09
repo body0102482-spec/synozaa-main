@@ -1,0 +1,25 @@
+{
+  "name": "synoza",
+  "version": "1.0.0",
+  "description": "Synoza - AI-powered OSCE medical training platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client && npm run build --prefix server",
+    "deploy:package": "powershell -ExecutionPolicy Bypass -File deploy/build-package.ps1",
+    "deploy:remote": "powershell -ExecutionPolicy Bypass -File deploy/remote-deploy.ps1",
+    "deploy": "npm run deploy:package && npm run deploy:remote",
+    "start": "npm run start --prefix server",
+    "db:generate": "npm run db:generate --prefix server",
+    "db:setup-mysql": "powershell -ExecutionPolicy Bypass -File server/scripts/setup-mysql.ps1",
+    "db:reset-mysql-root": "powershell -ExecutionPolicy Bypass -File server/scripts/reset-mysql-root.ps1",
+    "db:migrate": "npm run db:migrate --prefix server",
+    "db:seed": "npm run db:seed --prefix server",
+    "setup": "npm install && npm install --prefix server && npm install --prefix client && npm run db:generate && npm run db:migrate && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,0 +1,40 @@
+==== TREE synoza-media ====
+/ dirs= ['exam'] files= []
+/exam dirs= ['cases'] files= []
+/exam/cases dirs= ['as-mr'] files= []
+/exam/cases/as-mr dirs= [] files= ['auscultation-as.mpeg', 'inspection.png', 'auscultation-mr.mpeg', 'palpation.mp4']
+==== TREE client/public/exam ====
+/ dirs= ['cases'] files= ['chest-inspection.svg', 'chest-auscultation.svg', 'chest-palpation.svg', 'chest-percussion.svg']
+/cases dirs= ['as-mr'] files= []
+/cases/as-mr dirs= [] files= ['auscultation-as.mpeg', 'inspection.png', 'auscultation-mr.mpeg', 'palpation.mp4']
+==== TREE /tmp/synoza-exam-cases.bak ====
+/tmp/synoza-exam-cases.bak dirs= ['as-mr'] files= []
+/tmp/synoza-exam-cases.bak/as-mr dirs= [] files= ['auscultation-as.mpeg', 'inspection.png', 'auscultation-mr.mpeg', 'palpation.mp4']
+==== NAME SEARCH (depth-limited) ====
+ABSENT ASCITES.png => 
+ABSENT ASCITES-PALPATION.mp4 => 
+ABSENT ASCITES-PERCUSSION.mp4 => 
+ABSENT Portal-Hypertension.png => 
+ABSENT Classic-Mitral-Stenosis.mp4 => 
+ABSENT Classic-Mitral-Stenosis2.png => 
+ABSENT Chronic-Heart-Failure--HFrEF-.png => 
+ABSENT chronic-heart-failure.mp4 => 
+ABSENT spleen palpation.mp4 => 
+ABSENT liver palpation.mp4 => 
+ABSENT Jaundice_.jpg => 
+ABSENT palmar_erythema_hand.jpg => 
+ABSENT 5836913327987166802.jpg => 
+ABSENT video5954128306499494169.mp4 => 
+ABSENT MS.mp3 => 
+ABSENT TR.mp3 => 
+==== SLUG DIRS ====
+ascites => NONE
+classic-mitral-stenosis => NONE
+chronic-heart-failure => NONE
+portal-hypertension => NONE
+liver-cirrhosis-decompensated => NONE
+bilharziasis-schistosomiasis => NONE
+pulmonary-hypertension => NONE
+==== nginx cache sample ====
+cache dir /var/cache/nginx
+/var/cache/nginx files 0 dirs 6

@@ -1,0 +1,18 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.db
+*.db-journal
+Thumbs.db
+*.log
+.vite/
+coverage/
+deploy/server.env.production
+deploy/synoza-deploy.tar.gz
+
+# Transformers.js model cache (large ONNX files, downloaded at runtime)
+server/.cache/
+.cache/transformers/
+*.onnx

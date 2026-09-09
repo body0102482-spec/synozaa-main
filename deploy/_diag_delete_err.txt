@@ -1,0 +1,161 @@
+=== prisma models in schema ===
+model KnowledgeCategory {
+model AiKnowledgeEntry {
+model KnowledgeItem {
+model User {
+model Specialty {
+model DifficultyLevel {
+model Case {
+model CaseUniversityOverride {
+model Session {
+model Message {
+model Result {
+model Subscription {
+model CaseAccess {
+model PaymentOrder {
+model QbankModuleEntitlement {
+model QbankTerm {
+model QbankModule {
+model QbankModuleUniversity {
+model QbankChapter {
+model QbankReference {
+model QbankQuestion {
+model AISettings {
+model AiUsageLog {
+model PlanConfig {
+model AiCostRate {
+model AuditLog {
+model SiteContent {
+model PartnerUniversity {
+model SiteSettings {
+
+=== deleteMany in dist adminCases ===
+260:                await tx.message.deleteMany({ where: { sessionId: { in: sessionIds } } });
+261:                await tx.result.deleteMany({ where: { sessionId: { in: sessionIds } } });
+262:                await tx.aiUsageLog.deleteMany({ where: { sessionId: { in: sessionIds } } });
+263:                await tx.session.deleteMany({ where: { caseId } });
+265:            await tx.caseUniversityOverride.deleteMany({ where: { caseId } });
+266:            await tx.caseAccess.deleteMany({ where: { caseId } });
+267:            await tx.aiKnowledgeEntry.deleteMany({ where: { caseId } });
+
+=== prisma client model presence ===
+KEYS aISettings,aiCostRate,aiKnowledgeEntry,aiUsageLog,auditLog,case,caseAccess,constructor,difficultyLevel,knowledgeCategory,knowledgeItem,message,partnerUniversity,paymentOrder,planConfig,qbankChapter,qbankModule,qbankModuleEntitlement,qbankQuestion,qbankReference,qbankTerm,result,session,siteContent,siteSettings,specialty,subscription,user
+message typeof= object deleteMany= function
+result typeof= object deleteMany= function
+aiUsageLog typeof= object deleteMany= function
+session typeof= object deleteMany= function
+caseUniversityOverride typeof= undefined deleteMany= undefined
+caseAccess typeof= object deleteMany= function
+aiKnowledgeEntry typeof= object deleteMany= function
+case typeof= object deleteMany= function
+
+=== recent pm2 error logs ===
+
+>>>> In-memory PM2 is out-of-date, do:
+>>>> $ pm2 update
+In memory PM2 version: 6.0.14
+Local PM2 version: 7.0.1
+
+[TAILING] Tailing last 100 lines for [synoza] process (change the value with --lines option)
+/root/.pm2/logs/synoza-error-347.log last 100 lines:
+347|synoza | ?   id?: true,
+347|synoza | ?   email?: true,
+347|synoza | ?   passwordHash?: true,
+347|synoza | ?   firstName?: true,
+347|synoza | ?   lastName?: true,
+347|synoza | ?   phone?: true,
+347|synoza | ?   studentId?: true,
+347|synoza | ?   avatarUrl?: true,
+347|synoza | ?   role?: true,
+347|synoza | ?   isActive?: true,
+347|synoza | ?   emailVerified?: true,
+347|synoza | ?   preferredLang?: true,
+347|synoza | ?   totalXp?: true,
+347|synoza | ?   academicYear?: true,
+347|synoza | ?   lastSeenAt?: true,
+347|synoza | ?   otpCode?: true,
+347|synoza | ?   otpExpires?: true,
+347|synoza | ?   resetToken?: true,
+347|synoza | ?   resetExpires?: true,
+347|synoza | ?   createdAt?: true,
+347|synoza | ?   updatedAt?: true,
+347|synoza | ?   sessions?: true,
+347|synoza | ?   subscriptions?: true,
+347|synoza | ?   caseAccess?: true,
+347|synoza | ?   auditLogs?: true,
+347|synoza | ?   paymentOrders?: true,
+347|synoza | ?   qbankModuleAccess?: true,
+347|synoza | ?   aiUsageLogs?: true,
+347|synoza | ?   _count?: true
+347|synoza |   }
+347|synoza | }
+347|synoza | 
+347|synoza | Unknown field `universityId` for select statement on model `User`. Available options are marked with ?.
+347|synoza |     at throwValidationException (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:45:9)
+347|synoza |     at ei.handleRequestError (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/RequestHandler.ts:202:7)
+347|synoza |     at ei.handleAndLogRequestError (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+347|synoza |     at ei.request (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+347|synoza |     at async a (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+347|synoza |     at async resolveUserUniversityId (file:///home/adminanmkavps/synoza.anmka.com/server/dist/lib/universityScope.js:3:18)
+347|synoza |     at async resolveStationConfigForUser (file:///home/adminanmkavps/synoza.anmka.com/server/dist/services/caseResolveService.js:13:26)
+347|synoza |     at async serializeResolvedStationConfigForUser (file:///home/adminanmkavps/synoza.anmka.com/server/dist/services/caseResolveService.js:25:20)
+347|synoza |     at async file:///home/adminanmkavps/synoza.anmka.com/server/dist/routes/sessions.js:63:35 {
+347|synoza |   clientVersion: '6.19.3'
+347|synoza | }
+347|synoza | PrismaClientValidationError: 
+347|synoza | Invalid `prisma.user.findUnique()` invocation:
+347|synoza | 
+347|synoza | {
+347|synoza |   where: {
+347|synoza |     id: "cmqqluhp4000gx2vpwkh00xfd"
+347|synoza |   },
+347|synoza |   select: {
+347|synoza |     universityId: true,
+347|synoza |     ~~~~~~~~~~~~
+347|synoza |     university: true,
+347|synoza | ?   id?: true,
+347|synoza | ?   email?: true,
+347|synoza | ?   passwordHash?: true,
+347|synoza | ?   firstName?: true,
+347|synoza | ?   lastName?: true,
+347|synoza | ?   phone?: true,
+347|synoza | ?   studentId?: true,
+347|synoza | ?   avatarUrl?: true,
+347|synoza | ?   role?: true,
+347|synoza | ?   isActive?: true,
+347|synoza | ?   emailVerified?: true,
+347|synoza | ?   preferredLang?: true,
+347|synoza | ?   totalXp?: true,
+347|synoza | ?   academicYear?: true,
+347|synoza | ?   lastSeenAt?: true,
+347|synoza | ?   otpCode?: true,
+347|synoza | ?   otpExpires?: true,
+347|synoza | ?   resetToken?: true,
+347|synoza | ?   resetExpires?: true,
+347|synoza | ?   createdAt?: true,
+347|synoza | ?   updatedAt?: true,
+347|synoza | ?   sessions?: true,
+347|synoza | ?   subscriptions?: true,
+347|synoza | ?   caseAccess?: true,
+347|synoza | ?   auditLogs?: true,
+347|synoza | ?   paymentOrders?: true,
+347|synoza | ?   qbankModuleAccess?: true,
+347|synoza | ?   aiUsageLogs?: true,
+347|synoza | ?   _count?: true
+347|synoza |   }
+347|synoza | }
+347|synoza | 
+347|synoza | Unknown field `universityId` for select statement on model `User`. Available options are marked with ?.
+347|synoza |     at throwValidationException (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/core/errorRendering/throwValidationException.ts:45:9)
+347|synoza |     at ei.handleRequestError (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/RequestHandler.ts:202:7)
+347|synoza |     at ei.handleAndLogRequestError (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/RequestHandler.ts:174:12)
+347|synoza |     at ei.request (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/RequestHandler.ts:143:12)
+347|synoza |     at async a (/home/adminanmkavps/synoza.anmka.com/server/node_modules/@prisma/client/src/runtime/getPrismaClient.ts:833:24)
+347|synoza |     at async resolveUserUniversityId (file:///home/adminanmkavps/synoza.anmka.com/server/dist/lib/universityScope.js:3:18)
+347|synoza |     at async resolveStationConfigForUser (file:///home/adminanmkavps/synoza.anmka.com/server/dist/services/caseResolveService.js:13:26)
+347|synoza |     at async serializeResolvedStationConfigForUser (file:///home/adminanmkavps/synoza.anmka.com/server/dist/services/caseResolveService.js:25:20)
+347|synoza |     at async file:///home/adminanmkavps/synoza.anmka.com/server/dist/routes/sessions.js:63:35 {
+347|synoza |   clientVersion: '6.19.3'
+347|synoza | }
+347|synoza | [admin] case delete failed Cannot read properties of undefined (reading 'deleteMany')
+
