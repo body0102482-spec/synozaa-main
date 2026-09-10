@@ -5,7 +5,7 @@ JWT_SECRET=change-this-to-a-long-random-secret-key-1234567890
 JWT_EXPIRES_IN=365d
 CLIENT_URL=http://localhost:5173
 
-# Database — SQLite (default) OR MySQL
+# Database — postgresql
 DATABASE_URL="file:./dev.db"
 
 # AI Provider (openai | gemini | mock | openrouter)
