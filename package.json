@@ -7,7 +7,7 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
-    "build": "npm install --prefix client && npm run build --prefix client && npm run build --prefix server",
+    "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server && npm run build --prefix server",
     "deploy:package": "powershell -ExecutionPolicy Bypass -File deploy/build-package.ps1",
     "deploy:remote": "powershell -ExecutionPolicy Bypass -File deploy/remote-deploy.ps1",
     "deploy": "npm run deploy:package && npm run deploy:remote",
