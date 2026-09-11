@@ -26,10 +26,11 @@ ENV PORT=5000
 ENV DATABASE_URL="file:/app/prisma/dev.db"
 ENV JWT_SECRET="synoza-jwt-default-secret-key-super-secure-2026"
 ENV AI_PROVIDER="openrouter"
-ENV OPENROUTER_API_KEY="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"
+ENV OPENROUTER_API_KEY="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
+OPENROUTER_FALLBACK_MODEL=qwen/qwen3.7-flash"
 ENV OPENROUTER_FALLBACK_MODEL="qwen/qwen3.7-flash"
-ENV OPENAI_MODEL="google/gemini-2.5-flash"
-ENV OPENAI_PATIENT_MODEL="google/gemini-2.5-flash"
+ENV OPENAI_MODEL="google/gemini-2.5-flash-lite"
+ENV OPENAI_PATIENT_MODEL="google/gemini-2.5-flash-lite"
 EXPOSE 5000
 
 CMD ["npm", "start"]

@@ -468,7 +468,7 @@ Do NOT volunteer the diagnosis. Answer in Egyptian Arabic when student uses Arab
   }
 
   const aiProvider = process.env.AI_PROVIDER || 'openrouter';
-  const aiModel = process.env.OPENAI_MODEL || 'google/gemini-2.5-flash';
+  const aiModel = process.env.OPENAI_MODEL || 'google/gemini-2.5-flash-lite';
   const existingAI = await prisma.aISettings.findFirst();
   if (existingAI) {
     await prisma.aISettings.update({

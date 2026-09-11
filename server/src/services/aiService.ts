@@ -822,7 +822,7 @@ JSON structure:
 }
 
 async function getAISettings() {
-  const defaultModel = process.env.OPENAI_MODEL || 'google/gemini-2.5-flash';
+  const defaultModel = process.env.OPENAI_MODEL || 'google/gemini-2.5-flash-lite';
   let settings = await prisma.aISettings.findFirst();
   if (!settings) {
     settings = await prisma.aISettings.create({
@@ -857,12 +857,12 @@ async function getAISettings() {
       process.env.OPENAI_PATIENT_MODEL ||
       process.env.OPENAI_MODEL ||
       settings.patientModel ||
-      'google/gemini-2.5-flash',
+      'google/gemini-2.5-flash-lite',
     examinerModel:
       process.env.OPENAI_EXAMINER_MODEL ||
       process.env.OPENAI_MODEL ||
       settings.examinerModel ||
-      'google/gemini-2.5-flash',
+      'google/gemini-2.5-flash-lite',
     maxContextMessages: settings.maxContextMessages ?? 16,
     openRouterApiKey:
       process.env.OPENROUTER_API_KEY?.trim() ||
