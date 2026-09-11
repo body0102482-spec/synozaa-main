@@ -22,6 +22,7 @@ RUN npx prisma generate
 RUN npm run build
 
 ENV NODE_ENV=production
+ENV DATABASE_URL="file:/app/prisma/dev.db"
 ENV PORT=5000
 ENV JWT_SECRET="synoza-jwt-default-secret-key-super-secure-2026"
 ENV AI_PROVIDER="openrouter"
