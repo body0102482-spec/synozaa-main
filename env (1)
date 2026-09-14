@@ -11,7 +11,7 @@ DATABASE_URL="file:./dev.db"
 # AI Provider (openai | gemini | mock)
 AI_PROVIDER=openrouter
 # Optional OpenRouter (also configurable in Admin → Settings)
-OPENROUTER_API_KEY=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
+OPENROUTER_API_KEY=
 OPENROUTER_FALLBACK_MODEL=qwen/qwen3.7-flash
 OPENAI_API_KEY=your-openai-api-key-here
 OPENAI_MODEL=qwen/qwen3.7-flash

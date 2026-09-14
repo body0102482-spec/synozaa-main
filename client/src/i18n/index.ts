@@ -436,7 +436,7 @@ export default {
       refreshExamTitle: "Page refreshed during exam",
       refreshExamMessage:
         "You refreshed the page during the exam. Continue where you left off, or leave — the session will end and progress may be lost.",
-      stayInExam: "Stay in exam",
+      stayInExam: "Stay ",
       leaveExam: "Leave exam",
       viewExaminer: "View Examiner",
       active: "Active",
@@ -568,13 +568,15 @@ export default {
       loading: "Loading...",
       error: "Something went wrong",
       serverOffline:
-        "Cannot reach server. Run backend: cd server && npm run dev (port 5000)",
+        ""Unable to connect to the server. Please check your internet connection and try again."
+",
       invalidCredentials: "Invalid email or password",
       emailAlreadyRegistered:
         "This email is already registered. Sign in or use another email.",
       verifyEmail: "Verify your email",
       verifyEmailDesc:
-        "We sent a 6-digit code to your email. Enter it below to activate your account.",
+        ""We sent a 6-digit code to your email. Enter it below to activate your account. If you don't see it in your inbox, please check your Spam or Junk folder."
+",
       otpCode: "Verification code",
       verifyAndContinue: "Verify & continue",
       resendOtp: "Resend code",
