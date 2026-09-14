@@ -1272,7 +1272,6 @@ export default {
       endLiveCall: "End call",
       liveCallNotSupported:
         "Live call needs a microphone and works best in Chrome or Safari on your phone",
-    },
-  },
+      },
   },
 };
