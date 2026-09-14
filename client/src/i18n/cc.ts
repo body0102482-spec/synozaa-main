@@ -436,7 +436,7 @@ export default {
       refreshExamTitle: "Page refreshed during exam",
       refreshExamMessage:
         "You refreshed the page during the exam. Continue where you left off, or leave — the session will end and progress may be lost.",
-      stayInExam: "Stay ",
+      stayInExam: "Stay",
       leaveExam: "Leave exam",
       active: "Active",
       startInterview:
