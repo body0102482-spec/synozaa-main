@@ -289,12 +289,12 @@ export default {
       landingFaq5Answer:
         "Digital subscriptions are final once activated. Full refunds apply only for duplicate charges, failed activation due to a platform error, or mistaken payment collection. Requests must be submitted within 7 days of payment.",
       landingFaq5Link: "Read the full refund policy",
-      landingSimulatorTitle: "Station_Simulator_02",
+      landingSimulatorTitle: "Station_Simulator",
       landingSimulatorPatient: "Simulated Patient",
       landingChatDoctor:
-        "Good morning, I am Dr. Sarah. Can you tell me what brought you in today?",
-      landingChatPatient:
-        "I have been having chest tightness for about two weeks, especially when I walk upstairs.",
+"صباح الخير، أنا د. سارة. ممكن تقولي إيه اللي جابك النهاردة؟",   
+   landingChatPatient:
+    "عندي ضيق في الصدر من حوالي أسبوعين، خصوصاً لما بطلع السلم.",
       landingEcoHeading: "An Immersive Ecosystem",
       landingEcoSubheading: "For Modern Clinical Minds",
       landingEcoIntro:
@@ -427,7 +427,7 @@ export default {
       examinerTyping: "Examiner is typing...",
       chatError: "Could not get a response. Try again.",
       chatErrorOffline:
-        "Server offline — start the backend with npm run dev, then try again.",
+        "Unable to connect to Synoza . Please check your internet connection and try again",
       send: "Send",
       quit: "Quit",
       exitExamTitle: "Leave OSCE session?",
