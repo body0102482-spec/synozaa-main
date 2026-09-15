@@ -20,7 +20,7 @@ echo '=== body title ==='
 curl -s https://synoza.anmka.com/ | grep -oE '<title>[^<]+</title>|Coming Soon|Synoza' | head -10
 echo
 echo '=== medsynoza title ==='
-curl -s https://medsynoza.com/ | grep -oE '<title>[^<]+</title>' | head -3
+curl -s https://synozaa.com/ | grep -oE '<title>[^<]+</title>' | head -3
 """
 
 client = paramiko.SSHClient()

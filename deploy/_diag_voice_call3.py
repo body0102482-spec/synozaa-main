@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Inspect medsynoza.com access log + synoza pm2 logs for voice/realtime failures."""
+"""Inspect synozaa.com access log + synoza pm2 logs for voice/realtime failures."""
 import sys
 import paramiko
 
@@ -16,13 +16,13 @@ echo '==== pm2 describe synoza (log paths) ===='
 pm2 describe synoza 2>/dev/null | grep -E 'out log|error log|script|exec cwd|status|uptime'
 echo
 echo '==== medsynoza access log: voice endpoints (last 40) ===='
-grep -E 'transcribe|realtime|voice-turn|speech' /var/log/nginx/domains/medsynoza.com.log 2>/dev/null | tail -40
+grep -E 'transcribe|realtime|voice-turn|speech' /var/log/nginx/domains/synozaa.com.log 2>/dev/null | tail -40
 echo
 echo '==== medsynoza access log: last 20 api hits ===='
-grep '/api/' /var/log/nginx/domains/medsynoza.com.log 2>/dev/null | tail -20
+grep '/api/' /var/log/nginx/domains/synozaa.com.log 2>/dev/null | tail -20
 echo
 echo '==== medsynoza error log tail ===='
-tail -20 /var/log/nginx/domains/medsynoza.com.error.log 2>/dev/null
+tail -20 /var/log/nginx/domains/synozaa.com.error.log 2>/dev/null
 echo
 OUTLOG=$(pm2 describe synoza 2>/dev/null | grep 'out log' | awk '{print $NF}')
 ERRLOG=$(pm2 describe synoza 2>/dev/null | grep 'error log' | awk '{print $NF}')

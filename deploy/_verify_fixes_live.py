@@ -14,7 +14,7 @@ PORT = 2222
 USER = "root"
 PASSWORD = "shtlIf9LAyf1yk3bKF4J"
 APP = "/home/adminanmkavps/synoza.anmka.com"
-SITE = "https://medsynoza.com"
+SITE = "https://synozaa.com"
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
@@ -82,25 +82,25 @@ section("1. Public health")
 try:
     status, body = http_json(f"{SITE}/api/ping")
     data = json.loads(body)
-    (ok if status == 200 and data.get("pong") is True else bad)("medsynoza.com /api/ping", body[:120])
+    (ok if status == 200 and data.get("pong") is True else bad)("synozaa.com /api/ping", body[:120])
 except Exception as e:
-    bad("medsynoza.com /api/ping", str(e))
+    bad("synozaa.com /api/ping", str(e))
 
 try:
     status, body = http_json(f"{SITE}/api/health")
     data = json.loads(body)
     (ok if status == 200 and data.get("status") == "ok" else bad)(
-        "medsynoza.com /api/health", f"uptime={data.get('uptime')}"
+        "synozaa.com /api/health", f"uptime={data.get('uptime')}"
     )
 except Exception as e:
-    bad("medsynoza.com /api/health", str(e))
+    bad("synozaa.com /api/health", str(e))
 
 try:
     req = urllib.request.Request(SITE + "/", method="HEAD", headers={"User-Agent": "synoza-deploy-verify"})
     with urllib.request.urlopen(req, timeout=20) as resp:
-        (ok if resp.status in (200, 301, 302) else bad)("medsynoza.com homepage", f"HTTP {resp.status}")
+        (ok if resp.status in (200, 301, 302) else bad)("synozaa.com homepage", f"HTTP {resp.status}")
 except Exception as e:
-    bad("medsynoza.com homepage", str(e))
+    bad("synozaa.com homepage", str(e))
 
 
 section("2. Deployed code markers (lightweight, no pm2)")

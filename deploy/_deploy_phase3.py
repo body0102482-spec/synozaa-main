@@ -101,7 +101,7 @@ curl -s http://127.0.0.1:5099/api/ping
 echo
 grep -o 'assets/index-[^"]*\\.js' {APP}/client/dist/index.html | head -3
 grep -n 'VOICE_TIMEOUT_MS\\|caseAccess\\|codeSwitch\\|effectivePatientLanguage' {APP}/server/dist/services/aiService.js {APP}/server/dist/services/voiceTurnService.js {APP}/server/dist/routes/adminCases.js 2>/dev/null | head -30
-curl -sI https://medsynoza.com/ | head -5
+curl -sI https://synozaa.com/ | head -5
 """
 print(">>> extracting + restarting")
 _, stdout, stderr = client.exec_command(cmd, timeout=240)

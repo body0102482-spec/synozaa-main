@@ -22,8 +22,8 @@ CMDS = [
     "ls -la /home/adminanmkavps/synoza.anmka.com/ 2>/dev/null | head -20",
     "curl -sI http://127.0.0.1:5099/ | head -15 || true",
     "curl -sI https://synoza.anmka.com/ | head -15 || true",
-    "curl -sI https://medsynoza.com/ | head -15 || true",
-    "grep -n 'proxy_pass\\|root\\|server_name' /home/adminanmkavps/conf/web/medsynoza.com/nginx.ssl.conf 2>/dev/null | head -40 || true",
+    "curl -sI https://synozaa.com/ | head -15 || true",
+    "grep -n 'proxy_pass\\|root\\|server_name' /home/adminanmkavps/conf/web/synozaa.com/nginx.ssl.conf 2>/dev/null | head -40 || true",
 ]
 
 

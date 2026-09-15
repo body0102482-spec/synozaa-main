@@ -6,7 +6,7 @@ has EXAM NIGHT true
 has PURCHASE BASIC false
 has Get Basic Plan true
 
-=== nginx domains mentioning synoza/med ===
+=== nginx domains mentioning synozaa/ ===
 /etc/nginx/conf.d/domains/ahmed-sherif.anmka.com.conf
 /etc/nginx/conf.d/domains/ahmed-sherif.anmka.com.ssl.conf
 /etc/nginx/conf.d/domains/ahmed-zeyada.anmka.com.conf
@@ -25,10 +25,10 @@ has Get Basic Plan true
 /etc/nginx/conf.d/domains/medex.anmka.com.ssl.conf
 /etc/nginx/conf.d/domains/medex2.anmka.com.conf
 /etc/nginx/conf.d/domains/medex2.anmka.com.ssl.conf
-/etc/nginx/conf.d/domains/medsynoza.com.conf
-/etc/nginx/conf.d/domains/medsynoza.com.conf
-/etc/nginx/conf.d/domains/medsynoza.com.ssl.conf
-/etc/nginx/conf.d/domains/medsynoza.com.ssl.conf
+/etc/nginx/conf.d/domains/synozaa.com.conf
+/etc/nginx/conf.d/domains/synozaa.com.conf
+/etc/nginx/conf.d/domains/synozaa.com.ssl.conf
+/etc/nginx/conf.d/domains/synozaa.com.ssl.conf
 /etc/nginx/conf.d/domains/medzone.anmka.com.conf
 /etc/nginx/conf.d/domains/medzone.anmka.com.ssl.conf
 /etc/nginx/conf.d/domains/micromedic.anmka.com.conf

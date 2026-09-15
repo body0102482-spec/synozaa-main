@@ -159,7 +159,7 @@ await p.$disconnect();
     # Quick verify new routes exist in bundle
     run(
         client,
-        f"grep -n 'ai-usage' {APP_DIR}/server/dist/routes/admin.js | head -3; grep -n 'PlanConfig' {APP_DIR}/server/prisma/schema.prisma | head -3; curl -sI https://medsynoza.com/ | head -5",
+        f"grep -n 'ai-usage' {APP_DIR}/server/dist/routes/admin.js | head -3; grep -n 'PlanConfig' {APP_DIR}/server/prisma/schema.prisma | head -3; curl -sI https://synozaa.com/ | head -5",
     )
     client.close()
     print("Deploy complete.")

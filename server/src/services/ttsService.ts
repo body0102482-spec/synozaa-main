@@ -68,7 +68,7 @@ export async function synthesizeSpeech(text: string, lang: string): Promise<Buff
         headers: {
           Authorization: `Bearer ${openRouterKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://medsynoza.com',
+          'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://synozaa.com',
           'X-Title': process.env.OPENROUTER_APP_NAME || 'Synoza OSCE',
         },
         body: JSON.stringify({

@@ -20,7 +20,7 @@ set -e
 APP={APP}
 echo BUNDLE=$(grep -o 'assets/index-[^"]*\\.js' $APP/client/dist/index.html | head -1)
 curl -s http://127.0.0.1:5099/api/ping; echo
-curl -sI https://medsynoza.com/ | head -3
+curl -sI https://synozaa.com/ | head -3
 
 check() {{
   local s="$1"

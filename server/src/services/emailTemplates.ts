@@ -248,9 +248,9 @@ export function getPasswordResetEmailSubject(lang: EmailLang = 'en'): string {
 }
 
 export function getEmailSiteUrl(): string {
-  const clientUrl = process.env.CLIENT_URL || process.env.EMAIL_SITE_URL || 'https://medsynoza.com';
+  const clientUrl = process.env.CLIENT_URL || process.env.EMAIL_SITE_URL || 'https://synozaa.com';
   if (/localhost|127\.0\.0\.1/i.test(clientUrl)) {
-    return process.env.EMAIL_SITE_URL || 'https://medsynoza.com';
+    return process.env.EMAIL_SITE_URL || 'https://synozaa.com';
   }
   return clientUrl.replace(/\/$/, '');
 }

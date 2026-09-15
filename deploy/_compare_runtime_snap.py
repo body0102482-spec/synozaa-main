@@ -39,5 +39,5 @@ if err.strip():
 client.close()
 
 print("--- live site index ---")
-html = urllib.request.urlopen("https://medsynoza.com/", timeout=20).read().decode("utf-8", "replace")
-print(html)
+html = urllib.request.urlopen("https:///", timeout=20).read().decode("utf-8", "replace")
+print(html)synozaa.com

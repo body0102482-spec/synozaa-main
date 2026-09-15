@@ -30,7 +30,7 @@ done
 
 echo
 echo '=== curl hosts ==='
-for host in medsynoza.com www.medsynoza.com synoza.anmka.com med.synoza.com; do
+for host in synozaa.com www.synozaa.com ; do
   echo "---- $host ----"
   curl -sI --max-time 10 "https://$host/" | head -8 || echo FAIL
   # fetch index and extract bundle hash

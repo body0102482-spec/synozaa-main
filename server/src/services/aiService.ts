@@ -988,7 +988,7 @@ async function createChatClient(settings?: Awaited<ReturnType<typeof getAISettin
         apiKey: openRouterKey,
         baseURL: OPENROUTER_BASE_URL,
         defaultHeaders: {
-          'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://medsynoza.com',
+          'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://synozaa.com',
           'X-Title': process.env.OPENROUTER_APP_NAME || 'Synoza OSCE',
         },
       }),
@@ -1014,7 +1014,7 @@ async function createChatClient(settings?: Awaited<ReturnType<typeof getAISettin
         apiKey: openRouterKey,
         baseURL: OPENROUTER_BASE_URL,
         defaultHeaders: {
-          'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://medsynoza.com',
+          'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://synozaa.com',
           'X-Title': process.env.OPENROUTER_APP_NAME || 'Synoza OSCE',
         },
       }),

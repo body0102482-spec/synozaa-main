@@ -17,7 +17,7 @@ echo '=== disk index ==='
 cat $APP/client/dist/index.html
 echo
 echo '=== live HTML bundle refs ==='
-for host in medsynoza.com synoza.anmka.com; do
+for host in synozaa.com synoza.anmka.com; do
   echo "---- $host ----"
   curl -sk --max-time 15 "https://$host/" | grep -oE 'assets/index-[^"]+\.(js|css)' | head -5
 done

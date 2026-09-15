@@ -97,12 +97,12 @@ rm -rf client server deploy start.sh ecosystem.config.cjs 2>/dev/null || true
 tar xzf {remote_tar} -C "$APP"
 if [ -f /tmp/synoza-server.env.bak ]; then
   cp /tmp/synoza-server.env.bak server/.env
-  grep -q '^EMAIL_SITE_URL=' server/.env || echo 'EMAIL_SITE_URL=https://medsynoza.com' >> server/.env
-  grep -q '^CLIENT_URL=' server/.env || echo 'CLIENT_URL=https://medsynoza.com' >> server/.env
+  grep -q '^EMAIL_SITE_URL=' server/.env || echo 'EMAIL_SITE_URL=https://synozaa.com' >> server/.env
+  grep -q '^CLIENT_URL=' server/.env || echo 'CLIENT_URL=https://synozaa.com' >> server/.env
   grep -q '^SYNOZA_EXAM_MEDIA_ROOT=' server/.env || echo 'SYNOZA_EXAM_MEDIA_ROOT=/home/adminanmkavps/synoza-media/exam' >> server/.env
   grep -q '^SYNOZA_AI_KNOWLEDGE_ROOT=' server/.env || echo 'SYNOZA_AI_KNOWLEDGE_ROOT=/home/adminanmkavps/synoza-media/knowledge' >> server/.env
-  sed -i 's|^CLIENT_URL=.*|CLIENT_URL=https://medsynoza.com|' server/.env
-  sed -i 's|^EMAIL_SITE_URL=.*|EMAIL_SITE_URL=https://medsynoza.com|' server/.env
+  sed -i 's|^CLIENT_URL=.*|CLIENT_URL=https://synozaa.com|' server/.env
+  sed -i 's|^EMAIL_SITE_URL=.*|EMAIL_SITE_URL=https://synozaa.com|' server/.env
 fi
 cd "$APP/server"
 export NODE_ENV=production

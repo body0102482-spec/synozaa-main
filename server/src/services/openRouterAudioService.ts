@@ -138,7 +138,7 @@ function openRouterHeaders(key: string) {
   return {
     Authorization: `Bearer ${key}`,
     'Content-Type': 'application/json',
-    'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://medsynoza.com',
+    'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://synozaa.com',
     'X-Title': process.env.OPENROUTER_APP_NAME || 'Synoza OSCE',
   };
 }

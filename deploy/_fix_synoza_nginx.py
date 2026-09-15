@@ -15,7 +15,7 @@ REMOTE_SCRIPT = r"""
 set -e
 SSL=/home/adminanmkavps/conf/web/synoza.anmka.com/nginx.ssl.conf
 HTTP=/home/adminanmkavps/conf/web/synoza.anmka.com/nginx.conf
-MED=/home/adminanmkavps/conf/web/medsynoza.com/nginx.ssl.conf
+MED=/home/adminanmkavps/conf/web/synozaa.com/nginx.ssl.conf
 
 echo '=== medsynoza ssl conf ==='
 cat "$MED" 2>/dev/null || echo 'NO_MED_CONF'

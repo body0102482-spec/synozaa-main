@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read synoza pm2 logs + today's session/voice activity on medsynoza.com."""
+"""Read synoza pm2 logs + today's session/voice activity on synozaa.com."""
 import sys
 import paramiko
 
@@ -19,10 +19,10 @@ echo '==== synoza pm2 out log (last 40) ===='
 tail -40 /root/.pm2/logs/synoza-out-347.log 2>/dev/null
 echo
 echo '==== today: sessions/voice/speech/transcribe hits ===='
-grep '17/Jul/2026' /var/log/nginx/domains/medsynoza.com.log 2>/dev/null | grep -E 'sessions|voice|speech|transcribe|realtime' | tail -60
+grep '17/Jul/2026' /var/log/nginx/domains/synozaa.com.log 2>/dev/null | grep -E 'sessions|voice|speech|transcribe|realtime' | tail -60
 echo
 echo '==== today: any 4xx/5xx on api ===='
-grep '17/Jul/2026' /var/log/nginx/domains/medsynoza.com.log 2>/dev/null | grep '/api/' | awk '$9 >= 400 {print}' | tail -40
+grep '17/Jul/2026' /var/log/nginx/domains/synozaa.com.log 2>/dev/null | grep '/api/' | awk '$9 >= 400 {print}' | tail -40
 echo 'DIAG4_DONE'
 """
 

@@ -63,7 +63,7 @@ curl -s http://127.0.0.1:5099/api/ping
 echo
 grep -o 'assets/index-[^"]*\\.js' {APP}/client/dist/index.html | head -3
 grep -n 'getVivaClosing\\|بالتوفيق\\|timeoutMs\\|CHAT_EXAMINER_MAX_TOKENS' {APP}/server/dist/services/examinerVivaService.js {APP}/server/dist/services/aiService.js 2>/dev/null | head -20
-curl -sI https://medsynoza.com/ | head -5
+curl -sI https://synozaa.com/ | head -5
 """
 print(">>> extracting + restarting")
 _, stdout, stderr = client.exec_command(cmd, timeout=180)

@@ -89,11 +89,11 @@ anmka-doc.anmka.com.ssl.conf
 anmka.com.conf
 
 === domains conf for synoza ===
-lrwxrwxrwx 1 root root   53 Jul 18 04:47 /etc/nginx/conf.d/domains/medsynoza.com.conf -> /home/adminanmkavps/conf/web/medsynoza.com/nginx.conf
--rw-r--r-- 1 root root 1501 Jul  2 23:46 /etc/nginx/conf.d/domains/medsynoza.com.ssl.conf
+lrwxrwxrwx 1 root root   53 Jul 18 04:47 /etc/nginx/conf.d/domains/synozaa.com.conf -> /home/adminanmkavps/conf/web/synozaa.com/nginx.conf
+-rw-r--r-- 1 root root 1501 Jul  2 23:46 /etc/nginx/conf.d/domains/synozaa.com.ssl.conf
 lrwxrwxrwx 1 root root   56 Jul 18 04:47 /etc/nginx/conf.d/domains/synoza.anmka.com.conf -> /home/adminanmkavps/conf/web/synoza.anmka.com/nginx.conf
 lrwxrwxrwx 1 root root   60 Jul 18 04:47 /etc/nginx/conf.d/domains/synoza.anmka.com.ssl.conf -> /home/adminanmkavps/conf/web/synoza.anmka.com/nginx.ssl.conf
----- /etc/nginx/conf.d/domains/medsynoza.com.conf ----
+---- /etc/nginx/conf.d/domains/synozaa.com.conf ----
 #=========================================================================#
 # Default Web Domain Template                                             #
 # DO NOT MODIFY THIS FILE! CHANGES WILL BE LOST WHEN REBUILDING DOMAINS   #
@@ -102,14 +102,14 @@ lrwxrwxrwx 1 root root   60 Jul 18 04:47 /etc/nginx/conf.d/domains/synoza.anmka.
 
 server {
 	listen      77.237.232.181:80;
-	server_name medsynoza.com www.medsynoza.com;
-	root        /home/adminanmkavps/web/medsynoza.com/public_html;
+	server_name synozaa.com www.synozaa.com;
+	root        /home/adminanmkavps/web/synozaa.com/public_html;
 	index       index.php index.html index.htm;
-	access_log  /var/log/nginx/domains/medsynoza.com.log combined;
-	access_log  /var/log/nginx/domains/medsynoza.com.bytes bytes;
-	error_log   /var/log/nginx/domains/medsynoza.com.error.log error;
+	access_log  /var/log/nginx/domains/synozaa.com.log combined;
+	access_log  /var/log/nginx/domains/synozaa.com.bytes bytes;
+	error_log   /var/log/nginx/domains/synozaa.com.error.log error;
 
-	include /home/adminanmkavps/conf/web/medsynoza.com/nginx.forcessl.conf*;
+	include /home/adminanmkavps/conf/web/synozaa.com/nginx.forcessl.conf*;
 
 	location ~ /\.(?!well-known\/) {
 		deny all;
@@ -130,44 +130,44 @@ server {
 			fastcgi_index index.php;
 			fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 
-			fastcgi_pass unix:/run/php/php8.3-fpm-medsynoza.com.sock;
+			fastcgi_pass unix:/run/php/php8.3-fpm-synozaa.com.sock;
 
-			include /home/adminanmkavps/conf/web/medsynoza.com/nginx.fastcgi_cache.conf*;
+			include /home/adminanmkavps/conf/web/synozaa.com/nginx.fastcgi_cache.conf*;
 		}
 	}
 
 	location /error/ {
-		alias /home/adminanmkavps/web/medsynoza.com/document_errors/;
+		alias /home/adminanmkavps/web/synozaa.com/document_errors/;
 	}
 
 	location /vstats/ {
-		alias   /home/adminanmkavps/web/medsynoza.com/stats/;
-		include /home/adminanmkavps/web/medsynoza.com/stats/auth.conf*;
+		alias   /home/adminanmkavps/web/synozaa.com/stats/;
+		include /home/adminanmkavps/web/synozaa.com/stats/auth.conf*;
 	}
 
 	include /etc/nginx/conf.d/phpmyadmin.inc*;
 	include /etc/nginx/conf.d/phppgadmin.inc*;
-	include /home/adminanmkavps/conf/web/medsynoza.com/nginx.conf_*;
+	include /home/adminanmkavps/conf/web/synozaa.com/nginx.conf_*;
 }
----- /etc/nginx/conf.d/domains/medsynoza.com.ssl.conf ----
+---- /etc/nginx/conf.d/domains/synozaa.com.ssl.conf ----
 #!/bin/bash
 # Synoza nginx SSL proxy — single Node.js app on port 5099
 server {
 	listen      77.237.232.181:443 ssl;
-	server_name medsynoza.com www.medsynoza.com ;
-	root        /home/adminanmkavps/web/medsynoza.com/public_html;
+	server_name synozaa.com www.synozaa.com;
+	root        /home/adminanmkavps/web/synozaa.com/public_html;
 	index       index.html index.htm;
-	access_log  /var/log/nginx/domains/medsynoza.com.log combined;
-	access_log  /var/log/nginx/domains/medsynoza.com.bytes bytes;
-	error_log   /var/log/nginx/domains/medsynoza.com.error.log error;
+	access_log  /var/log/nginx/domains/synozaa.com.log combined;
+	access_log  /var/log/nginx/domains/synozaa.com.bytes bytes;
+	error_log   /var/log/nginx/domains/synozaa.com.error.log error;
 
-	ssl_certificate     /etc/letsencrypt/live/medsynoza.com/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/medsynoza.com/privkey.pem;
+	ssl_certificate     /etc/letsencrypt/live/synozaa.com/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/synozaa.com/privkey.pem;
 
 	if ($anti_replay = 307) { return 307 https://$host$request_uri; }
 	if ($anti_replay = 425) { return 425; }
 
-	include /home/adminanmkavps/conf/web/medsynoza.com/nginx.hsts.conf*;
+	include /home/adminanmkavps/conf/web/synozaa.com/nginx.hsts.conf*;
 
 	location ~ /\.(?!well-known\/) {
 		deny all;
@@ -190,11 +190,11 @@ server {
 	}
 
 	location /error/ {
-		alias /home/adminanmkavps/web/medsynoza.com/document_errors/;
+		alias /home/adminanmkavps/web/synozaa.com/document_errors/;
 	}
 
 	proxy_hide_header Upgrade;
-	include /home/adminanmkavps/conf/web/medsynoza.com/nginx.ssl.conf_*;
+	include /home/adminanmkavps/conf/web/synozaa.com/nginx.ssl.conf_*;
 }
 ---- /etc/nginx/conf.d/domains/synoza.anmka.com.conf ----
 #=========================================================================#
@@ -506,28 +506,53 @@ location ~ "^/\.well-known/acme-challenge/([-_A-Za-z0-9]+)$" {
 
 === curl compare headers ===
 ---
-HTTP/2 200 
-server: nginx
-date: Sun, 19 Jul 2026 12:39:42 GMT
-content-type: text/html; charset=UTF-8
-content-length: 923
-content-security-policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
-cross-origin-opener-policy: same-origin
-cross-origin-resource-policy: cross-origin
-origin-agent-cluster: ?1
-referrer-policy: no-referrer
-strict-transport-security: max-age=31536000; includeSubDomains
-x-content-type-options: nosniff
-x-dns-prefetch-control: off
-x-download-options: noopen
-x-frame-options: SAMEORIGIN
-x-permitted-cross-domain-policies: none
-x-xss-protection: 0
-access-control-allow-origin: https://medsynoza.com
-vary: Origin
-access-control-allow-credentials: true
-accept-ranges: bytes
-cache-control: public, max-age=0
-last-modified: Sun, 19 Jul 2026 10:03:20 GMT
-etag: W/"39b-19f79d48d93"
-strict-transport-security: max-age=31536000;
+HTTP/2 200 
+
+server: nginx
+
+date: Sun, 19 Jul 2026 12:39:42 GMT
+
+content-type: text/html; charset=UTF-8
+
+content-length: 923
+
+content-security-policy: default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests
+
+cross-origin-opener-policy: same-origin
+
+cross-origin-resource-policy: cross-origin
+
+origin-agent-cluster: ?1
+
+referrer-policy: no-referrer
+
+strict-transport-security: max-age=31536000; includeSubDomains
+
+x-content-type-options: nosniff
+
+x-dns-prefetch-control: off
+
+x-download-options: noopen
+
+x-frame-options: SAMEORIGIN
+
+x-permitted-cross-domain-policies: none
+
+x-xss-protection: 0
+
+access-control-allow-origin: https://synozaa.com
+
+vary: Origin
+
+access-control-allow-credentials: true
+
+accept-ranges: bytes
+
+cache-control: public, max-age=0
+
+last-modified: Sun, 19 Jul 2026 10:03:20 GMT
+
+etag: W/"39b-19f79d48d93"
+
+strict-transport-security: max-age=31536000;
+

@@ -40,7 +40,7 @@ set -e
 tar -xzf {remote} -C {APP}
 # bust any nested old hashed assets by ensuring index references new bundle
 grep -o 'assets/index-[^"]*\\.js' {APP}/client/dist/index.html | head -3
-curl -sI https://medsynoza.com/ | head -5
+curl -sI https://synozaa.com/ | head -5
 curl -s http://127.0.0.1:5099/api/ping
 """
 print(">>> extracting on server")
