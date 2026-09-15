@@ -568,15 +568,13 @@ export default {
       loading: "Loading...",
       error: "Something went wrong",
       serverOffline:
-        ""Unable to connect to the server. Please check your internet connection and try again."
-",
+        "Unable to connect to the server. Please check your internet connection and try again.",
       invalidCredentials: "Invalid email or password",
       emailAlreadyRegistered:
         "This email is already registered. Sign in or use another email.",
       verifyEmail: "Verify your email",
       verifyEmailDesc:
-        ""We sent a 6-digit code to your email. Enter it below to activate your account. If you don't see it in your inbox, please check your Spam or Junk folder."
-",
+        "We sent a 6-digit code to your email. Enter it below to activate your account. If you don't see it in your inbox, please check your Spam or Junk folder.",
       otpCode: "Verification code",
       verifyAndContinue: "Verify & continue",
       resendOtp: "Resend code",

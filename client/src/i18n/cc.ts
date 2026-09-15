@@ -291,10 +291,8 @@ export default {
       landingFaq5Link: "Read the full refund policy",
       landingSimulatorTitle: "Station_Simulator",
       landingSimulatorPatient: "Simulated Patient",
-      landingChatDoctor: 
-             "صباح الخير، أنا د. سارة. ممكن تقولي إيه اللي جابك النهاردة؟",
-      landingChatPatient:
-        "عندي ضيق في الصدر من حوالي أسبوعين، خصوصاً لما بطلع السلم.",
+      landingChatDoctor: "صباح الخير، أنا د. سارة. ممكن تقولي إيه اللي جابك النهاردة؟",
+      landingChatPatient:"عندي ضيق في الصدر من حوالي أسبوعين، خصوصاً لما بطلع السلم.",
       landingEcoHeading: "An Immersive Ecosystem",
       landingEcoSubheading: "For Modern Clinical Minds",
       landingEcoIntro:
@@ -563,25 +561,23 @@ export default {
       noResults: "No results yet. Complete a station to see your evaluation.",
       loading: "Loading...",
       error: "Something went wrong",
-      serverOffline:
-        "Unable to connect to Synoza . Please check your internet connection and try again",
+      serverOffline:"Unable to connect to Synoza . Please check your internet connection and try again",
       invalidCredentials: "Invalid email or password",
       emailAlreadyRegistered:
         "This email is already registered. Sign in or use another email.",
       verifyEmail: "Verify your email",
-      verifyEmailDesc:
-        "We sent a 6-digit code to your email. Enter it below to activate your account. If you don't see it in your inbox, please check your Spam.",
+      verifyEmailDesc:"We sent a 6-digit code to your email. Enter it below to activate your account. If you don't see it in your inbox, please check your Spam.",
       otpCode: "Verification code",
-      verifyAndContinue: "Verify & continue",
-      resendOtp: "Resend code",
-      otpResent: "A new code was sent to your email.",
+      verifyAndContinue:"Verify & continue",
+      resendOtp:"Resend code",
+      otpResent:"A new code was sent to your email.",
       otpInvalid: "Invalid verification code",
       otpExpired: "Code expired. Request a new one.",
       otpSendFailed: "Could not send verification email. Try again later.",
       emailRequired: "Enter your email address",
-      backToLogin: "Back to login",
-      allSpecialties: "All Specialties",
-      allDifficulties: "All Difficulties",
+      backToLogin:"Back to login",
+      allSpecialties:"All Specialties",
+      allDifficulties:"All Difficulties",
       chooseExamArea:
         "Choose the department and topic you want to be examined on",
       rotationsLibrary: "OSCE Rotations Library",
