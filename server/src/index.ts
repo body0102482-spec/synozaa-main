@@ -134,16 +134,19 @@ app.use("/exam", express.static(persistentExamRoot()));
 app.use("/exam", express.static(packagedExamRoot()));
 app.use("/knowledge", express.static(persistentAiKnowledgeRoot()));
 
-const clientDist = path.join(__dirname, "../../client/dist");
-if (fs.existsSync(clientDist)) {
-  app.use(express.static(clientDist));
-  app.get("*", (req, res, next) => {
-    if (
-      req.path.startsWith("/api") ||
-      req.path.startsWith("/exam") ||
-      req.path.startsWith("/knowledge")
-    ) {
-      return next();
+const clientDist = path.join(__dirname, "../../client/dist"); 
+app.get("/sitemap.xml", (req, res) => { 
+  const sitemapPath = path.join(clientDist, "sitemap.xml"); 
+  
+  if (fs.existsSync(sitemapPath)) { 
+    res.type("application/xml"); 
+    return res.sendFile(sitemapPath); } 
+    res.status(404).send("Sitemap not found"); }); 
+    if (fs.existsSync(clientDist)) { 
+      app.use(express.static(clientDist)); 
+      app.get("*", (req, res, next) => { 
+        if ( req.path === "/sitemap.xml" || req.path === "/robots.txt" || req.path.startsWith("/api") || req.path.startsWith("/exam") || req.path.startsWith("/knowledge") ) { 
+          return next();
     }
     const indexPath = path.join(clientDist, "index.html");
     if (fs.existsSync(indexPath)) {
