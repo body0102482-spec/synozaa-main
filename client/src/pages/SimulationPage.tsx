@@ -130,16 +130,22 @@ const STAGE_ICONS = {
 } as const;
 
 const EXAM_MANEUVERS = [
-  { id: "inspection", nameEn: "Inspection"  },
+  { id: "inspection", nameEn: "Inspection" },
   { id: "palpation", nameEn: "Palpation" },
   { id: "percussion", nameEn: "Percussion" },
   { id: "auscultation", nameEn: "Auscultation" },
 ] as const;
 
+const DEFAULT_MANEUVER_IMAGES: Record<string, string> = {
+  inspection: chestInspectionImg,
+  palpation: chestPalpationImg,
+  percussion: chestPercussionImg,
+  auscultation: chestAuscultationImg,
+};
+
 type ExamManeuverMeta = {
   id: (typeof EXAM_MANEUVERS)[number]["id"];
   nameEn: string;
-  nameAr: string;
 };
 
 const STATION_SECONDS = 20 * 60;
@@ -275,7 +281,6 @@ export default function SimulationPage() {
       EXAM_MANEUVERS.filter((m) => stationConfig.enabledManeuvers.includes(m.id)).map((m) => ({
         ...m,
         nameEn: resolveManeuverLabel(m.id, stationConfig, 'en'),
-        nameAr: resolveManeuverLabel(m.id, stationConfig, 'ar'),
       })),
     [stationConfig],
   );
@@ -1070,7 +1075,7 @@ export default function SimulationPage() {
                       }`}
                     >
                       <p className="font-semibold">
-                        {isAr ? m.nameAr : m.nameEn}
+                        {m.nameEn}
                       </p>
                       <p
                         className={`text-[10px] mt-0.5 ${active ? "text-white/80" : ""}`}
@@ -1324,7 +1329,7 @@ function ExaminationStepsBar({
                     : "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-primary/50"
               }`}
             >
-              {isAr ? m.nameAr : m.nameEn}
+              {m.nameEn}
             </button>
           );
         })}
@@ -1414,7 +1419,7 @@ function ExaminationView({
   const maneuverModelAnswer = activeManeuver ? structuredFindings[activeManeuver] ?? '' : '';
   const consolidatedFindings = caseManeuvers
     .filter((m) => completedManeuvers.includes(m.id) && (structuredFindings[m.id] ?? '').trim())
-    .map((m) => ({ id: m.id, name: isAr ? m.nameAr : m.nameEn, findings: structuredFindings[m.id] }));
+    .map((m) => ({ id: m.id, name: m.nameEn, findings: structuredFindings[m.id] }));
 
   if (!activeManeuver || !activeManeuverMeta) {
     const nextId = getNextManeuver(completedManeuvers, caseManeuvers);
@@ -1430,13 +1435,13 @@ function ExaminationView({
           ) : nextMeta ? (
             <>
               <Eye size={48} className="mx-auto mb-3 text-slate-300" />
-              <p className="font-medium">{t("continueToStep", { step: isAr ? nextMeta.nameAr : nextMeta.nameEn })}</p>
+              <p className="font-medium">{t("continueToStep", { step: nextMeta.nameEn })}</p>
               <button
                 type="button"
                 onClick={() => onStartManeuver(nextMeta.id)}
                 className="btn-primary mt-4 px-6 py-2.5 inline-flex items-center gap-2"
               >
-                {isAr ? nextMeta.nameAr : nextMeta.nameEn}
+                {nextMeta.nameEn}
                 <ChevronRight size={16} />
               </button>
             </>
@@ -1465,8 +1470,7 @@ function ExaminationView({
       : [
           {
             url: fallbackUrl,
-            caption: isAr ? activeManeuverMeta.nameAr : activeManeuverMeta.nameEn,
-            captionAr: activeManeuverMeta.nameAr,
+            caption: activeManeuverMeta.nameEn,
           },
         ];
 
@@ -1495,7 +1499,7 @@ function ExaminationView({
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 sm:p-4 shadow-xs space-y-3">
           <div className="flex items-center justify-between text-xs font-bold px-1">
             <span className="text-slate-800 dark:text-slate-200 uppercase tracking-wide">
-              CHEST {activeManeuverMeta.nameEn.toUpperCase()} ({activeManeuverMeta.nameAr})
+              {activeManeuverMeta.nameEn}
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
@@ -1554,9 +1558,9 @@ function ExaminationView({
               />
             )}
           </div>
-          {(currentMedia.caption || currentMedia.captionAr) && (
+          {currentMedia.caption && (
             <p className="text-xs text-slate-500 dark:text-slate-400 px-1 italic" dir="auto">
-              {isAr ? currentMedia.captionAr || currentMedia.caption : currentMedia.caption || currentMedia.captionAr}
+              {currentMedia.caption}
             </p>
           )}
         </div>
