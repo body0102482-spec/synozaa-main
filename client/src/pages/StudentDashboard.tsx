@@ -6,7 +6,6 @@ import api from '../lib/api';
 import { boardDisplayName } from '../lib/boardLabels';
 import { BoardIcon, getBoardIconBg } from '../components/BoardIcon';
 import { BlindMockOsceCard } from '../components/student/BlindMockOsceCard';
-import { RandomCasePreview } from '../components/student/RandomCasePreview';
 import { StartCaseConfirmDialog } from '../components/student/StartCaseConfirmDialog';
 import { StudentCaseCard } from '../components/student/StudentCaseCard';
 import { PortalSupportCard } from '../components/student/PortalSupportCard';
@@ -46,6 +45,7 @@ interface Entitlements {
   plan: string;
   isFree: boolean;
   freeAttemptsPerCase: number;
+  freeAttemptsRemaining: number;
   casesQuota: number;
   casesUnlocked: number;
   casesRemaining: number;
@@ -407,11 +407,8 @@ export default function StudentDashboard() {
   };
 
   const sortedCases = useMemo(() => {
-    if (entitlements?.isFree) {
-      return cases.filter((c) => !c.isFreeTier);
-    }
     return cases;
-  }, [cases, entitlements?.isFree]);
+  }, [cases]);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -431,9 +428,7 @@ export default function StudentDashboard() {
         }}
       />
 
-      {entitlements?.isFree ? (
-        <RandomCasePreview entitlements={entitlements} categoryRootId={selectedBoardId ?? undefined} />
-      ) : entitlements && sectionOptions.length > 0 ? (
+      {entitlements && sectionOptions.length > 0 ? (
         <BlindMockOsceCard
           sections={randomSectionsForBoard.map((o) => ({
             id: o.id,

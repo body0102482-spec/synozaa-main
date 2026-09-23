@@ -113,6 +113,7 @@ interface Session {
     physicalExam: string;
     labResults: string;
     examImages: string;
+    isFreeTier?: boolean;
     stationConfig?: string;
   };
   messages: Message[];
@@ -623,7 +624,7 @@ export default function SimulationPage() {
     } catch (err) {
       // Session not found or access denied — redirect to dashboard
       if (axios.isAxiosError(err) && (err.response?.status === 404 || err.response?.status === 403)) {
-        navigate('/dashboard', { replace: true });
+        navigate('/student', { replace: true });
       }
     }
   }, [sessionId, navigate]);
@@ -1190,6 +1191,7 @@ export default function SimulationPage() {
                   isAr={isAr}
                   onRegenerate={completeSession}
                   regenerating={completing}
+                  onBackToCases={session.case.isFreeTier ? () => navigate('/student') : undefined}
                 />
               </div>
             ) : (
@@ -2730,6 +2732,7 @@ function FeedbackView({
   isAr,
   onRegenerate,
   regenerating,
+  onBackToCases,
 }: {
   result: Record<string, unknown>;
   rankProgress?: RankSnapshot | null;
@@ -2738,6 +2741,7 @@ function FeedbackView({
   isAr: boolean;
   onRegenerate?: () => void | Promise<void>;
   regenerating?: boolean;
+  onBackToCases?: () => void;
 }) {
   const [downloadingReport, setDownloadingReport] = useState(false);
 
@@ -2905,6 +2909,16 @@ function FeedbackView({
               ) : (
                 t("regenerateReport")
               )}
+            </button>
+          )}
+          {onBackToCases && (
+            <button
+              type="button"
+              onClick={onBackToCases}
+              className="btn-secondary inline-flex items-center gap-2 px-4 py-2 text-sm"
+            >
+              <ArrowLeft size={16} />
+              OSCE cases
             </button>
           )}
         </div>

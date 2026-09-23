@@ -38,6 +38,7 @@ interface Entitlements {
   casesQuota: number;
   casesUnlocked: number;
   casesRemaining: number;
+  freeAttemptsRemaining?: number;
   planEndDate?: string | null;
   totalXp?: number;
   rankProgress?: RankSnapshot;
@@ -77,15 +78,6 @@ function getPortalPageTitleKey(pathname: string): NavLabelKey {
     }
   }
   return 'portalNavOsce';
-}
-
-function formatExpiry(iso: string | null | undefined, isAr: boolean, noExpiry: string): string {
-  if (!iso) return noExpiry;
-  return new Date(iso).toLocaleDateString(isAr ? 'ar-EG' : 'en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
 }
 
 export function StudentPortalShell() {
@@ -186,8 +178,7 @@ function StudentPortalLayout() {
   const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}`.toUpperCase() || 'ST';
   const planKey = entitlements ? getPlanTierKey(entitlements.plan) : 'planTierFree';
   const used = entitlements?.casesUnlocked ?? 0;
-  const total = entitlements?.isFree ? used : entitlements?.casesQuota ?? 0;
-  const remaining = entitlements?.isFree ? '—' : String(entitlements?.casesRemaining ?? 0);
+  const total = entitlements?.isFree ? 0 : entitlements?.casesQuota ?? 0;
   const usedPct = total > 0 ? Math.min(100, (used / total) * 100) : 0;
   const showFullSidebar = !collapsed || sidebarOpen;
 
@@ -255,7 +246,7 @@ function StudentPortalLayout() {
         ].join(' ')}
       >
         <div
-          className={`px-3 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center gap-1 min-h-[64px] shrink-0 ${
+          className={`px-3 py-3 flex items-center gap-1 min-h-[64px] shrink-0 ${
             collapsed && !sidebarOpen ? 'justify-center' : 'justify-between'
           }`}
         >
@@ -266,7 +257,7 @@ function StudentPortalLayout() {
           )}
           <button
             type="button"
-            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
+            className="hidden lg:flex min-h-11 min-w-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0"
             onClick={() => setCollapsed((c) => !c)}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
@@ -274,7 +265,7 @@ function StudentPortalLayout() {
           </button>
           <button
             type="button"
-            className="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0 ms-auto"
+            className="lg:hidden min-h-11 min-w-11 flex items-center justify-center rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0 ms-auto"
             onClick={closeSidebar}
             aria-label="Close menu"
           >
@@ -284,9 +275,9 @@ function StudentPortalLayout() {
 
         {showFullSidebar && (
           <>
-            <div className="p-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden">
+            <div className="px-5 pt-5 pb-4 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 ring-1 ring-teal-100 dark:ring-teal-900 flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden">
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -294,106 +285,65 @@ function StudentPortalLayout() {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
+                  <p className="font-semibold text-slate-900 dark:text-slate-100 text-[15px] truncate">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800">
-                    {t(planKey)}
-                  </span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('portalMedicalStudent')}</p>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide bg-teal-50 text-teal-700 dark:bg-teal-950/70 dark:text-teal-300">
+                      {t(planKey)}
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                      Level 1 • {(entitlements?.totalXp ?? 0).toLocaleString()} XP
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 p-3 space-y-2">
-                {entitlements?.rankProgress && (
-                  <div className="pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
-                    <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase mb-1">
-                      {t('portalClinicalRank')}
-                    </p>
-                    <p className="text-xs font-bold text-teal-700 dark:text-teal-400 leading-snug">
-                      {rankLabel(entitlements.rankProgress.currentRank, !!isAr)}
-                    </p>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                      {(entitlements.totalXp ?? 0).toLocaleString()} XP
-                    </p>
-                    {entitlements.rankProgress.nextRank && (
-                      <div className="mt-2">
-                        <div className="h-1 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                          <div
-                            className="h-full bg-teal-500 rounded-full"
-                            style={{ width: `${entitlements.rankProgress.progressPercent}%` }}
-                          />
-                        </div>
-                        <Link
-                          to="/student/diagnostics"
-                          className="text-[10px] font-semibold text-teal-600 dark:text-teal-400 mt-1 inline-block hover:underline"
-                        >
-                          {t('xpCareerPath')} →
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                )}
-                {entitlements?.universityRank && (
-                  <div className="pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
-                    <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase mb-1">
-                      University Rank
-                    </p>
-                    <p className="text-xs font-bold text-blue-700 dark:text-blue-400 leading-snug">
-                      #{entitlements.universityRank.rank}
-                      {entitlements.universityRank.cohortSize === 1 ? ' in your university' : ''}
-                    </p>
-                    {entitlements.universityRank.cohortSize > 1 && (
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
-                        Top {entitlements.universityRank.topPercent}% in your university
-                      </p>
-                    )}
-                  </div>
-                )}
-                <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase">
-                  {t('portalPlanStatus')}
-                </p>
-                <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                  <div className="h-full bg-teal-500 rounded-full transition-all" style={{ width: `${usedPct}%` }} />
+              <div className="grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-800 mt-5 py-3 border-y border-slate-100 dark:border-slate-800">
+                <div className="px-2 first:ps-0">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">{t('portalClinicalRank')}</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-200 mt-1 truncate">{entitlements?.rankProgress ? rankLabel(entitlements.rankProgress.currentRank, !!isAr) : '—'}</p>
+                  {entitlements?.rankProgress?.nextRank && (
+                    <Link to="/student/diagnostics" className="text-[9px] font-semibold text-teal-600 dark:text-teal-400 mt-1 inline-block hover:underline">
+                      {t('xpCareerPath')} →
+                    </Link>
+                  )}
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div>
-                    <p className="text-slate-400 dark:text-slate-300">{t('welcomeCardCasesUsed')}</p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200">{used}</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-400 dark:text-slate-300">{t('welcomeCardCasesRemaining')}</p>
-                    <p className="font-bold text-slate-800 dark:text-slate-200">{remaining}</p>
-                  </div>
+                <div className="px-3">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">University</p>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1">{entitlements?.universityRank ? `#${entitlements.universityRank.rank}` : '—'}</p>
                 </div>
-                {entitlements?.isFree && (
-                  <p className="text-[10px] text-amber-700 dark:text-amber-300 leading-snug">
-                    {t('portalFreePlanHint')}
+                <div className="px-3 last:pe-0">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">XP</p>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1">{(entitlements?.totalXp ?? 0).toLocaleString()}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/80 p-3.5 space-y-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[10px] font-bold tracking-[0.12em] text-slate-500 dark:text-slate-300 uppercase">{t('portalPlanStatus')}</p>
+                  <span className="text-[10px] font-semibold text-teal-700 dark:text-teal-300">{t(planKey)}</span>
+                </div>
+                {entitlements?.isFree ? (
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Free attempts: <span className="font-semibold text-slate-700 dark:text-slate-200">{entitlements.freeAttemptsRemaining ?? 0} remaining</span>
                   </p>
+                ) : (
+                  <>
+                    <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                      <div className="h-full bg-teal-500 rounded-full transition-all" style={{ width: `${usedPct}%` }} />
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">{used} {t('welcomeCardCasesUsed').toLowerCase()}</p>
+                  </>
                 )}
-                {!entitlements?.isFree && (
-                  <p className="text-[10px] text-slate-400 dark:text-slate-300 leading-snug">
-                    {t('portalPaidPlanHint')}
-                  </p>
-                )}
-                <p className="text-[10px] text-slate-400 dark:text-slate-300">
-                  {t('portalExpires')}:{' '}
-                  <span className="font-semibold text-slate-600 dark:text-slate-200">
-                    {entitlements?.isFree
-                      ? t('welcomeCardNoExpiry')
-                      : formatExpiry(entitlements?.planEndDate, !!isAr, t('welcomeCardActivePlan'))}
-                  </span>
-                </p>
                 {entitlements?.isFree && (
                   <Link
                     to="/student/upgrade"
                     onClick={closeSidebar}
-                    className={`mt-1 flex w-full items-center justify-center gap-2 rounded-lg text-white text-xs font-bold py-2.5 transition-colors ${
-                      isMcqSection ? 'hover:opacity-90' : 'bg-violet-600 hover:bg-violet-700'
-                    }`}
-                    style={isMcqSection ? { backgroundColor: QBANK.primary } : undefined}
+                    className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl text-teal-700 dark:text-teal-300 text-xs font-semibold py-2 transition-colors hover:bg-teal-50 dark:hover:bg-teal-950/50"
                   >
-                    <CreditCard size={14} />
-                    {t('portalUpgradeNow')}
+                    {t('portalUpgradeNow')} <span aria-hidden="true">→</span>
                   </Link>
                 )}
               </div>

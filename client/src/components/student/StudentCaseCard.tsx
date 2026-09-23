@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Lock, Play } from 'lucide-react';
+import { Clock, Lock, Play } from 'lucide-react';
 
 export interface OsceCaseSummary {
   id: string;
@@ -8,6 +8,9 @@ export interface OsceCaseSummary {
   titleAr: string;
   chiefComplaint: string;
   isFreeTier?: boolean;
+  specialty?: { nameEn: string; nameAr: string };
+  difficulty?: { nameEn: string; nameAr: string; level: number };
+  examImages?: string;
 }
 
 interface StudentCaseCardProps {
@@ -30,6 +33,16 @@ export function StudentCaseCard({
   const { t } = useTranslation();
   const title = isAr ? caseData.titleAr : caseData.titleEn;
   const lockedByPlan = isFreeUser && !caseData.isFreeTier;
+  const specialty = caseData.specialty ? (isAr ? caseData.specialty.nameAr : caseData.specialty.nameEn) : null;
+  const difficulty = caseData.difficulty ? (isAr ? caseData.difficulty.nameAr : caseData.difficulty.nameEn) : null;
+  const coverImage = (() => {
+    try {
+      const images = JSON.parse(caseData.examImages || '[]') as Array<{ url?: string }>;
+      return images.find((image) => image.url?.startsWith('/'))?.url ?? '/exam/chest-inspection.svg';
+    } catch {
+      return '/exam/chest-inspection.svg';
+    }
+  })();
 
   return (
     <article
@@ -39,6 +52,21 @@ export function StudentCaseCard({
           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 hover:shadow-md transition-shadow'
       }`}
     >
+      <div className="h-36 bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+        <img src={coverImage} alt={title} className="w-full h-full object-contain p-3" />
+        <div className="absolute top-3 start-3 flex gap-2">
+          {difficulty && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white bg-teal-700">
+              {difficulty}
+            </span>
+          )}
+          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-900/70 text-white flex items-center gap-1">
+            <Clock size={10} />
+            18 {t('portalMins')}
+          </span>
+        </div>
+      </div>
+
       <div className="p-5 flex-1 flex flex-col gap-4 min-h-0">
         <div className="flex-1 min-h-0">
           {lockedByPlan && (
@@ -47,6 +75,7 @@ export function StudentCaseCard({
               {t('portalCaseLocked')}
             </span>
           )}
+          {specialty && <p className="text-[10px] font-bold tracking-[0.12em] text-teal-600 dark:text-teal-400 uppercase mb-2">{specialty}</p>}
           <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{caseData.chiefComplaint}</p>
           {attemptLabel && !lockedByPlan && (

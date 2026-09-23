@@ -209,12 +209,25 @@ export async function getUserEntitlements(userId: string) {
     attemptsByCase[row.caseId] = Math.max(attemptsByCase[row.caseId] ?? 0, row._count._all);
   }
 
+  let freeAttemptsRemaining = 0;
+  if (isFree) {
+    const freeCases = await prisma.case.findMany({
+      where: { isPublished: true, isFreeTier: true },
+      select: { id: true },
+    });
+    freeAttemptsRemaining = freeCases.reduce(
+      (remaining, caseData) => remaining + Math.max(0, FREE_ATTEMPTS_PER_CASE - (attemptsByCase[caseData.id] ?? 0)),
+      0,
+    );
+  }
+
   const planEndDate = await resolvePlanEndDate(subscription);
 
   return {
     plan,
     isFree,
     freeAttemptsPerCase: FREE_ATTEMPTS_PER_CASE,
+    freeAttemptsRemaining,
     // Free entitlements stay attempt-based; paid plans use credit quotas.
     casesQuota: isFree ? 0 : casesQuota,
     casesUnlocked,
