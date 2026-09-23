@@ -130,10 +130,10 @@ const STAGE_ICONS = {
 } as const;
 
 const EXAM_MANEUVERS = [
-  { id: "inspection", nameEn: "Inspection", nameAr: "الفحص البصري" },
-  { id: "palpation", nameEn: "Palpation", nameAr: "الجس" },
-  { id: "percussion", nameEn: "Percussion", nameAr: "النقر" },
-  { id: "auscultation", nameEn: "Auscultation", nameAr: "الاستماع" },
+  { id: "inspection", nameEn: "Inspection"  },
+  { id: "palpation", nameEn: "Palpation" },
+  { id: "percussion", nameEn: "Percussion" },
+  { id: "auscultation", nameEn: "Auscultation" },
 ] as const;
 
 type ExamManeuverMeta = {
@@ -143,13 +143,6 @@ type ExamManeuverMeta = {
 };
 
 const STATION_SECONDS = 20 * 60;
-
-const DEFAULT_MANEUVER_IMAGES: Record<string, string> = {
-  inspection: chestInspectionImg,
-  palpation: chestPalpationImg,
-  percussion: chestPercussionImg,
-  auscultation: chestAuscultationImg,
-};
 
 function resolveExamImageUrl(maneuverId: string, url: string): string {
   if (url.startsWith('/exam/cases/')) return url;

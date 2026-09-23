@@ -38,13 +38,13 @@ export const DEFAULT_PATIENT_BEHAVIOR: PatientBehavior = {
 };
 
 export const DEFAULT_MANEUVER_OPENING_TEMPLATE =
-  'I am evaluating your clinical {{maneuver}}. Take a close look at the clinical presentation and images provided. Describe your findings systematically and explain what you would look for during {{maneuver}}, including any scars, deformities, or visible abnormalities.';
+  'I am evaluating your clinical {{maneuver}}. Take a close look at the clinical presentation and images provided. Describe your findings systematically and explain what you would look for during {{maneuver}}.';
 
 export const MANEUVER_LABELS: Record<ManeuverId, { en: string; ar: string }> = {
-  inspection: { en: 'Inspection', ar: 'الفحص البصري' },
-  palpation: { en: 'Palpation', ar: 'الجس' },
-  percussion: { en: 'Percussion', ar: 'النقر' },
-  auscultation: { en: 'Auscultation', ar: 'الاستماع' },
+  inspection: { en: 'Inspection' },
+  palpation: { en: 'Palpation' },
+  percussion: { en: 'Percussion' },
+  auscultation: { en: 'Auscultation'},
 };
 
 export const DEFAULT_STATION_CONFIG: StationConfig = {
