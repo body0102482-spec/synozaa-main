@@ -17,6 +17,8 @@ OPENAI_API_KEY=your-openai-api-key-here
 OPENAI_MODEL=google/gemini-2.5-flash-Lite
 OPENAI_PATIENT_MODEL=google/gemini-2.5-flash-Lite
 OPENAI_EXAMINER_MODEL=google/gemini-2.5-flash-Lite
+PATIENT_MODEL=gemini-2.5-flash-lite
+EXAMINER_MODEL=gpt-6-luna-pro
 # Speech-to-text: openai (recommended) | local (on-server Whisper; needs working ffmpeg)
 # On Windows, prefer openai — bundled ffmpeg-static often fails with spawn EFTYPE.
 STT_PROVIDER=openai

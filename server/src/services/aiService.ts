@@ -450,11 +450,13 @@ async function getAISettings() {
     // Explicit environment provider wins locally/deployment; admin setting is fallback.
     provider: process.env.AI_PROVIDER || settings.provider || 'openrouter',
     patientModel:
+      process.env.PATIENT_MODEL ||
       process.env.OPENAI_PATIENT_MODEL ||
       process.env.OPENAI_MODEL ||
       settings.patientModel ||
       'google/gemini-2.5-flash-lite',
     examinerModel:
+      process.env.EXAMINER_MODEL ||
       process.env.OPENAI_EXAMINER_MODEL ||
       process.env.OPENAI_MODEL ||
       settings.examinerModel ||
@@ -551,6 +553,7 @@ function chatPatientModel(settings: Awaited<ReturnType<typeof getAISettings>>): 
   const configured = settings.patientModel;
   if (configured && !/realtime/i.test(configured)) return configured;
   return (
+    process.env.PATIENT_MODEL ||
     process.env.OPENAI_PATIENT_MODEL ||
     process.env.OPENAI_MODEL ||
     'google/gemini-2.5-flash'
