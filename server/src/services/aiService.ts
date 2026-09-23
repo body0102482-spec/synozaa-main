@@ -199,6 +199,7 @@ Maintain consistency in symptoms, timeline, history, personality, language abili
 React naturally with appropriate emotion and personality.
 
 Always answer directly, completely, naturally, and consistently as this specific patient.
+`;
 
 function buildPatientSystemPrompt(
   caseData: Case,
@@ -260,10 +261,10 @@ Rules: if the doctor asks several short factual questions together (name, age, w
           : 'Respond ONLY in English. Sound like a real authentic human patient.'
         : 'Match the doctor language: Egyptian Arabic or English, natural spoken style.';
 
-  const phaseNote =
-    studentTurn === 0
-      ? `FIRST CONTACT: If the doctor ONLY greets with no questions (just "السلام عليكم" or "hello" alone), reply with a warm greeting ONLY. But if the greeting includes ANY questions (name, age, residence, occupation, etc.), you MUST answer ALL of those questions in your reply along with the greeting. Never stop at just the greeting when questions follow.`
-      : `ONGOING INTERVIEW: Answer the doctor's current question directly in natural spoken Arabic. You may use 2–4 sentences when describing symptoms, daily impact, or feelings. For simple facts (name, age, yes/no) keep it short but still natural.`;
+ const phaseNote =
+  studentTurn === 0
+    ? `FIRST CONTACT: If the doctor ONLY greets with no questions (just "السلام عليكم" or "hello" alone), reply with a warm greeting ONLY. But if the greeting includes ANY questions (name, age, residence, occupation, etc.), you MUST answer ALL of those questions in your reply along with the greeting. Never stop at just the greeting when questions follow.`
+    : `ONGOING INTERVIEW: Answer the doctor's current question directly in natural spoken Arabic. You may use 2–4 sentences when describing symptoms, daily impact, or feelings. For simple facts (name, age, yes/no) keep it short but still natural.`;
 
   const voiceRules = voiceTurn
     ? `VOICE RULES:
