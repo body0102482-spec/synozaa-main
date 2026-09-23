@@ -275,9 +275,9 @@ function StudentPortalLayout() {
 
         {showFullSidebar && (
           <>
-            <div className="px-5 pt-5 pb-4 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-teal-50 dark:bg-teal-950/70 text-teal-700 dark:text-teal-300 ring-1 ring-teal-100 dark:ring-teal-900 flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-slate-800 dark:bg-slate-700 text-white flex items-center justify-center text-sm font-bold shrink-0 overflow-hidden">
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
@@ -285,49 +285,50 @@ function StudentPortalLayout() {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-900 dark:text-slate-100 text-[15px] truncate">
+                  <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
                     {user?.firstName} {user?.lastName}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{t('portalMedicalStudent')}</p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wide bg-teal-50 text-teal-700 dark:bg-teal-950/70 dark:text-teal-300">
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
                       {t(planKey)}
                     </span>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
                       Level 1 • {(entitlements?.totalXp ?? 0).toLocaleString()} XP
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-800 mt-5 py-3 border-y border-slate-100 dark:border-slate-800">
-                <div className="px-2 first:ps-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">{t('portalClinicalRank')}</p>
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-200 mt-1 truncate">{entitlements?.rankProgress ? rankLabel(entitlements.rankProgress.currentRank, !!isAr) : '—'}</p>
-                  {entitlements?.rankProgress?.nextRank && (
-                    <Link to="/student/diagnostics" className="text-[9px] font-semibold text-teal-600 dark:text-teal-400 mt-1 inline-block hover:underline">
-                      {t('xpCareerPath')} →
-                    </Link>
-                  )}
-                </div>
-                <div className="px-3">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">University</p>
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1">{entitlements?.universityRank ? `#${entitlements.universityRank.rank}` : '—'}</p>
-                </div>
-                <div className="px-3 last:pe-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-400 dark:text-slate-500">XP</p>
-                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 mt-1">{(entitlements?.totalXp ?? 0).toLocaleString()}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/80 p-3.5 space-y-2.5">
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 p-3 space-y-2">
+                {entitlements?.rankProgress && (
+                  <div className="pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
+                    <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase mb-1">
+                      {t('portalClinicalRank')}
+                    </p>
+                    <p className="text-xs font-bold text-teal-700 dark:text-teal-400 leading-snug">
+                      {rankLabel(entitlements.rankProgress.currentRank, !!isAr)}
+                    </p>
+                    {entitlements.rankProgress.nextRank && (
+                      <Link to="/student/diagnostics" className="text-[10px] font-semibold text-teal-600 dark:text-teal-400 mt-1 inline-block hover:underline">
+                        {t('xpCareerPath')} →
+                      </Link>
+                    )}
+                  </div>
+                )}
+                {entitlements?.universityRank && (
+                  <div className="pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
+                    <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase mb-1">University Rank</p>
+                    <p className="text-xs font-bold text-blue-700 dark:text-blue-400 leading-snug">#{entitlements.universityRank.rank}</p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[10px] font-bold tracking-[0.12em] text-slate-500 dark:text-slate-300 uppercase">{t('portalPlanStatus')}</p>
-                  <span className="text-[10px] font-semibold text-teal-700 dark:text-teal-300">{t(planKey)}</span>
+                  <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase">{t('portalPlanStatus')}</p>
+                  <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300">{t(planKey)}</span>
                 </div>
                 {entitlements?.isFree ? (
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Free attempts: <span className="font-semibold text-slate-700 dark:text-slate-200">{entitlements.freeAttemptsRemaining ?? 0} remaining</span>
+                    {entitlements.freeAttemptsRemaining ?? 0} free attempts remaining
                   </p>
                 ) : (
                   <>

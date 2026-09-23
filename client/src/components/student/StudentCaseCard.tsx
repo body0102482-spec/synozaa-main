@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Lock, Play } from 'lucide-react';
 
@@ -11,6 +12,17 @@ export interface OsceCaseSummary {
   specialty?: { nameEn: string; nameAr: string };
   difficulty?: { nameEn: string; nameAr: string; level: number };
   examImages?: string;
+}
+
+const DEFAULT_COVER = '/exam/chest-inspection.svg';
+
+function getCaseCover(examImages?: string): string {
+  try {
+    const images = JSON.parse(examImages || '[]') as Array<{ url?: string }>;
+    return images.find((image) => image.url?.startsWith('http') || image.url?.startsWith('/'))?.url ?? DEFAULT_COVER;
+  } catch {
+    return DEFAULT_COVER;
+  }
 }
 
 interface StudentCaseCardProps {
@@ -35,14 +47,12 @@ export function StudentCaseCard({
   const lockedByPlan = isFreeUser && !caseData.isFreeTier;
   const specialty = caseData.specialty ? (isAr ? caseData.specialty.nameAr : caseData.specialty.nameEn) : null;
   const difficulty = caseData.difficulty ? (isAr ? caseData.difficulty.nameAr : caseData.difficulty.nameEn) : null;
-  const coverImage = (() => {
-    try {
-      const images = JSON.parse(caseData.examImages || '[]') as Array<{ url?: string }>;
-      return images.find((image) => image.url?.startsWith('/'))?.url ?? '/exam/chest-inspection.svg';
-    } catch {
-      return '/exam/chest-inspection.svg';
-    }
-  })();
+  const [coverImage, setCoverImage] = useState(() => getCaseCover(caseData.examImages));
+  const isSvg = coverImage.endsWith('.svg');
+
+  useEffect(() => {
+    setCoverImage(getCaseCover(caseData.examImages));
+  }, [caseData.examImages]);
 
   return (
     <article
@@ -52,8 +62,15 @@ export function StudentCaseCard({
           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 hover:shadow-md transition-shadow'
       }`}
     >
-      <div className="h-36 bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
-        <img src={coverImage} alt={title} className="w-full h-full object-contain p-3" />
+      <div className="h-44 bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
+        <img
+          src={coverImage}
+          alt={title}
+          className={`w-full h-full ${isSvg ? 'object-contain p-3 bg-slate-100 dark:bg-slate-800' : 'object-cover'}`}
+          onError={() => {
+            if (coverImage !== DEFAULT_COVER) setCoverImage(DEFAULT_COVER);
+          }}
+        />
         <div className="absolute top-3 start-3 flex gap-2">
           {difficulty && (
             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase text-white bg-teal-700">

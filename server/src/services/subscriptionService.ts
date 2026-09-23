@@ -162,14 +162,17 @@ export async function getActiveSubscription(userId: string) {
   });
 }
 
-async function getEffectiveAttempts(userId: string, caseId: string) {
+async function getFreeAttemptsUsed(userId: string) {
   const [access, sessionCount] = await Promise.all([
-    prisma.caseAccess.findUnique({
-      where: { userId_caseId: { userId, caseId } },
+    prisma.caseAccess.aggregate({
+      where: { userId, case: { isFreeTier: true } },
+      _sum: { attempts: true },
     }),
-    prisma.session.count({ where: { userId, caseId } }),
+    prisma.session.count({
+      where: { userId, case: { isFreeTier: true } },
+    }),
   ]);
-  return Math.max(access?.attempts ?? 0, sessionCount);
+  return Math.max(access._sum.attempts ?? 0, sessionCount);
 }
 
 async function getUsedCaseCredits(userId: string, since?: Date | null) {
@@ -209,17 +212,8 @@ export async function getUserEntitlements(userId: string) {
     attemptsByCase[row.caseId] = Math.max(attemptsByCase[row.caseId] ?? 0, row._count._all);
   }
 
-  let freeAttemptsRemaining = 0;
-  if (isFree) {
-    const freeCases = await prisma.case.findMany({
-      where: { isPublished: true, isFreeTier: true },
-      select: { id: true },
-    });
-    freeAttemptsRemaining = freeCases.reduce(
-      (remaining, caseData) => remaining + Math.max(0, FREE_ATTEMPTS_PER_CASE - (attemptsByCase[caseData.id] ?? 0)),
-      0,
-    );
-  }
+  const freeAttemptsUsed = isFree ? await getFreeAttemptsUsed(userId) : 0;
+  const freeAttemptsRemaining = Math.max(0, FREE_ATTEMPTS_PER_CASE - freeAttemptsUsed);
 
   const planEndDate = await resolvePlanEndDate(subscription);
 
@@ -257,7 +251,7 @@ export async function checkCanStartCase(userId: string, caseId: string) {
       };
     }
 
-    const attempts = await getEffectiveAttempts(userId, caseId);
+    const attempts = await getFreeAttemptsUsed(userId);
     if (attempts >= FREE_ATTEMPTS_PER_CASE) {
       return {
         allowed: false as const,

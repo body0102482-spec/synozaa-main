@@ -388,7 +388,7 @@ export default function StudentDashboard() {
     if (!entitlements) return false;
     if (entitlements.isFree) {
       if (!c.isFreeTier) return false;
-      return getCaseAttempts(c.id) < entitlements.freeAttemptsPerCase;
+      return entitlements.freeAttemptsRemaining > 0;
     }
     const attempts = getCaseAttempts(c.id);
     if (attempts > 0) return true;
@@ -399,7 +399,7 @@ export default function StudentDashboard() {
     if (!entitlements) return null;
     const used = getCaseAttempts(caseId);
     if (entitlements.isFree) {
-      const left = Math.max(0, entitlements.freeAttemptsPerCase - used);
+      const left = entitlements.freeAttemptsRemaining;
       return left > 0 ? t('attemptsRemaining', { count: left }) : t('attemptsUsedUp');
     }
     if (used > 0) return t('completed');
