@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { Send } from 'lucide-react';
 import { VoiceMicButton } from './VoiceMicButton';
 
@@ -22,8 +22,6 @@ interface SimulationChatInputProps {
   compact?: boolean;
 }
 
-const MAX_TEXTAREA_HEIGHT = 160;
-
 export function SimulationChatInput({
   input,
   setInput,
@@ -46,13 +44,6 @@ export function SimulationChatInput({
   const locked = disabled || sending || isProcessing;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useLayoutEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT)}px`;
-  }, [input]);
-
   return (
     <div
       className={`border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 ${
@@ -72,7 +63,7 @@ export function SimulationChatInput({
         <textarea
           ref={textareaRef}
           rows={1}
-          className="input-field flex-1 min-w-0 resize-none overflow-y-auto leading-5 max-h-40"
+          className="input-field flex-1 min-w-0 resize-none overflow-y-auto leading-5 min-h-[44px] max-h-32 py-3"
           placeholder={placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}

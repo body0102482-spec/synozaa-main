@@ -180,26 +180,73 @@ function hasPattern(text: string, pattern: RegExp): boolean {
 
 
 
-/** Official Medsynoza Realistic Simulated Patient System Prompt. */
-const PATIENT_KNOWLEDGE_FIRST_RULES = `# Medsynoza — Realistic Simulated Patient System Prompt
+/** Compact patient-only rules: keep the behavior, drop the repetition. */
+const PATIENT_KNOWLEDGE_FIRST_RULES = `# Medsynoza — Simulated Patient
 
-You are the simulated patient in an OSCE.
-
-Stay fully in character as the patient, never a doctor, tutor, examiner, or AI.
-The case and patient background are the source of truth. Never contradict them or previous answers.
-Understand the full student message and answer all relevant questions naturally in one response.
+Stay fully in character as the patient. Never act as doctor, examiner, tutor, or AI.
+Case background is the source of truth. Never contradict it or previous answers.
+Answer all relevant parts of the current message in one natural reply.
 Reveal information naturally; do not dump the case or volunteer unrelated details.
-Match the patient's language to their age, education, occupation, and social background. Do not speak fluent English if the patient would not realistically know it. An educated/professional patient may use natural English; a poorly educated or older patient should mainly use natural Egyptian Arabic, even if the doctor speaks English.
-Use the patient's realistic vocabulary and level of understanding. Do not use medical jargon unless the patient's background makes it plausible.
-Describe symptoms like a real patient, using simple everyday language.
-Never reveal the diagnosis, differential, reasoning, treatment, examiner information, or hidden case data.
-For unstated non-clinical details, make plausible assumptions consistent with the patient.
-Avoid robotic replies such as “the case does not specify.” Use uncertainty only when natural for the patient.
-Maintain consistency in symptoms, timeline, history, personality, language ability, and previous answers.
-React naturally with appropriate emotion and personality.
-
-Always answer directly, completely, naturally, and consistently as this specific patient.
+Use the patient's own language level and background. Match age, education, occupation, and social setting.
+Do not reveal diagnosis, treatment, examiner information, scoring, or hidden case data.
+Use ordinary patient language. No medical jargon unless it fits the patient.
+Maintain consistency in symptoms, timeline, personality, and previous answers.
+If a personal detail is missing, make a safe, realistic assumption consistent with the patient.
+Never say the case does not specify in a robotic way; use natural uncertainty only when appropriate.
 `;
+
+const SAFE_DETERMINISTIC_PATIENT_INTENTS = new Set<PatientQuestionIntent>([
+  'greeting',
+  'empathy',
+  'wellbeing',
+  'name',
+  'age',
+  'residence',
+  'occupation',
+  'birthPlace',
+  'nationality',
+  'marital',
+  'gender',
+  'weight',
+  'height',
+  'priorDoctor',
+  'socialHabits',
+  'hobbies',
+]);
+
+function shouldUseDeterministicPatientFastPath(
+  userMessage: string,
+  history: { role: string; content: string }[],
+  voiceTurn: boolean,
+): boolean {
+  if (voiceTurn) return false;
+  if (isMultiPartPatientQuestion(userMessage)) return false;
+
+  const intents = resolvePatientQuestionIntents(userMessage);
+  if (intents.length === 0) return false;
+  const hasUnsafeIntent = intents.some((intent) => !SAFE_DETERMINISTIC_PATIENT_INTENTS.has(intent));
+  if (hasUnsafeIntent) return false;
+
+  // Only deterministic for direct, unambiguous personal-details questions.
+  return intents.every((intent) => SAFE_DETERMINISTIC_PATIENT_INTENTS.has(intent));
+}
+
+function estimateTokenCount(text: string): number {
+  const safe = (text || '').trim();
+  if (!safe) return 0;
+  return Math.max(1, Math.ceil(safe.length / 4));
+}
+
+function logPatientChatMetric(event: 'deterministic' | 'llm' | 'fallback', data: Record<string, string | number | boolean>) {
+  if (!/^(1|true|yes)$/i.test(String(process.env.PATIENT_CHAT_METRICS || ''))) return;
+  const payload = {
+    feature: 'patient_chat',
+    event,
+    ...data,
+    timestamp: new Date().toISOString(),
+  };
+  console.info('[patient_chat_metrics]', JSON.stringify(payload));
+}
 
 function buildPatientSystemPrompt(
   caseData: Case,
@@ -3466,6 +3513,34 @@ export async function getPatientResponse(
     options?.stationConfig?.patientBehavior ??
     null;
 
+  const deterministicFastPath = shouldUseDeterministicPatientFastPath(normalizedMessage, history, voiceTurn);
+  if (deterministicFastPath) {
+    const deterministicReply = getDeterministicPatientResponse(
+      caseData,
+      normalizedMessage,
+      lang,
+      history,
+      voiceTurn,
+    );
+    if (deterministicReply) {
+      const finalReply = finalizePatientReply(
+        caseData,
+        normalizedMessage,
+        deterministicReply,
+        lang,
+        history,
+        voiceTurn,
+      );
+      logPatientChatMetric('deterministic', {
+        routing: 'fast_path',
+        prompt_tokens: estimateTokenCount(normalizedMessage),
+        completion_tokens: estimateTokenCount(finalReply),
+        total_tokens: estimateTokenCount(normalizedMessage) + estimateTokenCount(finalReply),
+      });
+      return finalReply;
+    }
+  }
+
   const [customPatientKnowledge, settings] = await Promise.all([
     hasPatientAiKnowledge({
       caseId: caseData.id,
@@ -3583,6 +3658,14 @@ export async function getPatientResponse(
     },
     { timeoutMs: voiceTurn ? VOICE_TIMEOUT_MS : chatTimeout, stream: voiceTurn },
   );
+
+  logPatientChatMetric('llm', {
+    routing: voiceTurn ? 'voice' : 'chat',
+    prompt_tokens: estimateTokenCount(JSON.stringify(messages)),
+    completion_tokens: estimateTokenCount(raw),
+    total_tokens: estimateTokenCount(JSON.stringify(messages)) + estimateTokenCount(raw),
+    model: activeModel,
+  });
 
   const sanitized = sanitizePatientResponse(
     caseData,

@@ -515,22 +515,23 @@ export default function StudentDashboard() {
             {t('noStationsInCategory')}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 min-w-0">
             {sortedCases.map((c) =>
               entitlements?.isFree ? (
-                <StudentCaseCard
-                  key={c.id}
-                  caseData={c}
-                  isAr={!!isAr}
-                  isFreeUser
-                  canStart={canStartCase(c)}
-                  attemptLabel={caseAttemptLabel(c.id)}
-                  onStart={(id) => requestCaseStart({ type: 'station', caseId: id })}
-                />
+                <div key={c.id} className="min-w-0">
+                  <StudentCaseCard
+                    caseData={c}
+                    isAr={!!isAr}
+                    isFreeUser
+                    canStart={canStartCase(c)}
+                    attemptLabel={caseAttemptLabel(c.id)}
+                    onStart={(id) => requestCaseStart({ type: 'station', caseId: id })}
+                  />
+                </div>
               ) : (
                 <article
                   key={c.id}
-                  className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
+                  className="min-w-0 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
                 >
                   <div className="h-44 bg-slate-100 dark:bg-slate-900 relative overflow-hidden">
                     <CaseCoverImage examImages={c.examImages} title={isAr ? c.titleAr : c.titleEn} />

@@ -2217,7 +2217,7 @@ function DiagnosisView({
         </p>
 
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+          <div className="min-w-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
             <div className="flex items-center gap-2 mb-4 text-teal-600 dark:text-teal-400">
               <Search size={18} />
               <span className="text-xs font-bold tracking-wider uppercase">
@@ -2225,7 +2225,7 @@ function DiagnosisView({
               </span>
             </div>
             <textarea
-              className="w-full min-h-55 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 p-4 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 resize-y focus:outline-none focus:ring-2 focus:ring-teal-500/30"
+              className="w-full min-h-[220px] max-h-[420px] overflow-y-auto rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 p-4 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 resize-y focus:outline-none focus:ring-2 focus:ring-teal-500/30"
               placeholder={t("diagnosticImpressionPlaceholder")}
               value={impression}
               onChange={(e) => setImpression(e.target.value)}
@@ -2233,7 +2233,7 @@ function DiagnosisView({
             />
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
+          <div className="min-w-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6">
             <div className="flex items-center gap-2 mb-4 text-emerald-600 dark:text-emerald-400">
               <ClipboardCheck size={18} />
               <span className="text-xs font-bold tracking-wider uppercase">
@@ -2241,7 +2241,7 @@ function DiagnosisView({
               </span>
             </div>
             <textarea
-              className="w-full min-h-55 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 p-4 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 resize-y focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+              className="w-full min-h-[220px] max-h-[420px] overflow-y-auto rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 p-4 text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400 resize-y focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
               placeholder={t("initialManagementPlaceholder")}
               value={management}
               onChange={(e) => setManagement(e.target.value)}
