@@ -419,13 +419,19 @@ JSON structure:
 
 async function getAISettings() {
   const defaultModel = process.env.OPENAI_MODEL || 'google/gemini-2.5-flash-lite';
+  const defaultExaminerModel =
+    process.env.EXAMINER_MODEL ||
+    process.env.OPENAI_EXAMINER_MODEL ||
+    process.env.OPENAI_MODEL ||
+    'openai/gpt-oss-120b';
+
   let settings = await prisma.aISettings.findFirst();
   if (!settings) {
     settings = await prisma.aISettings.create({
       data: {
         provider: process.env.AI_PROVIDER || 'openrouter',
         patientModel: defaultModel,
-        examinerModel: defaultModel,
+        examinerModel: defaultExaminerModel,
       },
     });
   }
@@ -460,7 +466,7 @@ async function getAISettings() {
       process.env.OPENAI_EXAMINER_MODEL ||
       process.env.OPENAI_MODEL ||
       settings.examinerModel ||
-      'google/gemini-2.5-flash-lite',
+      'openai/gpt-oss-120b',
     maxContextMessages: settings.maxContextMessages ?? 16,
     openRouterApiKey:
       process.env.OPENROUTER_API_KEY?.trim() ||

@@ -469,15 +469,21 @@ Do NOT volunteer the diagnosis. Answer in Egyptian Arabic when student uses Arab
 
   const aiProvider = process.env.AI_PROVIDER || 'openrouter';
   const aiModel = process.env.OPENAI_MODEL || 'google/gemini-2.5-flash-lite';
+  const examinerModel =
+    process.env.EXAMINER_MODEL ||
+    process.env.OPENAI_EXAMINER_MODEL ||
+    process.env.OPENAI_MODEL ||
+    'openai/gpt-oss-120b';
+
   const existingAI = await prisma.aISettings.findFirst();
   if (existingAI) {
     await prisma.aISettings.update({
       where: { id: existingAI.id },
-      data: { provider: aiProvider, patientModel: aiModel, examinerModel: aiModel },
+      data: { provider: aiProvider, patientModel: aiModel, examinerModel },
     });
   } else {
     await prisma.aISettings.create({
-      data: { provider: aiProvider, patientModel: aiModel, examinerModel: aiModel },
+      data: { provider: aiProvider, patientModel: aiModel, examinerModel },
     });
   }
 
