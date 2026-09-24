@@ -42,10 +42,10 @@ interface Entitlements {
   planEndDate?: string | null;
   totalXp?: number;
   rankProgress?: RankSnapshot;
-  universityRank?: UniversityRankSnapshot | null;
+  globalRank?: GlobalRankSnapshot | null;
 }
 
-export interface UniversityRankSnapshot {
+export interface GlobalRankSnapshot {
   rank: number;
   cohortSize: number;
   higherCount: number;
@@ -316,10 +316,10 @@ function StudentPortalLayout() {
                     )}
                   </div>
                 )}
-                {entitlements?.universityRank && (
+                {entitlements?.globalRank && (
                   <div className="pb-2 mb-2 border-b border-slate-200 dark:border-slate-700">
-                    <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase mb-1">University Rank</p>
-                    <p className="text-xs font-bold text-blue-700 dark:text-blue-400 leading-snug">#{entitlements.universityRank.rank}</p>
+                    <p className="text-[10px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-300 uppercase mb-1">Global Rank</p>
+                    <p className="text-xs font-bold text-blue-700 dark:text-blue-400 leading-snug">#{entitlements.globalRank.rank}</p>
                   </div>
                 )}
                 <div className="flex items-center justify-between gap-3">

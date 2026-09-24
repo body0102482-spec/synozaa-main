@@ -22,6 +22,8 @@ type ProfilePayload = {
     studentId?: string | null;
     lastSeenAt?: string | null;
     totalXp: number;
+    rank: number | null;
+    globalRank: number | null;
     rankProgress?: { rank: string; nextRank?: string; progress?: number };
   };
   subscription: {
@@ -135,6 +137,12 @@ export function AdminStudentProfile({ userId, open, onClose }: Props) {
                   <p className="font-medium mt-1">
                     {Math.round(data.user.totalXp)}
                     {data.user.rankProgress?.rank ? ` · ${data.user.rankProgress.rank}` : ''}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-blue-50 dark:bg-blue-950/30 p-3">
+                  <p className="text-xs text-slate-500">Rank</p>
+                  <p className="font-bold text-blue-700 dark:text-blue-300 mt-1">
+                    {data.user.rank === null ? '—' : `#${data.user.rank}`}
                   </p>
                 </div>
               </div>

@@ -4,7 +4,7 @@ import { CLINICAL_RANKS, rankLabel } from '../../lib/clinicalRanks';
 import type { RankSnapshot } from './XpBreakdownSection';
 import { CareerPathMap } from './CareerPathMap';
 import { CareerPathSidebar } from './CareerPathSidebar';
-import type { UniversityRankSnapshot } from './StudentPortalLayout';
+import type { GlobalRankSnapshot } from './StudentPortalLayout';
 
 function formatXp(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
@@ -90,11 +90,11 @@ export function RankProgressSummary({ progress, isAr }: { progress: RankSnapshot
 export function CareerPathSection({
   progress,
   isAr,
-  universityRank,
+  globalRank,
 }: {
   progress: RankSnapshot;
   isAr: boolean;
-  universityRank?: UniversityRankSnapshot | null;
+  globalRank?: GlobalRankSnapshot | null;
 }) {
   const { t } = useTranslation();
   const [selectedKey, setSelectedKey] = useState<string | null>(progress.currentRank.key);
@@ -119,7 +119,7 @@ export function CareerPathSection({
           progress={progress}
           isAr={isAr}
           selectedKey={selectedKey}
-          universityRank={universityRank}
+          globalRank={globalRank}
         />
       </div>
     </div>

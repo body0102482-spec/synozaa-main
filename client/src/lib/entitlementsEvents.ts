@@ -11,7 +11,8 @@ export type EntitlementsSnapshot = {
   planEndDate?: string | null;
   planStartDate?: string | null;
   totalXp?: number;
-  universityRank?: {
+  rank?: number | null;
+  globalRank?: {
     rank: number;
     cohortSize: number;
     higherCount: number;

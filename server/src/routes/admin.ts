@@ -20,6 +20,7 @@ import {
   ensureDefaultCostRates,
 } from '../services/aiUsageService.js';
 import { getRankProgress } from '../services/xpService.js';
+import { getGlobalRank } from '../services/universityRankService.js';
 import adminQbankRoutes from './adminQbank.js';
 import adminCasesRoutes from './adminCases.js';
 import adminAiKnowledgeRoutes from './adminAiKnowledge.js';
@@ -294,7 +295,7 @@ router.get('/users/:userId/profile', async (req, res) => {
   });
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  const [entitlements, subscription, qbankModules, recentSessions, completedCount, results] =
+  const [entitlements, subscription, qbankModules, recentSessions, completedCount, results, globalRank] =
     await Promise.all([
       getUserEntitlements(user.id),
       getActiveSubscription(user.id),
@@ -320,6 +321,7 @@ router.get('/users/:userId/profile', async (req, res) => {
           missedQuestions: true,
         },
       }),
+      getGlobalRank(user.id),
     ]);
 
   const moduleIds = qbankModules.map((m) => m.moduleId);
@@ -359,6 +361,8 @@ router.get('/users/:userId/profile', async (req, res) => {
   res.json({
     user: {
       ...user,
+      rank: globalRank?.rank ?? null,
+      globalRank: globalRank?.rank ?? null,
       rankProgress: (() => {
         const rp = getRankProgress(user.totalXp ?? 0);
         return {

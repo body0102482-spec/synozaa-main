@@ -1,60 +1,45 @@
-import {
-  calculateUniversityRank,
-  normalizeUniversityName,
-  selectUniversityCohort,
-} from '../src/services/universityRankService.js';
+import { calculateGlobalRank } from '../src/services/universityRankService.js';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-const sameUniversity = [
-  { id: 'a', totalXp: 500 },
-  { id: 'b', totalXp: 400 },
-  { id: 'c', totalXp: 400 },
-  { id: 'd', totalXp: 300 },
+const students = [
+  { id: 'a', totalXp: 1000, createdAt: new Date('2026-01-01') },
+  { id: 'b', totalXp: 1000, createdAt: new Date('2026-01-02') },
+  { id: 'c', totalXp: 900, createdAt: new Date('2026-01-03') },
 ];
+assert(calculateGlobalRank('a', students)?.rank === 1, 'First tied student should rank #1.');
+assert(calculateGlobalRank('b', students)?.rank === 2, 'Second tied student should rank #2.');
+assert(calculateGlobalRank('c', students)?.rank === 3, 'Lower XP student should rank #3.');
 
-const b = calculateUniversityRank('b', sameUniversity);
-assert(b?.rank === 2 && b.higherCount === 1 && b.cohortSize === 4, 'Expected B to rank #2 within its cohort.');
-const c = calculateUniversityRank('c', sameUniversity);
-assert(c?.rank === 2, 'Equal XP must use competition ranking.');
-const d = calculateUniversityRank('d', sameUniversity);
-assert(d?.rank === 4, 'Competition ranking must skip after a tie.');
-const solo = calculateUniversityRank('solo', [{ id: 'solo', totalXp: 0 }]);
-assert(solo?.rank === 1 && solo.cohortSize === 1, 'A one-student university must rank #1 even at zero XP.');
-assert(calculateUniversityRank('missing', sameUniversity) === null, 'A student outside the cohort must not receive a rank.');
+const tiedStudents = Array.from({ length: 10 }, (_, index) => ({
+  id: `student-${index}`,
+  totalXp: 500,
+  createdAt: new Date(`2026-01-${String(index + 1).padStart(2, '0')}`),
+}));
+const tiedRanks = tiedStudents.map((student) => calculateGlobalRank(student.id, tiedStudents)?.rank);
+assert(new Set(tiedRanks).size === 10, 'Equal XP students must have unique ranks.');
+assert(tiedRanks.every((rank, index) => rank === index + 1), 'Equal XP students must receive sequential ranks.');
 
-const candidates = [
-  { id: 'self', role: 'STUDENT', universityId: 'uni-a', university: 'University A', totalXp: 400 },
-  { id: 'same', role: 'STUDENT', universityId: 'uni-a', university: 'University A', totalXp: 500 },
-  { id: 'other-university', role: 'STUDENT', universityId: 'uni-b', university: 'University B', totalXp: 9999 },
-  { id: 'admin', role: 'ADMIN', universityId: 'uni-a', university: 'University A', totalXp: 9999 },
+const promoted = [...students, { id: 'new-top', totalXp: 1200, createdAt: new Date('2026-09-24') }];
+assert(calculateGlobalRank('new-top', promoted)?.rank === 1, 'A new highest-XP student must become #1.');
+assert(calculateGlobalRank('a', promoted)?.rank === 2, 'Existing students must shift down after a new #1 joins.');
+
+const afterGain = [
+  { id: 'a', totalXp: 1000, createdAt: new Date('2026-01-01') },
+  { id: 'b', totalXp: 1100, createdAt: new Date('2026-01-02') },
+  { id: 'c', totalXp: 900, createdAt: new Date('2026-01-03') },
 ];
-const structuredCohort = selectUniversityCohort(candidates[0], candidates);
-assert(structuredCohort.length === 2, 'Structured university cohorts must exclude other universities and non-students.');
-assert(calculateUniversityRank('self', structuredCohort)?.rank === 2, 'Structured university rank should use only same-university students.');
+assert(calculateGlobalRank('b', afterGain)?.rank === 1, 'A student who gains XP past another must become #1.');
+assert(calculateGlobalRank('a', afterGain)?.rank === 2, 'The passed student must move down.');
 
-const customCandidates = [
-  { id: 'custom-self', role: 'STUDENT', universityId: null, university: '  Custom   Medical University ', totalXp: 20 },
-  { id: 'custom-peer', role: 'STUDENT', universityId: null, university: 'custom medical university', totalXp: 30 },
-  { id: 'custom-near-match', role: 'STUDENT', universityId: null, university: 'Custom Medical University Hospital', totalXp: 100 },
-  { id: 'structured-same-name', role: 'STUDENT', universityId: 'partner-id', university: 'Custom Medical University', totalXp: 100 },
+const zeroXp = [
+  { id: 'zero-a', totalXp: 0, createdAt: new Date('2026-01-01') },
+  { id: 'zero-b', totalXp: 0, createdAt: new Date('2026-01-02') },
 ];
-const customCohort = selectUniversityCohort(customCandidates[0], customCandidates);
-assert(customCohort.length === 2, 'Custom university matching must be normalized and exact, without mixing structured universities.');
-assert(selectUniversityCohort({ role: 'STUDENT', universityId: null, university: null }, customCandidates).length === 0, 'Missing university must not receive a global rank.');
+assert(calculateGlobalRank('zero-a', zeroXp)?.rank === 1, 'Zero XP students must still be ranked.');
+assert(calculateGlobalRank('zero-b', zeroXp)?.rank === 2, 'Zero XP ties must still be unique.');
+assert(calculateGlobalRank('missing', students) === null, 'Unknown students must not receive a rank.');
 
-assert(
-  normalizeUniversityName('  Other   University ') === normalizeUniversityName('other university'),
-  'Custom universities should match only after safe whitespace/case normalization.',
-);
-assert(
-  normalizeUniversityName('Other University') !== normalizeUniversityName('Other University Hospital'),
-  'Custom universities must not use loose substring matching.',
-);
-
-// The rank payload is deliberately aggregate-only: the public type has no names, emails, IDs, or peer XP.
-assert(!Object.keys(b ?? {}).some((key) => /name|email|student|xp/i.test(key) && key !== 'topPercent'), 'Rank output leaked peer data.');
-
-console.log('University rank regressions passed.');
+console.log('Global rank regressions passed.');

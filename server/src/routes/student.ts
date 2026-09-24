@@ -8,7 +8,7 @@ import {
 } from '../services/subscriptionService.js';
 import { getPaymentPublicConfig } from '../services/payment/paymentService.js';
 import { getRankProgress } from '../services/xpService.js';
-import { getUniversityRank } from '../services/universityRankService.js';
+import { getGlobalRank } from '../services/universityRankService.js';
 import { getModulesForUser, userHasModuleAccess, getActiveTerms, getModuleSetupMeta, countAvailableQuestions, fetchExamQuestions } from '../services/qbankService.js';
 
 const router = Router();
@@ -17,15 +17,21 @@ router.use(authenticate);
 
 router.get('/entitlements', async (req, res) => {
   const userId = req.user!.id;
-  const [entitlements, user, plans, universityRank] = await Promise.all([
+  const [entitlements, user, plans, globalRank] = await Promise.all([
     getUserEntitlements(userId),
     prisma.user.findUnique({ where: { id: userId }, select: { totalXp: true } }),
     listPlanConfigs(true),
-    getUniversityRank(userId),
+    getGlobalRank(userId),
   ]);
   const rankProgress = getRankProgress(user?.totalXp ?? 0);
   res.json({
-    entitlements: { ...entitlements, totalXp: user?.totalXp ?? 0, rankProgress, universityRank },
+    entitlements: {
+      ...entitlements,
+      totalXp: user?.totalXp ?? 0,
+      rank: globalRank?.rank ?? null,
+      rankProgress,
+      globalRank,
+    },
     payment: getPaymentPublicConfig(),
     plans: plans
       .filter((p) => p.id === 'PACKAGE_50' || p.id === 'PACKAGE_150' || p.id === 'PACKAGE_300')

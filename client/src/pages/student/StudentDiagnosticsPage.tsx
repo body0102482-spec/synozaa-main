@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
 import { CareerPathSection } from '../../components/student/CareerPathSection';
 import type { RankSnapshot } from '../../components/student/XpBreakdownSection';
-import type { UniversityRankSnapshot } from '../../components/student/StudentPortalLayout';
+import type { GlobalRankSnapshot } from '../../components/student/StudentPortalLayout';
 
 interface Stats {
   totalSessions: number;
@@ -17,7 +17,7 @@ export default function StudentDiagnosticsPage() {
   const isAr = i18n.language?.startsWith('ar');
   const [stats, setStats] = useState<Stats | null>(null);
   const [rankProgress, setRankProgress] = useState<RankSnapshot | null>(null);
-  const [universityRank, setUniversityRank] = useState<UniversityRankSnapshot | null>(null);
+  const [globalRank, setGlobalRank] = useState<GlobalRankSnapshot | null>(null);
   const [recent, setRecent] = useState<
     Array<{ id: string; case: { titleEn: string; titleAr: string }; result?: { totalScore: number } | null }>
   >([]);
@@ -29,7 +29,7 @@ export default function StudentDiagnosticsPage() {
     });
     api.get('/student/entitlements').then((r) => {
       setRankProgress(r.data.entitlements?.rankProgress ?? null);
-      setUniversityRank(r.data.entitlements?.universityRank ?? null);
+      setGlobalRank(r.data.entitlements?.globalRank ?? null);
     }).catch(() => {});
   }, []);
 
@@ -40,7 +40,7 @@ export default function StudentDiagnosticsPage() {
         <p className="text-slate-500 dark:text-slate-400 mt-2">{t('portalDiagnosticsDesc')}</p>
       </div>
 
-      {rankProgress && <CareerPathSection progress={rankProgress} isAr={!!isAr} universityRank={universityRank} />}
+      {rankProgress && <CareerPathSection progress={rankProgress} isAr={!!isAr} globalRank={globalRank} />}
 
       {stats && (
         <div className="grid sm:grid-cols-3 gap-4">

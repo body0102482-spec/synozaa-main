@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CLINICAL_RANKS, rankLabel } from '../../lib/clinicalRanks';
 import type { RankSnapshot } from './XpBreakdownSection';
-import type { UniversityRankSnapshot } from './StudentPortalLayout';
+import type { GlobalRankSnapshot } from './StudentPortalLayout';
 
 function formatXp(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
@@ -12,10 +12,10 @@ interface CareerPathSidebarProps {
   progress: RankSnapshot;
   isAr: boolean;
   selectedKey: string | null;
-  universityRank?: UniversityRankSnapshot | null;
+  globalRank?: GlobalRankSnapshot | null;
 }
 
-export function CareerPathSidebar({ progress, isAr, selectedKey, universityRank }: CareerPathSidebarProps) {
+export function CareerPathSidebar({ progress, isAr, selectedKey, globalRank }: CareerPathSidebarProps) {
   const { t } = useTranslation();
 
   const selectedRank = useMemo(() => {
@@ -32,9 +32,9 @@ export function CareerPathSidebar({ progress, isAr, selectedKey, universityRank 
         <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
           {t('xpBoardStatus')}
         </p>
-        {universityRank ? (
+        {globalRank ? (
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 mt-1">
-            University Rank
+            Global Rank
           </p>
         ) : (
           <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400 mt-1">
@@ -42,22 +42,22 @@ export function CareerPathSidebar({ progress, isAr, selectedKey, universityRank 
           </p>
         )}
 
-        {universityRank && (
+        {globalRank && (
           <div className="mt-3 rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/60 dark:bg-blue-950/20 px-4 py-3">
             <div className="flex items-baseline justify-between gap-3">
               <p className="text-2xl font-black text-blue-700 dark:text-blue-300">
-                #{universityRank.rank}{universityRank.cohortSize === 1 ? ' in your university' : ''}
+                #{globalRank.rank}
               </p>
-              {universityRank.cohortSize > 1 && (
+              {globalRank.cohortSize > 1 && (
                 <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                  Top {universityRank.topPercent}% in your university
+                  Top {globalRank.topPercent}% globally
                 </p>
               )}
             </div>
             <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-              {universityRank.higherCount === 0
-                ? 'You are currently at the top of your university cohort.'
-                : `${universityRank.higherCount} student${universityRank.higherCount === 1 ? '' : 's'} ahead of you.`}
+              {globalRank.higherCount === 0
+                ? 'You are currently ranked #1 globally.'
+                : `${globalRank.higherCount} student${globalRank.higherCount === 1 ? '' : 's'} ahead of you.`}
             </p>
           </div>
         )}
