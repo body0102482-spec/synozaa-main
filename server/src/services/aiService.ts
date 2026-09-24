@@ -423,7 +423,7 @@ async function getAISettings() {
     process.env.EXAMINER_MODEL ||
     process.env.OPENAI_EXAMINER_MODEL ||
     process.env.OPENAI_MODEL ||
-    'openai/gpt-oss-120b';
+    'google/gemini-3.1-flash-lite';
 
   let settings = await prisma.aISettings.findFirst();
   if (!settings) {
@@ -466,7 +466,7 @@ async function getAISettings() {
       process.env.OPENAI_EXAMINER_MODEL ||
       process.env.OPENAI_MODEL ||
       settings.examinerModel ||
-      'openai/gpt-oss-120b',
+      'google/gemini-3.1-flash-lite',
     maxContextMessages: settings.maxContextMessages ?? 16,
     openRouterApiKey:
       process.env.OPENROUTER_API_KEY?.trim() ||

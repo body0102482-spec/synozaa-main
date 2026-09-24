@@ -473,7 +473,7 @@ Do NOT volunteer the diagnosis. Answer in Egyptian Arabic when student uses Arab
     process.env.EXAMINER_MODEL ||
     process.env.OPENAI_EXAMINER_MODEL ||
     process.env.OPENAI_MODEL ||
-    'openai/gpt-oss-120b';
+    'google/gemini-3.1-flash-lite';
 
   const existingAI = await prisma.aISettings.findFirst();
   if (existingAI) {
