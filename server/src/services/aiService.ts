@@ -195,42 +195,6 @@ If a personal detail is missing, make a safe, realistic assumption consistent wi
 Never say the case does not specify in a robotic way; use natural uncertainty only when appropriate.
 `;
 
-const SAFE_DETERMINISTIC_PATIENT_INTENTS = new Set<PatientQuestionIntent>([
-  'greeting',
-  'empathy',
-  'wellbeing',
-  'name',
-  'age',
-  'residence',
-  'occupation',
-  'birthPlace',
-  'nationality',
-  'marital',
-  'gender',
-  'weight',
-  'height',
-  'priorDoctor',
-  'socialHabits',
-  'hobbies',
-]);
-
-function shouldUseDeterministicPatientFastPath(
-  userMessage: string,
-  history: { role: string; content: string }[],
-  voiceTurn: boolean,
-): boolean {
-  if (voiceTurn) return false;
-  if (isMultiPartPatientQuestion(userMessage)) return false;
-
-  const intents = resolvePatientQuestionIntents(userMessage);
-  if (intents.length === 0) return false;
-  const hasUnsafeIntent = intents.some((intent) => !SAFE_DETERMINISTIC_PATIENT_INTENTS.has(intent));
-  if (hasUnsafeIntent) return false;
-
-  // Only deterministic for direct, unambiguous personal-details questions.
-  return intents.every((intent) => SAFE_DETERMINISTIC_PATIENT_INTENTS.has(intent));
-}
-
 function estimateTokenCount(text: string): number {
   const safe = (text || '').trim();
   if (!safe) return 0;
@@ -969,8 +933,6 @@ function finalizePatientReply(
   text = stripEmbeddedEnglishFromArabic(text);
 
   if (!voiceTurn && (isMostlyEnglish(text) || containsEnglishMedicalLeak(text))) {
-    const fallback = getDeterministicPatientResponse(caseData, userMessage, 'AR', history, false);
-    if (fallback) return fallback;
     if (asksWellbeing(userMessage)) return patientWellbeingReply(caseData, true, false);
     if (asksAboutSymptoms(userMessage)) return patientComplaintPhrase(caseData, true);
     if (asksName(userMessage)) return `اسمي ${patientNameInLang(caseData, true)}.`;
@@ -1404,16 +1366,6 @@ function quickSocialPatientReply(
   }
 
   if (asksWellbeing(userMessage)) {
-    // If the doctor mixed wellbeing with other questions (name/age/...),
-    // don't answer wellbeing alone — let the multi-intent combiner handle it.
-    const intents = resolvePatientQuestionIntents(userMessage);
-    const hasOtherFacts = intents.some(
-      (intent) =>
-        intent !== 'wellbeing' &&
-        intent !== 'greeting' &&
-        intent !== 'empathy',
-    );
-    if (hasOtherFacts) return null;
     return patientWellbeingReply(caseData, isArabic, voiceTurn);
   }
 
@@ -3162,13 +3114,11 @@ function sanitizePatientResponse(
     text = text.replaceAll(caseData.patientName, patientNameInLang(caseData, true));
   }
 
-  const intent = resolvePrimaryPatientQuestionIntent(userMessage);
   if (
-    (intent === 'greeting' || isGreetingOnly(userMessage)) &&
+    (isGreetingOnly(userMessage) || isDoctorIntroduction(userMessage)) &&
     !asksAboutSymptoms(userMessage) &&
     !asksWellbeing(userMessage)
   ) {
-    // Model (or cached opening) dumped symptoms on a pure greeting — strip to greeting only.
     const complaintSnippet = caseData.chiefComplaint.toLowerCase().slice(0, 24);
     const responseLower = text.toLowerCase();
     const dumpedComplaint =
@@ -3359,16 +3309,7 @@ function mockPatientResponse(
     return isArabic ? 'أهلاً يا دكتور.' : 'Hello doctor.';
   }
 
-  // Priority 1: Check deterministic and multi-part handlers first
-  const deterministic = getDeterministicPatientResponse(caseData, userMessage, language, history, false);
-  if (deterministic !== null) return deterministic;
-
-  const intent = resolvePrimaryPatientQuestionIntent(userMessage);
-
-  if (intent === 'wellbeing') {
-    return patientWellbeingReply(caseData, isArabic, false);
-  }
-  if (intent === 'symptoms' || asksAboutSymptoms(userMessage)) {
+  if (asksAboutSymptoms(userMessage)) {
     const brief = patientRichComplaint(caseData, isArabic);
     if (
       asksSymptomDetails(userMessage) ||
@@ -3381,7 +3322,8 @@ function mockPatientResponse(
     }
     return brief;
   }
-  if (intent === 'name') {
+
+  if (asksName(userMessage)) {
     return isArabic
       ? `اسمي ${patientNameInLang(caseData, true)}.`
       : `My name is ${caseData.patientName}.`;
@@ -3468,10 +3410,6 @@ export function sanitizeRealtimePatientTranscript(
   sessionLanguage: string,
 ): string {
   const lang: Language = sessionLanguage === 'EN' ? 'EN' : 'AR';
-  if (isGreetingOnly(studentMessage) || isDoctorIntroduction(studentMessage) || /إيه\s*الأخبار|ايه\s*الاخبار|السلام\s*عليكم/i.test(studentMessage)) {
-    const deterministic = getDeterministicPatientResponse(caseData, studentMessage, lang, [], true);
-    if (deterministic) return deterministic;
-  }
   let text = sanitizePatientResponse(caseData, studentMessage, patientTranscript, lang, true);
 
   if (patientActingAsDoctor(text)) {
@@ -3484,8 +3422,6 @@ export function sanitizeRealtimePatientTranscript(
 
   const trimmed = text.trim();
   if (!trimmed) {
-    const retry = getDeterministicPatientResponse(caseData, studentMessage, lang, [], true);
-    if (retry) return retry;
     return lang === 'AR' ? 'أيوه يا دكتور، معاك.' : 'Yes doctor, please go ahead.';
   }
   return trimmed;
@@ -3513,34 +3449,6 @@ export async function getPatientResponse(
     options?.stationConfig?.patientBehavior ??
     null;
 
-  const deterministicFastPath = shouldUseDeterministicPatientFastPath(normalizedMessage, history, voiceTurn);
-  if (deterministicFastPath) {
-    const deterministicReply = getDeterministicPatientResponse(
-      caseData,
-      normalizedMessage,
-      lang,
-      history,
-      voiceTurn,
-    );
-    if (deterministicReply) {
-      const finalReply = finalizePatientReply(
-        caseData,
-        normalizedMessage,
-        deterministicReply,
-        lang,
-        history,
-        voiceTurn,
-      );
-      logPatientChatMetric('deterministic', {
-        routing: 'fast_path',
-        prompt_tokens: estimateTokenCount(normalizedMessage),
-        completion_tokens: estimateTokenCount(finalReply),
-        total_tokens: estimateTokenCount(normalizedMessage) + estimateTokenCount(finalReply),
-      });
-      return finalReply;
-    }
-  }
-
   const [customPatientKnowledge, settings] = await Promise.all([
     hasPatientAiKnowledge({
       caseId: caseData.id,
@@ -3563,24 +3471,6 @@ export async function getPatientResponse(
         normalizedMessage,
       );
       return finalizePatientReply(caseData, normalizedMessage, greeting, lang, history, voiceTurn);
-    }
-
-    const deterministic = getDeterministicPatientResponse(
-      caseData,
-      normalizedMessage,
-      lang,
-      history,
-      voiceTurn,
-    );
-    if (deterministic !== null) {
-      return finalizePatientReply(
-        caseData,
-        normalizedMessage,
-        deterministic,
-        lang,
-        history,
-        voiceTurn,
-      );
     }
 
     return finalizePatientReply(
