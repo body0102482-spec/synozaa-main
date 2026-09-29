@@ -1,6 +1,7 @@
-import { Router } from "express";
+import { Router, type Request, type Response, type NextFunction } from "express";
 import fs from "fs/promises";
 import path from "path";
+import multer from "multer";
 import { prisma } from "../lib/prisma.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 import { Role } from "@prisma/client";
@@ -18,6 +19,10 @@ import {
   examCasesUploadRoot,
   ensureExamMediaDirs,
 } from "../lib/examMediaPaths.js";
+import {
+  MAX_VIDEO_UPLOAD_SIZE_BYTES,
+  MAX_VIDEO_UPLOAD_SIZE_MB,
+} from "../lib/videoUploadConfig.js";
 import {
   mergeStationConfig,
   parsePartialStationConfig,
@@ -58,38 +63,81 @@ const ALLOWED_MEDIA_EXT = new Set([
   ".ogg",
 ]);
 
-async function saveExamMediaFile(input: {
-  fileName: string;
-  mimeType?: string;
-  dataBase64: string;
-  caseSlug?: string;
-}): Promise<{ url: string; fileName: string; mimeType: string }> {
-  const safeName = path
-    .basename(input.fileName)
-    .replace(/[^a-zA-Z0-9._-]/g, "-");
-  const ext = path.extname(safeName).toLowerCase();
-  if (!ALLOWED_MEDIA_EXT.has(ext)) {
-    throw Object.assign(new Error("Unsupported file type"), { status: 400 });
-  }
+const VIDEO_MEDIA_EXT = new Set([".mp4", ".webm", ".mpeg"]);
+const ALLOWED_MIME_TYPES_BY_EXT: Record<string, Set<string>> = {
+  ".png": new Set(["image/png"]),
+  ".jpg": new Set(["image/jpeg"]),
+  ".jpeg": new Set(["image/jpeg"]),
+  ".webp": new Set(["image/webp"]),
+  ".gif": new Set(["image/gif"]),
+  ".svg": new Set(["image/svg+xml"]),
+  ".mp4": new Set(["video/mp4"]),
+  ".webm": new Set(["video/webm"]),
+  ".mpeg": new Set(["video/mpeg"]),
+  ".mp3": new Set(["audio/mpeg", "audio/mp3"]),
+  ".wav": new Set(["audio/wav", "audio/x-wav", "audio/wave"]),
+  ".ogg": new Set(["audio/ogg", "audio/opus"]),
+};
 
-  const buffer = Buffer.from(input.dataBase64, "base64");
-  if (buffer.length > 12 * 1024 * 1024) {
-    throw Object.assign(new Error("File too large (max 12 MB)"), {
-      status: 400,
-    });
-  }
+const MAX_NON_VIDEO_UPLOAD_SIZE_BYTES = 12 * 1024 * 1024;
+const mediaUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, _file, callback) => {
+      const folder = slugify(String(req.body?.caseSlug || "draft"));
+      const dir = path.join(examMediaRoot, folder);
+      void fs.mkdir(dir, { recursive: true }).then(
+        () => callback(null, dir),
+        (error: NodeJS.ErrnoException) => callback(error, dir),
+      );
+    },
+    filename: (_req, file, callback) => {
+      const safeName = path
+        .basename(file.originalname)
+        .replace(/[^a-zA-Z0-9._-]/g, "-");
+      callback(null, safeName);
+    },
+  }),
+  limits: {
+    fileSize: MAX_VIDEO_UPLOAD_SIZE_BYTES,
+    files: 1,
+    fields: 1,
+    fieldSize: 256,
+    parts: 2,
+  },
+  fileFilter: (_req, file, callback) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowedMimeTypes = ALLOWED_MIME_TYPES_BY_EXT[ext];
+    if (
+      !ALLOWED_MEDIA_EXT.has(ext) ||
+      (file.mimetype && !allowedMimeTypes?.has(file.mimetype.toLowerCase()))
+    ) {
+      callback(Object.assign(new Error("Unsupported file type"), { status: 400 }));
+      return;
+    }
+    callback(null, true);
+  },
+});
 
-  const folder = slugify(input.caseSlug || "draft");
-  const dir = path.join(examMediaRoot, folder);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, safeName), buffer);
+const handleMediaUpload = (req: Request, res: Response, next: NextFunction) => {
+  mediaUpload.single("file")(req, res, (error: unknown) => {
+    if (!error) {
+      next();
+      return;
+    }
 
-  return {
-    url: `/exam/cases/${folder}/${safeName}`,
-    fileName: safeName,
-    mimeType: input.mimeType || "application/octet-stream",
-  };
-}
+    const status =
+      error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
+        ? 413
+        : (error as { status?: number }).status ?? 400;
+    const message =
+      error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
+        ? `Video exceeds the maximum allowed size of ${MAX_VIDEO_UPLOAD_SIZE_MB} MB.`
+        : error instanceof Error
+          ? error.message
+          : "Could not upload media file.";
+    res.status(status).json({ error: message });
+  });
+};
 
 router.get("/", async (_req, res) => {
   const cases = await prisma.case.findMany({
@@ -135,33 +183,27 @@ router.post("/import/parse", async (req, res) => {
 });
 
 /** Upload exam media without requiring the case to be saved first. */
-router.post("/media/upload", async (req, res) => {
-  const { fileName, mimeType, dataBase64, caseSlug } = req.body as {
-    fileName?: string;
-    mimeType?: string;
-    dataBase64?: string;
-    caseSlug?: string;
-  };
+router.get("/media/config", (_req, res) => {
+  res.json({ maxVideoUploadSizeMb: MAX_VIDEO_UPLOAD_SIZE_MB });
+});
 
-  if (!fileName?.trim() || !dataBase64?.trim()) {
-    return res
-      .status(400)
-      .json({ error: "fileName and dataBase64 are required" });
+router.post("/media/upload", handleMediaUpload, async (req, res) => {
+  const file = req.file;
+  if (!file) return res.status(400).json({ error: "A media file is required." });
+
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (!VIDEO_MEDIA_EXT.has(ext) && file.size > MAX_NON_VIDEO_UPLOAD_SIZE_BYTES) {
+    await fs.unlink(file.path).catch(() => undefined);
+    return res.status(413).json({ error: "File exceeds the maximum allowed size of 12 MB." });
   }
 
-  try {
-    const saved = await saveExamMediaFile({
-      fileName,
-      mimeType,
-      dataBase64,
-      caseSlug,
-    });
-    res.status(201).json(saved);
-  } catch (error) {
-    const status = (error as { status?: number }).status ?? 500;
-    const message = error instanceof Error ? error.message : "Upload failed";
-    res.status(status).json({ error: message });
-  }
+  const folder = slugify(String(req.body?.caseSlug || "draft"));
+  const safeName = path.basename(file.path);
+  res.status(201).json({
+    url: `/exam/cases/${folder}/${safeName}`,
+    fileName: safeName,
+    mimeType: file.mimetype || "application/octet-stream",
+  });
 });
 
 router.get("/:id/university-overrides", async (req, res) => {

@@ -1,6 +1,7 @@
-import { Router } from 'express';
+import { Router, type Request, type Response, type NextFunction } from 'express';
 import fs from 'fs/promises';
 import path from 'path';
+import multer from 'multer';
 import { AiKnowledgeKind, AiKnowledgeRole, Prisma, Role } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
@@ -8,6 +9,10 @@ import {
   ensureAiKnowledgeDirs,
   persistentAiKnowledgeRoot,
 } from '../lib/aiKnowledgePaths.js';
+import {
+  MAX_VIDEO_UPLOAD_SIZE_BYTES,
+  MAX_VIDEO_UPLOAD_SIZE_MB,
+} from '../lib/videoUploadConfig.js';
 
 const router = Router();
 ensureAiKnowledgeDirs();
@@ -41,7 +46,9 @@ const ALLOWED_FILE_EXT = new Set([
   '.ogg',
 ]);
 
+const VIDEO_FILE_EXT = new Set(['.mp4', '.webm', '.mpeg']);
 const TEXT_EXCERPT_EXT = new Set(['.txt', '.md', '.csv', '.json']);
+const MAX_NON_VIDEO_UPLOAD_SIZE_BYTES = 12 * 1024 * 1024;
 
 function slugify(value: string): string {
   return (
@@ -58,39 +65,76 @@ function isTextMime(mime: string | undefined, ext: string): boolean {
   return Boolean(mime && (mime.startsWith('text/') || mime.includes('json')));
 }
 
-async function saveKnowledgeFile(input: {
-  fileName: string;
-  mimeType?: string;
-  dataBase64: string;
-  folder?: string;
-}): Promise<{ url: string; fileName: string; mimeType: string; excerpt: string }> {
-  const safeName = path
-    .basename(input.fileName)
-    .replace(/[^a-zA-Z0-9._-]/g, '-');
+const mediaUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, _file, callback) => {
+      const dir = path.join(uploadRoot, slugify(String(req.body?.folder || 'general')));
+      void fs.mkdir(dir, { recursive: true }).then(
+        () => callback(null, dir),
+        (error: NodeJS.ErrnoException) => callback(error, dir),
+      );
+    },
+    filename: (_req, file, callback) => {
+      callback(
+        null,
+        path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, '-'),
+      );
+    },
+  }),
+  limits: {
+    fileSize: MAX_VIDEO_UPLOAD_SIZE_BYTES,
+    files: 1,
+    fields: 1,
+    parts: 2,
+  },
+  fileFilter: (_req, file, callback) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_FILE_EXT.has(ext)) {
+      callback(Object.assign(new Error('Unsupported file type'), { status: 400 }));
+      return;
+    }
+    callback(null, true);
+  },
+});
+
+const handleMediaUpload = (req: Request, res: Response, next: NextFunction) => {
+  mediaUpload.single('file')(req, res, (error: unknown) => {
+    if (!error) {
+      next();
+      return;
+    }
+
+    const status =
+      error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE'
+        ? 413
+        : (error as { status?: number }).status ?? 400;
+    const message =
+      error instanceof multer.MulterError && error.code === 'LIMIT_FILE_SIZE'
+        ? `Video exceeds the maximum allowed size of ${MAX_VIDEO_UPLOAD_SIZE_MB} MB.`
+        : error instanceof Error
+          ? error.message
+          : 'Could not upload media file.';
+    res.status(status).json({ error: message });
+  });
+};
+
+async function describeKnowledgeFile(file: Express.Multer.File, folder: string) {
+  const safeName = path.basename(file.path);
   const ext = path.extname(safeName).toLowerCase();
-  if (!ALLOWED_FILE_EXT.has(ext)) {
-    throw Object.assign(new Error('Unsupported file type'), { status: 400 });
+  if (!VIDEO_FILE_EXT.has(ext) && file.size > MAX_NON_VIDEO_UPLOAD_SIZE_BYTES) {
+    await fs.unlink(file.path).catch(() => undefined);
+    throw Object.assign(new Error('File too large (max 12 MB)'), { status: 413 });
   }
-
-  const buffer = Buffer.from(input.dataBase64, 'base64');
-  if (buffer.length > 12 * 1024 * 1024) {
-    throw Object.assign(new Error('File too large (max 12 MB)'), { status: 400 });
-  }
-
-  const folder = slugify(input.folder || 'general');
-  const dir = path.join(uploadRoot, folder);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(path.join(dir, safeName), buffer);
 
   let excerpt = '';
-  if (isTextMime(input.mimeType, ext) && buffer.length < 200_000) {
-    excerpt = buffer.toString('utf8').slice(0, 20_000);
+  if (isTextMime(file.mimetype, ext) && file.size < 200_000) {
+    excerpt = (await fs.readFile(file.path, 'utf8')).slice(0, 20_000);
   }
 
   return {
     url: `/knowledge/${folder}/${safeName}`,
     fileName: safeName,
-    mimeType: input.mimeType || 'application/octet-stream',
+    mimeType: file.mimetype || 'application/octet-stream',
     excerpt,
   };
 }
@@ -132,23 +176,17 @@ router.get('/', async (req, res) => {
   res.json({ entries });
 });
 
-router.post('/upload', async (req, res) => {
+router.post('/upload', handleMediaUpload, async (req, res) => {
   try {
-    const fileName = String(req.body?.fileName || '').trim();
-    const dataBase64 = String(req.body?.dataBase64 || '').trim();
-    if (!fileName || !dataBase64) {
-      return res.status(400).json({ error: 'fileName and dataBase64 are required' });
-    }
-    const saved = await saveKnowledgeFile({
-      fileName,
-      mimeType: req.body?.mimeType,
-      dataBase64,
-      folder: req.body?.folder,
-    });
+    if (!req.file) return res.status(400).json({ error: 'A file is required.' });
+    const folder = slugify(String(req.body?.folder || 'general'));
+    const saved = await describeKnowledgeFile(req.file, folder);
     res.status(201).json(saved);
   } catch (error) {
-    const status = (error as { status?: number }).status || 500;
-    res.status(status).json({ error: (error as Error).message || 'Upload failed' });
+    const status = (error as { status?: number }).status ?? 500;
+    res.status(status).json({
+      error: error instanceof Error ? error.message : 'Upload failed',
+    });
   }
 });
 

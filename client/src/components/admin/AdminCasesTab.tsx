@@ -259,39 +259,9 @@ function emptyForm(specialtyId = '', difficultyId = '', categoryId = ''): CaseFo
   };
 }
 
-function fileToBase64(
-  file: File,
-  onProgress?: (pct: number) => void,
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onprogress = (event) => {
-      if (event.lengthComputable && onProgress) {
-        onProgress(Math.round((event.loaded / event.total) * 40));
-      }
-    };
-    reader.onload = () => {
-      const result = reader.result;
-      if (typeof result !== 'string') {
-        reject(new Error('read-failed'));
-        return;
-      }
-      const base64 = result.split(',')[1];
-      if (!base64) {
-        reject(new Error('read-failed'));
-        return;
-      }
-      onProgress?.(40);
-      resolve(base64);
-    };
-    reader.onerror = () => reject(new Error('read-failed'));
-    reader.readAsDataURL(file);
-  });
-}
-
 function mediaTypeFromFile(file: File): MediaType {
-  if (file.type.startsWith('video/')) return 'video';
-  if (file.type.startsWith('audio/')) return 'audio';
+  if (file.type.startsWith('video/') || /\.(mp4|webm|mpeg)$/i.test(file.name)) return 'video';
+  if (file.type.startsWith('audio/') || /\.(mp3|wav|ogg)$/i.test(file.name)) return 'audio';
   return 'image';
 }
 
@@ -353,6 +323,7 @@ export function AdminCasesTab() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [maxVideoUploadSizeMb, setMaxVideoUploadSizeMb] = useState<number | null>(null);
   const [importSource, setImportSource] = useState('');
   const [importMessage, setImportMessage] = useState('');
   const [importError, setImportError] = useState('');
@@ -460,6 +431,19 @@ export function AdminCasesTab() {
   useEffect(() => {
     setPage(1);
   }, [search, specialtyFilter, difficultyFilter, categoryFilter, statusFilter, sortKey]);
+
+  useEffect(() => {
+    let active = true;
+    void api
+      .get<{ maxVideoUploadSizeMb: number }>('/admin/cases/media/config')
+      .then((response) => {
+        if (active) setMaxVideoUploadSizeMb(response.data.maxVideoUploadSizeMb);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const loadLookups = useCallback(async () => {
     const [specRes, diffRes, catRes, uniRes] = await Promise.all([
@@ -660,8 +644,16 @@ export function AdminCasesTab() {
 
   const uploadMedia = async (imageId: string, file: File) => {
     setError('');
-    setUploadProgress((prev) => ({ ...prev, [imageId]: 1 }));
     const detectedType = mediaTypeFromFile(file);
+    if (
+      detectedType === 'video' &&
+      maxVideoUploadSizeMb !== null &&
+      file.size > maxVideoUploadSizeMb * 1024 * 1024
+    ) {
+      setError(t('adminCaseVideoTooLarge', { max: maxVideoUploadSizeMb }));
+      return;
+    }
+    setUploadProgress((prev) => ({ ...prev, [imageId]: 0 }));
     setForm((prev) => ({
       ...prev,
       examImages: prev.examImages.map((img) =>
@@ -669,22 +661,18 @@ export function AdminCasesTab() {
       ),
     }));
     try {
-      const dataBase64 = await fileToBase64(file, (pct) => {
-        setUploadProgress((prev) => ({ ...prev, [imageId]: pct }));
-      });
+      const formData = new FormData();
+      formData.append('caseSlug', form.titleEn.trim() || 'draft');
+      formData.append('file', file, file.name);
       const r = await api.post(
         '/admin/cases/media/upload',
+        formData,
         {
-          fileName: file.name,
-          mimeType: file.type,
-          dataBase64,
-          caseSlug: form.titleEn.trim() || 'draft',
-        },
-        {
-          timeout: 120_000,
+          headers: { 'Content-Type': 'multipart/form-data' },
+          timeout: 600_000,
           onUploadProgress: (event) => {
             if (!event.total) return;
-            const pct = 40 + Math.round((event.loaded / event.total) * 60);
+            const pct = Math.round((event.loaded / event.total) * 99);
             setUploadProgress((prev) => ({ ...prev, [imageId]: Math.min(pct, 99) }));
           },
         },
@@ -706,8 +694,26 @@ export function AdminCasesTab() {
         });
       }, 600);
     } catch (err) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
-      setError(msg || t('adminCaseUploadError'));
+      const uploadError = err as {
+        response?: {
+          status?: number;
+          statusText?: string;
+          data?: { error?: string; message?: string } | string;
+        };
+        message?: string;
+      };
+      const responseData = uploadError.response?.data;
+      const responseMessage =
+        typeof responseData === 'string'
+          ? responseData.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+          : responseData?.error || responseData?.message;
+      const status = uploadError.response?.status;
+      const message = responseMessage || (status === 413
+        ? t('adminCaseVideoTooLarge', { max: maxVideoUploadSizeMb ?? '' })
+        : status
+          ? `${status} ${uploadError.response?.statusText || 'Upload request failed'}`
+          : uploadError.message || t('adminCaseUploadError'));
+      setError(message);
       setUploadProgress((prev) => {
         const next = { ...prev };
         delete next[imageId];
@@ -1496,6 +1502,11 @@ export function AdminCasesTab() {
                       }}
                     />
                   </label>
+                  {maxVideoUploadSizeMb !== null && (
+                    <span className="text-xs text-slate-500">
+                      {t('adminCaseVideoMaxSize', { max: maxVideoUploadSizeMb })}
+                    </span>
+                  )}
                   <button type="button" className="text-red-600 text-sm ms-auto" onClick={() => setForm({
                     ...form,
                     examImages: form.examImages.filter((row) => row.id !== img.id),

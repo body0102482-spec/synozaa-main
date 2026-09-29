@@ -969,6 +969,8 @@ export default {
         "Title (EN), specialty, and difficulty are required.",
       adminCaseSaveBeforeUpload: "Save the case first, then upload media.",
       adminCaseUploadError: "Could not upload media file.",
+      adminCaseVideoMaxSize: "Maximum video size: {{max}} MB",
+      adminCaseVideoTooLarge: "Video exceeds the maximum allowed size of {{max}} MB.",
       adminCaseUploading: "Uploading...",
       adminCaseUploadFile: "Upload file",
       adminCaseUploadProgress: "Upload progress",

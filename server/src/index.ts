@@ -183,8 +183,7 @@ process.on("uncaughtException", (err) => {
 
 const HOST = process.env.HOST || "0.0.0.0";
 
-app
-  .listen(Number(PORT), HOST, async () => {
+const httpServer = app.listen(Number(PORT), HOST, async () => {
     console.log(`Synoza server running on http://${HOST}:${PORT}`);
     if (isSmtpConfigured()) {
       const ok = await verifySmtpConnection();
@@ -216,8 +215,9 @@ app
         "[payments] Not configured — set PAYMENT_PROVIDER=kashier (or paymob) and the matching gateway keys",
       );
     }
-  })
-  .on("error", (err: NodeJS.ErrnoException) => {
+  });
+httpServer.requestTimeout = 600_000;
+httpServer.on("error", (err: NodeJS.ErrnoException) => {
     if (err.code === "EADDRINUSE") {
       console.error(
         `Port ${PORT} is already in use. Close the other Synoza server or run:`,
@@ -228,6 +228,6 @@ app
       process.exit(1);
     }
     throw err;
-  });
+});
 
 export default app;

@@ -73,19 +73,6 @@ const emptyForm = (role: RoleFilter): FormState => ({
   sortOrder: 0,
 });
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result || '');
-      const base64 = result.includes(',') ? result.split(',')[1] : result;
-      resolve(base64 || '');
-    };
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsDataURL(file);
-  });
-}
-
 export function AdminKnowledgeAiTab() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
@@ -102,6 +89,7 @@ export function AdminKnowledgeAiTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [maxVideoUploadSizeMb, setMaxVideoUploadSizeMb] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -145,6 +133,19 @@ export function AdminKnowledgeAiTab() {
   useEffect(() => {
     void loadMeta().catch(() => setError(t('adminAiKbLoadError')));
   }, [loadMeta, t]);
+
+  useEffect(() => {
+    let active = true;
+    void api
+      .get<{ maxVideoUploadSizeMb: number }>('/admin/cases/media/config')
+      .then((response) => {
+        if (active) setMaxVideoUploadSizeMb(response.data.maxVideoUploadSizeMb);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     void loadEntries();
@@ -192,19 +193,28 @@ export function AdminKnowledgeAiTab() {
 
   const onUpload = async (file: File | null) => {
     if (!file) return;
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mpeg)$/i.test(file.name);
+    if (
+      isVideo &&
+      maxVideoUploadSizeMb !== null &&
+      file.size > maxVideoUploadSizeMb * 1024 * 1024
+    ) {
+      setError(t('adminCaseVideoTooLarge', { max: maxVideoUploadSizeMb }));
+      return;
+    }
     setUploading(true);
     setError('');
     try {
-      const dataBase64 = await fileToBase64(file);
       const folder =
         scope === 'case'
           ? `case-${selectedCaseId || 'draft'}`
           : `category-${selectedCategoryId || 'general'}`;
-      const res = await api.post('/admin/ai-knowledge/upload', {
-        fileName: file.name,
-        mimeType: file.type,
-        dataBase64,
-        folder,
+      const formData = new FormData();
+      formData.append('folder', folder);
+      formData.append('file', file, file.name);
+      const res = await api.post('/admin/ai-knowledge/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 600_000,
       });
       setForm((f) => ({
         ...f,
@@ -214,7 +224,27 @@ export function AdminKnowledgeAiTab() {
         content: f.content || res.data.excerpt || '',
       }));
     } catch (err) {
-      setError((err as { response?: { data?: { error?: string } } })?.response?.data?.error || t('adminAiKbUploadError'));
+      const uploadError = err as {
+        response?: {
+          status?: number;
+          statusText?: string;
+          data?: { error?: string; message?: string } | string;
+        };
+        message?: string;
+      };
+      const data = uploadError.response?.data;
+      const responseMessage =
+        typeof data === 'string'
+          ? data.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+          : data?.error || data?.message;
+      const status = uploadError.response?.status;
+      setError(
+        responseMessage || (status === 413
+          ? t('adminCaseVideoTooLarge', { max: maxVideoUploadSizeMb ?? '' })
+          : status
+            ? `${status} ${uploadError.response?.statusText || 'Upload request failed'}`
+            : uploadError.message || t('adminAiKbUploadError')),
+      );
     } finally {
       setUploading(false);
     }
@@ -529,6 +559,11 @@ export function AdminKnowledgeAiTab() {
                     onChange={(e) => void onUpload(e.target.files?.[0] || null)}
                   />
                 </label>
+                {maxVideoUploadSizeMb !== null && (
+                  <span className="text-xs text-slate-500">
+                    {t('adminCaseVideoMaxSize', { max: maxVideoUploadSizeMb })}
+                  </span>
+                )}
                 {form.fileUrl && (
                   <a
                     href={form.fileUrl}
