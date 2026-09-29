@@ -139,6 +139,27 @@ const handleMediaUpload = (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+async function saveExamMediaFile(input: {
+  file: Express.Multer.File;
+  caseSlug: string;
+}): Promise<{ url: string; fileName: string; mimeType: string }> {
+  const folder = slugify(input.caseSlug);
+  const safeName = path.basename(input.file.filename);
+  const directory = path.join(examMediaRoot, folder);
+  await fs.mkdir(directory, { recursive: true });
+
+  const destination = path.join(directory, safeName);
+  if (path.resolve(input.file.path) !== path.resolve(destination)) {
+    await fs.rename(input.file.path, destination);
+  }
+
+  return {
+    url: `/exam/cases/${folder}/${safeName}`,
+    fileName: safeName,
+    mimeType: input.file.mimetype || "application/octet-stream",
+  };
+}
+
 router.get("/", async (_req, res) => {
   const cases = await prisma.case.findMany({
     include: { specialty: true, difficulty: true, category: true },
@@ -198,12 +219,32 @@ router.post("/media/upload", handleMediaUpload, async (req, res) => {
   }
 
   const folder = slugify(String(req.body?.caseSlug || "draft"));
-  const safeName = path.basename(file.path);
-  res.status(201).json({
-    url: `/exam/cases/${folder}/${safeName}`,
-    fileName: safeName,
-    mimeType: file.mimetype || "application/octet-stream",
+  const saved = await saveExamMediaFile({ file, caseSlug: folder });
+  res.status(201).json(saved);
+});
+
+router.post("/:id/media", handleMediaUpload, async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "A media file is required." });
+
+  const existing = await prisma.case.findUnique({
+    where: { id: req.params.id },
   });
+  if (!existing) {
+    await fs.unlink(req.file.path).catch(() => undefined);
+    return res.status(404).json({ error: "Case not found" });
+  }
+
+  try {
+    const saved = await saveExamMediaFile({
+      file: req.file,
+      caseSlug: String(req.body?.caseSlug || existing.titleEn),
+    });
+    res.status(201).json(saved);
+  } catch (error) {
+    const status = (error as { status?: number }).status ?? 500;
+    const message = error instanceof Error ? error.message : "Upload failed";
+    res.status(status).json({ error: message });
+  }
 });
 
 router.get("/:id/university-overrides", async (req, res) => {
@@ -386,38 +427,5 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.post("/:id/media", async (req, res) => {
-  const { fileName, mimeType, dataBase64, caseSlug } = req.body as {
-    fileName?: string;
-    mimeType?: string;
-    dataBase64?: string;
-    caseSlug?: string;
-  };
-
-  if (!fileName?.trim() || !dataBase64?.trim()) {
-    return res
-      .status(400)
-      .json({ error: "fileName and dataBase64 are required" });
-  }
-
-  const existing = await prisma.case.findUnique({
-    where: { id: req.params.id },
-  });
-  if (!existing) return res.status(404).json({ error: "Case not found" });
-
-  try {
-    const saved = await saveExamMediaFile({
-      fileName,
-      mimeType,
-      dataBase64,
-      caseSlug: caseSlug || existing.titleEn,
-    });
-    res.status(201).json(saved);
-  } catch (error) {
-    const status = (error as { status?: number }).status ?? 500;
-    const message = error instanceof Error ? error.message : "Upload failed";
-    res.status(status).json({ error: message });
-  }
-});
 
 export default router;
