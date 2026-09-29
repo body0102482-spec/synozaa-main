@@ -226,8 +226,14 @@ router.post("/media/upload", handleMediaUpload, async (req, res) => {
 router.post("/:id/media", handleMediaUpload, async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "A media file is required." });
 
+  const caseId = typeof req.params.id === "string" ? req.params.id : undefined;
+  if (!caseId) {
+    await fs.unlink(req.file.path).catch(() => undefined);
+    return res.status(400).json({ error: "Invalid case id" });
+  }
+
   const existing = await prisma.case.findUnique({
-    where: { id: req.params.id },
+    where: { id: caseId },
   });
   if (!existing) {
     await fs.unlink(req.file.path).catch(() => undefined);
