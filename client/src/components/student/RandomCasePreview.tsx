@@ -9,7 +9,7 @@ import { shouldConfirmCaseStart } from '../../lib/startCaseConfirm';
 
 interface EntitlementsLike {
   isFree: boolean;
-  freeAttemptsPerCase: number;
+  freeAttemptsRemaining: number;
   casesRemaining: number;
   attemptsByCase: Record<string, number>;
 }

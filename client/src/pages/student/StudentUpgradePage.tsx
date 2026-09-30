@@ -10,7 +10,8 @@ interface Entitlements {
   casesQuota: number;
   casesUnlocked: number;
   casesRemaining: number;
-  freeAttemptsPerCase: number;
+  freeAttemptsPerMonth: number;
+  freeAttemptsRemaining: number;
   attemptsByCase: Record<string, number>;
 }
 

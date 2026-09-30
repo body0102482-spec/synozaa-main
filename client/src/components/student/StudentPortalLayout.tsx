@@ -143,6 +143,12 @@ function StudentPortalLayout() {
   }, [debouncedFetchEntitlements, fetchEntitlements]);
 
   useEffect(() => {
+    if (!entitlements?.isFree) return;
+    const refreshInterval = window.setInterval(fetchEntitlements, 60_000);
+    return () => window.clearInterval(refreshInterval);
+  }, [entitlements?.isFree, fetchEntitlements]);
+
+  useEffect(() => {
     closeSidebar();
     releaseStuckUiLayers();
     debouncedFetchEntitlements();
@@ -328,7 +334,7 @@ function StudentPortalLayout() {
                 </div>
                 {entitlements?.isFree ? (
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    {entitlements.freeAttemptsRemaining ?? 0} free attempts remaining
+                    {t('freeCasesRemainingThisMonth', { count: entitlements.freeAttemptsRemaining ?? 0 })}
                   </p>
                 ) : (
                   <>

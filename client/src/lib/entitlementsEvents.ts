@@ -6,7 +6,8 @@ export type EntitlementsSnapshot = {
   casesQuota: number;
   casesUnlocked: number;
   casesRemaining: number;
-  freeAttemptsPerCase?: number;
+  freeAttemptsPerMonth?: number;
+  freeAttemptsRemaining?: number;
   attemptsByCase?: Record<string, number>;
   planEndDate?: string | null;
   planStartDate?: string | null;

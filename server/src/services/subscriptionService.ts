@@ -1,7 +1,7 @@
-import type { SubscriptionPlan } from '@prisma/client';
+import type { Language, Prisma, SubscriptionPlan } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 
-export const FREE_ATTEMPTS_PER_CASE = 3;
+export const FREE_ATTEMPTS_PER_MONTH = 3;
 
 export const PLAN_CATALOG = {
   FREE: { priceEgp: 0, casesQuota: 3, durationMonths: 0, labelEn: 'Free', labelAr: 'مجاني' },
@@ -162,17 +162,45 @@ export async function getActiveSubscription(userId: string) {
   });
 }
 
+function getServerCalendarMonth(date: Date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+async function ensureFreeUsageMonth(tx: Prisma.TransactionClient, userId: string, now = new Date()) {
+  const month = getServerCalendarMonth(now);
+  const user = await tx.user.findUnique({
+    where: { id: userId },
+    select: { freeCasesUsed: true, freeUsageMonth: true },
+  });
+  if (!user) return 0;
+
+  if (user.freeUsageMonth !== month) {
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const legacyMonthUsage = await tx.session.count({
+      where: {
+        userId,
+        startedAt: { gte: monthStart },
+        case: { isFreeTier: true },
+      },
+    });
+    await tx.user.updateMany({
+      where: { id: userId, freeUsageMonth: user.freeUsageMonth },
+      data: {
+        freeCasesUsed: Math.min(legacyMonthUsage, FREE_ATTEMPTS_PER_MONTH),
+        freeUsageMonth: month,
+      },
+    });
+  }
+
+  const current = await tx.user.findUnique({
+    where: { id: userId },
+    select: { freeCasesUsed: true },
+  });
+  return current?.freeCasesUsed ?? 0;
+}
+
 async function getFreeAttemptsUsed(userId: string) {
-  const [access, sessionCount] = await Promise.all([
-    prisma.caseAccess.aggregate({
-      where: { userId, case: { isFreeTier: true } },
-      _sum: { attempts: true },
-    }),
-    prisma.session.count({
-      where: { userId, case: { isFreeTier: true } },
-    }),
-  ]);
-  return Math.max(access._sum.attempts ?? 0, sessionCount);
+  return prisma.$transaction((tx) => ensureFreeUsageMonth(tx, userId));
 }
 
 async function getUsedCaseCredits(userId: string, since?: Date | null) {
@@ -213,14 +241,14 @@ export async function getUserEntitlements(userId: string) {
   }
 
   const freeAttemptsUsed = isFree ? await getFreeAttemptsUsed(userId) : 0;
-  const freeAttemptsRemaining = Math.max(0, FREE_ATTEMPTS_PER_CASE - freeAttemptsUsed);
+  const freeAttemptsRemaining = Math.max(0, FREE_ATTEMPTS_PER_MONTH - freeAttemptsUsed);
 
   const planEndDate = await resolvePlanEndDate(subscription);
 
   return {
     plan,
     isFree,
-    freeAttemptsPerCase: FREE_ATTEMPTS_PER_CASE,
+    freeAttemptsPerMonth: FREE_ATTEMPTS_PER_MONTH,
     freeAttemptsRemaining,
     // Free entitlements stay attempt-based; paid plans use credit quotas.
     casesQuota: isFree ? 0 : casesQuota,
@@ -252,18 +280,18 @@ export async function checkCanStartCase(userId: string, caseId: string) {
     }
 
     const attempts = await getFreeAttemptsUsed(userId);
-    if (attempts >= FREE_ATTEMPTS_PER_CASE) {
+    if (attempts >= FREE_ATTEMPTS_PER_MONTH) {
       return {
         allowed: false as const,
         code: 'FREE_LIMIT_REACHED' as const,
         attempts,
-        limit: FREE_ATTEMPTS_PER_CASE,
+        limit: FREE_ATTEMPTS_PER_MONTH,
       };
     }
     return {
       allowed: true as const,
       attempts,
-      attemptsRemaining: FREE_ATTEMPTS_PER_CASE - attempts,
+      attemptsRemaining: FREE_ATTEMPTS_PER_MONTH - attempts,
     };
   }
 
@@ -290,6 +318,41 @@ export async function recordCaseAttempt(userId: string, caseId: string) {
     where: { userId_caseId: { userId, caseId } },
     create: { userId, caseId, attempts: 1 },
     update: { attempts: { increment: 1 } },
+  });
+}
+
+export async function createFreeCaseSession(
+  userId: string,
+  caseId: string,
+  language: Language,
+  resolvedStationConfig: string,
+) {
+  return prisma.$transaction(async (tx) => {
+    const now = new Date();
+    await ensureFreeUsageMonth(tx, userId, now);
+    const claimed = await tx.user.updateMany({
+      where: {
+        id: userId,
+        freeUsageMonth: getServerCalendarMonth(now),
+        freeCasesUsed: { lt: FREE_ATTEMPTS_PER_MONTH },
+      },
+      data: { freeCasesUsed: { increment: 1 } },
+    });
+    if (claimed.count !== 1) return null;
+
+    const session = await tx.session.create({
+      data: { userId, caseId, language, resolvedStationConfig },
+      include: {
+        case: { include: { specialty: true, difficulty: true } },
+        messages: { orderBy: { createdAt: 'asc' } },
+      },
+    });
+    await tx.caseAccess.upsert({
+      where: { userId_caseId: { userId, caseId } },
+      create: { userId, caseId, attempts: 1 },
+      update: { attempts: { increment: 1 } },
+    });
+    return session;
   });
 }
 

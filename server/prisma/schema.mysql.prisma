@@ -146,6 +146,8 @@ model User {
   emailVerified Boolean        @default(false)
   preferredLang String         @default("en")
   totalXp       Float          @default(0)
+  freeCasesUsed Int            @default(0)
+  freeUsageMonth String?
   academicYear  String?
   lastSeenAt    DateTime?
   otpCode       String?

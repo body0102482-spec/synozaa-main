@@ -6,7 +6,7 @@ export type PendingCaseStart =
 
 interface EntitlementsLike {
   isFree: boolean;
-  freeAttemptsPerCase: number;
+  freeAttemptsRemaining: number;
   casesRemaining: number;
   attemptsByCase: Record<string, number>;
 }
@@ -17,9 +17,7 @@ export function shouldConfirmCaseStart(
 ): boolean {
   if (!entitlements) return true;
   if (entitlements.isFree) {
-    if (pending.type === 'random') return false;
-    const used = entitlements.attemptsByCase[pending.caseId] ?? 0;
-    return used < entitlements.freeAttemptsPerCase;
+    return entitlements.freeAttemptsRemaining > 0;
   }
   return true;
 }
@@ -32,10 +30,7 @@ export function startCaseConfirmMessage(
   if (!entitlements || !pending) return '';
 
   if (entitlements.isFree) {
-    const used =
-      pending.type === 'station' ? (entitlements.attemptsByCase[pending.caseId] ?? 0) : 0;
-    const left = Math.max(0, entitlements.freeAttemptsPerCase - used);
-    return t('startCaseConfirmFreeMessage', { count: left });
+    return t('startCaseConfirmFreeMessage', { count: entitlements.freeAttemptsRemaining });
   }
 
   const remaining = entitlements.casesRemaining;

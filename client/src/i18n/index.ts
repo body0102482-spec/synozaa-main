@@ -52,7 +52,7 @@ export default {
       startCaseConfirmRandomMessage:
         "A random blind station will open with no preview. This will use 1 credit from your plan ({{count}} remaining).",
       startCaseConfirmFreeMessage:
-        "You are about to start a practice attempt on this case ({{count}} attempts left). Continue?",
+        "You are about to start a free case attempt ({{count}} attempts remaining this month). Continue?",
       startCaseConfirmButton: "Start case",
       portalSurpriseMe: "SURPRISE ME",
       portalActiveRotations: "Active Case Rotations",
@@ -610,13 +610,14 @@ export default {
       subscriptionPlans: "Subscription Plans",
       currentPlan: "Current plan",
       planFree: "Free",
-      planFreeDesc: "Try free case up to 3 times",
+      planFreeDesc: "3 free case attempts each calendar month",
       casesRemaining: "{{count}} cases remaining",
       casesUnlocked: "{{used}} / {{total}} credits used",
       attemptsRemaining: "{{count}} attempts left",
       attemptsUsedUp: "No attempts left",
+      freeCasesRemainingThisMonth: "{{count}} free cases remaining this month",
       freeLimitReached:
-        "You used all 3 free attempts on this case. Upgrade to continue.",
+        "You used all 3 free case attempts this month. Upgrade to continue.",
       caseQuotaExceeded:
         "You reached your case limit. Upgrade your plan for more cases.",
       upgradePlan: "Upgrade plan",
@@ -638,7 +639,7 @@ export default {
       planFreeFeatureAiExaminer: "AI Examiner",
       planFreeFeatureFeedback: "Automated Feedback & Scoring",
       planUsageRuleFree:
-        "Usage Rule: Free trial includes one complimentary case with up to 3 practice attempts.",
+        "Usage Rule: 3 free case attempts are available each calendar month.",
       planCurrentPlan: "CURRENT PLAN",
       planStartForFree: "Start for Free",
       planStartFreeOsce: "START FREE OSCE",
@@ -1331,7 +1332,7 @@ export default {
       startCaseConfirmRandomMessage:
         "هتفتح محطة عشوائية بدون معاينة. ده هيستخدم رصيد واحد من باقتك ({{count}} متبقي).",
       startCaseConfirmFreeMessage:
-        "هتبدأ محاولة تدريب على الحالة دي ({{count}} محاولات متبقية). عايز تكمل؟",
+        "هتبدأ محاولة مجانية ({{count}} محاولات متبقية هذا الشهر). عايز تكمل؟",
       startCaseConfirmButton: "ابدأ الحالة",
       portalSurpriseMe: "فاجئني",
       portalActiveRotations: "دورات الحالات النشطة",
@@ -1868,13 +1869,14 @@ export default {
       subscriptionPlans: "باقات الاشتراك",
       currentPlan: "الباقة الحالية",
       planFree: "مجاني",
-      planFreeDesc: "جرّب الحالة المجانية حتى 3 مرات",
+      planFreeDesc: "3 محاولات مجانية للحالات كل شهر ميلادي",
       casesRemaining: "{{count}} حالة متبقية",
       casesUnlocked: "{{used}} / {{total}} رصيد مستخدم",
       attemptsRemaining: "{{count}} محاولات متبقية",
       attemptsUsedUp: "انتهت المحاولات",
+      freeCasesRemainingThisMonth: "متبقي {{count}} محاولات مجانية للحالات هذا الشهر",
       freeLimitReached:
-        "استخدمت الـ 3 محاولات المجانية للحالة دي. اشترك في باقة للمتابعة.",
+        "استخدمت الـ 3 محاولات المجانية لهذا الشهر. اشترك في باقة للمتابعة.",
       caseQuotaExceeded:
         "وصلت لحد الحالات في باقتك. ترقّي الباقة لفتح حالات أكتر.",
       upgradePlan: "ترقية الباقة",
@@ -1896,7 +1898,7 @@ export default {
       planFreeFeatureAiExaminer: "Examiner AI",
       planFreeFeatureFeedback: "تغذية راجعة وتقييم آلي",
       planUsageRuleFree:
-        "قاعدة الاستخدام: التجربة المجانية تشمل حالة واحدة مجانية حتى 3 محاولات تدريب.",
+        "قاعدة الاستخدام: متاح 3 محاولات مجانية للحالات كل شهر ميلادي.",
       planCurrentPlan: "باقتك الحالية",
       planStartForFree: "ابدأ مجاناً",
       planStartFreeOsce: "ابدأ الحالة المجانية",

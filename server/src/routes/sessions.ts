@@ -12,7 +12,7 @@ import {
   sanitizeRealtimePatientTranscript,
   unwrapExaminerPlainText,
 } from '../services/aiService.js';
-import { checkCanStartCase, getUserEntitlements, recordCaseAttempt } from '../services/subscriptionService.js';
+import { checkCanStartCase, createFreeCaseSession, getUserEntitlements, recordCaseAttempt } from '../services/subscriptionService.js';
 import { serializeResolvedStationConfigForUser } from '../services/caseResolveService.js';
 import { applySessionXp, getRankProgress } from '../services/xpService.js';
 import { processTextTurn, processVoiceTurn } from '../services/voiceTurnService.js';
@@ -83,7 +83,7 @@ router.post('/start', async (req, res) => {
     if (access.code === 'FREE_LIMIT_REACHED') {
       return res.status(403).json({
         error: 'FREE_LIMIT_REACHED',
-        message: 'You have used all free attempts for this case. Upgrade to continue.',
+        message: 'You have used all free case attempts this month. Upgrade to continue.',
         attempts: access.attempts,
         limit: access.limit,
       });
@@ -115,20 +115,28 @@ router.post('/start', async (req, res) => {
         ? stationConfig.patientBehavior.preferredLanguage
         : 'AUTO';
 
-  const session = await prisma.session.create({
-    data: {
-      userId,
-      caseId,
-      language: sessionLanguage as Language,
-      resolvedStationConfig,
-    },
-    include: {
-      case: { include: { specialty: true, difficulty: true } },
-      messages: { orderBy: { createdAt: 'asc' } },
-    },
-  });
-
-  await recordCaseAttempt(userId, caseId);
+  const languageValue = sessionLanguage as Language;
+  let session;
+  if ('attemptsRemaining' in access) {
+    session = await createFreeCaseSession(userId, caseId, languageValue, resolvedStationConfig);
+    if (!session) {
+      return res.status(403).json({
+        error: 'FREE_LIMIT_REACHED',
+        message: 'You have used all free case attempts this month. Upgrade to continue.',
+        attempts: 3,
+        limit: 3,
+      });
+    }
+  } else {
+    session = await prisma.session.create({
+      data: { userId, caseId, language: languageValue, resolvedStationConfig },
+      include: {
+        case: { include: { specialty: true, difficulty: true } },
+        messages: { orderBy: { createdAt: 'asc' } },
+      },
+    });
+    await recordCaseAttempt(userId, caseId);
+  }
 
   const entitlements = await getUserEntitlements(userId);
 

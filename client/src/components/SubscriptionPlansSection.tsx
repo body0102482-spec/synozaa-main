@@ -15,7 +15,8 @@ export interface EntitlementsSummary {
   casesQuota: number;
   casesUnlocked: number;
   casesRemaining: number;
-  freeAttemptsPerCase?: number;
+  freeAttemptsPerMonth?: number;
+  freeAttemptsRemaining?: number;
   attemptsByCase?: Record<string, number>;
 }
 
@@ -57,8 +58,7 @@ export function SubscriptionPlansSection({
   const [freeCases, setFreeCases] = useState<FreeTierCase[]>([]);
   const [startingCaseId, setStartingCaseId] = useState<string | null>(null);
 
-  const freeAttemptsPerCase = entitlements.freeAttemptsPerCase ?? 3;
-  const attemptsByCase = entitlements.attemptsByCase ?? {};
+  const freeAttemptsRemaining = entitlements.freeAttemptsRemaining ?? 0;
   const freeCase = freeCases[0] ?? null;
 
   useEffect(() => {
@@ -68,9 +68,6 @@ export function SubscriptionPlansSection({
       .then((r) => setFreeCases(r.data.cases ?? []))
       .catch(() => {});
   }, [entitlements.isFree]);
-
-  const getAttemptsLeft = (caseId: string) =>
-    Math.max(0, freeAttemptsPerCase - (attemptsByCase[caseId] ?? 0));
 
   const startFreeCase = async (caseId: string) => {
     setStartingCaseId(caseId);
@@ -122,7 +119,7 @@ export function SubscriptionPlansSection({
     }
   };
 
-  const canStartFree = Boolean(freeCase && getAttemptsLeft(freeCase.id) > 0);
+  const canStartFree = Boolean(freeCase && freeAttemptsRemaining > 0);
   const planLabel = entitlements.plan.replace('PACKAGE_', '');
 
   return (
@@ -192,6 +189,12 @@ export function SubscriptionPlansSection({
         }}
         onCheckout={(planId) => void handleCheckout(planId)}
       />
+
+      {entitlements.isFree && (
+        <p className="text-sm font-medium text-slate-700 dark:text-slate-300" aria-live="polite">
+          {t('freeCasesRemainingThisMonth', { count: freeAttemptsRemaining })}
+        </p>
+      )}
 
       <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/60 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">

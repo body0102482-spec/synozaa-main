@@ -44,7 +44,7 @@ interface CategoryNode {
 interface Entitlements {
   plan: string;
   isFree: boolean;
-  freeAttemptsPerCase: number;
+  freeAttemptsPerMonth: number;
   freeAttemptsRemaining: number;
   casesQuota: number;
   casesUnlocked: number;
@@ -400,7 +400,7 @@ export default function StudentDashboard() {
     const used = getCaseAttempts(caseId);
     if (entitlements.isFree) {
       const left = entitlements.freeAttemptsRemaining;
-      return left > 0 ? t('attemptsRemaining', { count: left }) : t('attemptsUsedUp');
+      return t('freeCasesRemainingThisMonth', { count: left });
     }
     if (used > 0) return t('completed');
     return null;

@@ -4,7 +4,7 @@ import { startCaseConfirmMessage, type PendingCaseStart } from '../../lib/startC
 
 interface EntitlementsLike {
   isFree: boolean;
-  freeAttemptsPerCase: number;
+  freeAttemptsRemaining: number;
   casesRemaining: number;
   attemptsByCase: Record<string, number>;
 }

@@ -52,7 +52,7 @@ export default {
       startCaseConfirmRandomMessage:
         "A random blind station will open with no preview. This will use 1 credit from your plan ({{count}} remaining).",
       startCaseConfirmFreeMessage:
-        "You are about to start a practice attempt on this case ({{count}} attempts left). Continue?",
+        "You are about to start a free case attempt ({{count}} attempts remaining this month). Continue?",
       startCaseConfirmButton: "Start case",
       portalSurpriseMe: "SURPRISE ME",
       portalActiveRotations: "Active Case Rotations",
@@ -602,13 +602,14 @@ export default {
       subscriptionPlans: "Subscription Plans",
       currentPlan: "Current plan",
       planFree: "Free",
-      planFreeDesc: "Try free case up to 3 times",
+      planFreeDesc: "3 free case attempts each calendar month",
       casesRemaining: "{{count}} cases remaining",
       casesUnlocked: "{{used}} / {{total}} credits used",
       attemptsRemaining: "{{count}} attempts left",
       attemptsUsedUp: "No attempts left",
+      freeCasesRemainingThisMonth: "{{count}} free cases remaining this month",
       freeLimitReached:
-        "You used all 3 free attempts on this case. Upgrade to continue.",
+        "You used all 3 free case attempts this month. Upgrade to continue.",
       caseQuotaExceeded:
         "You reached your case limit. Upgrade your plan for more cases.",
       upgradePlan: "Upgrade plan",
@@ -630,7 +631,7 @@ export default {
       planFreeFeatureAiExaminer: "AI Examiner",
       planFreeFeatureFeedback: "Automated Feedback & Scoring",
       planUsageRuleFree:
-        "Usage Rule: Free trial includes one complimentary case with up to 3 practice attempts.",
+        "Usage Rule: 3 free case attempts are available each calendar month.",
       planCurrentPlan: "CURRENT PLAN",
       planStartForFree: "Start for Free",
       planStartFreeOsce: "START FREE OSCE",
