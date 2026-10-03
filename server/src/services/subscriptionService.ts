@@ -1,10 +1,10 @@
 import type { Language, Prisma, SubscriptionPlan } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 
-export const FREE_ATTEMPTS_PER_MONTH = 3;
+export const FREE_ATTEMPTS_PER_MONTH = 5;
 
 export const PLAN_CATALOG = {
-  FREE: { priceEgp: 0, casesQuota: 3, durationMonths: 0, labelEn: 'Free', labelAr: 'مجاني' },
+  FREE: { priceEgp: 0, casesQuota: FREE_ATTEMPTS_PER_MONTH, durationMonths: 0, labelEn: 'Free', labelAr: 'مجاني' },
   PACKAGE_50: { priceEgp: 150, casesQuota: 30, durationMonths: 2, labelEn: 'Basic', labelAr: 'Basic' },
   PACKAGE_150: { priceEgp: 300, casesQuota: 60, durationMonths: 4, labelEn: 'Pro', labelAr: 'Pro' },
   PACKAGE_300: { priceEgp: 500, casesQuota: 100, durationMonths: 6, labelEn: 'Premium', labelAr: 'Premium' },
@@ -121,7 +121,7 @@ export async function listPlanConfigs(activeOnly = false) {
       return {
         id,
         priceEgp: cfg.priceEgp,
-        casesQuota: cfg.casesQuota,
+        casesQuota: id === 'FREE' ? FREE_ATTEMPTS_PER_MONTH : cfg.casesQuota,
         durationMonths: cfg.durationMonths,
         labelEn: cfg.labelEn,
         labelAr: cfg.labelAr,

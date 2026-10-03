@@ -204,7 +204,7 @@ export function resolveMarketingPlans(plans: PlanOption[]): Array<{ plan: PlanOp
   const free: PlanOption = byId.get('FREE') ?? {
     id: 'FREE',
     priceEgp: 0,
-    casesQuota: 3,
+    casesQuota: 0,
     durationMonths: 0,
     labelEn: 'Free',
     labelAr: 'مجاني',
@@ -227,6 +227,7 @@ export function resolveMarketingPlans(plans: PlanOption[]): Array<{ plan: PlanOp
 
 interface PlanMarketingCardsProps {
   plans: PlanOption[];
+  freeAttemptsPerMonth?: number;
   mode?: 'checkout' | 'preview';
   currentPlanId?: string;
   checkoutPlanId?: string | null;
@@ -238,6 +239,7 @@ interface PlanMarketingCardsProps {
 
 export function PlanMarketingCards({
   plans,
+  freeAttemptsPerMonth,
   mode = 'checkout',
   currentPlanId,
   checkoutPlanId = null,
@@ -256,7 +258,9 @@ export function PlanMarketingCards({
         const theme = THEMES[def.themeKey];
         const Icon = theme.icon;
         const BadgeIcon = def.badgeIcon;
-        const casesCount = plan.casesQuota || (def.isFree ? 3 : 0);
+        const casesCount = def.isFree
+          ? freeAttemptsPerMonth ?? plan.casesQuota
+          : plan.casesQuota;
         const isCurrent = currentPlanId === plan.id;
 
         return (

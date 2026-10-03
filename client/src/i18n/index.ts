@@ -24,7 +24,7 @@ export default {
       portalPlanStatus: "Plan Status",
       portalUpgradeNow: "Upgrade plan",
       portalFreePlanHint:
-        "Free: 3 tries per demo case. Upgrade to unlock the full case library.",
+        "Free: {{count}} total free case attempts each calendar month. Upgrade to unlock the full case library.",
       portalPaidPlanHint:
         "Each simulator session uses 1 credit, including retries on the same case.",
       portalExpires: "Expires",
@@ -610,14 +610,14 @@ export default {
       subscriptionPlans: "Subscription Plans",
       currentPlan: "Current plan",
       planFree: "Free",
-      planFreeDesc: "3 free case attempts each calendar month",
+      planFreeDesc: "{{count}} free case attempts each calendar month",
       casesRemaining: "{{count}} cases remaining",
       casesUnlocked: "{{used}} / {{total}} credits used",
       attemptsRemaining: "{{count}} attempts left",
       attemptsUsedUp: "No attempts left",
       freeCasesRemainingThisMonth: "{{count}} free cases remaining this month",
       freeLimitReached:
-        "You used all 3 free case attempts this month. Upgrade to continue.",
+        "You used all {{count}} free case attempts this month. Upgrade to continue.",
       caseQuotaExceeded:
         "You reached your case limit. Upgrade your plan for more cases.",
       upgradePlan: "Upgrade plan",
@@ -639,7 +639,7 @@ export default {
       planFreeFeatureAiExaminer: "AI Examiner",
       planFreeFeatureFeedback: "Automated Feedback & Scoring",
       planUsageRuleFree:
-        "Usage Rule: 3 free case attempts are available each calendar month.",
+        "Usage Rule: {{count}} free case attempts are available each calendar month.",
       planCurrentPlan: "CURRENT PLAN",
       planStartForFree: "Start for Free",
       planStartFreeOsce: "START FREE OSCE",
@@ -1306,7 +1306,7 @@ export default {
       portalPlanStatus: "حالة الباقة",
       portalUpgradeNow: "ترقية الباقة",
       portalFreePlanHint:
-        "المجاني: 3 محاولات لكل حالة تجريبية. رقّي باقتك لفتح كل الحالات.",
+        "المجاني: {{count}} محاولات مجانية إجمالاً للحالات كل شهر ميلادي. رقّي باقتك لفتح كل الحالات.",
       portalPaidPlanHint:
         "كل جلسة في المحاكي بتستهلك رصيد واحد، حتى لو نفس الحالة.",
       portalExpires: "ينتهي",
@@ -1869,14 +1869,14 @@ export default {
       subscriptionPlans: "باقات الاشتراك",
       currentPlan: "الباقة الحالية",
       planFree: "مجاني",
-      planFreeDesc: "3 محاولات مجانية للحالات كل شهر ميلادي",
+      planFreeDesc: "{{count}} محاولات مجانية للحالات كل شهر ميلادي",
       casesRemaining: "{{count}} حالة متبقية",
       casesUnlocked: "{{used}} / {{total}} رصيد مستخدم",
       attemptsRemaining: "{{count}} محاولات متبقية",
       attemptsUsedUp: "انتهت المحاولات",
       freeCasesRemainingThisMonth: "متبقي {{count}} محاولات مجانية للحالات هذا الشهر",
       freeLimitReached:
-        "استخدمت الـ 3 محاولات المجانية لهذا الشهر. اشترك في باقة للمتابعة.",
+        "استخدمت كل {{count}} محاولات مجانية لهذا الشهر. اشترك في باقة للمتابعة.",
       caseQuotaExceeded:
         "وصلت لحد الحالات في باقتك. ترقّي الباقة لفتح حالات أكتر.",
       upgradePlan: "ترقية الباقة",
@@ -1898,7 +1898,7 @@ export default {
       planFreeFeatureAiExaminer: "Examiner AI",
       planFreeFeatureFeedback: "تغذية راجعة وتقييم آلي",
       planUsageRuleFree:
-        "قاعدة الاستخدام: متاح 3 محاولات مجانية للحالات كل شهر ميلادي.",
+        "قاعدة الاستخدام: متاح {{count}} محاولات مجانية للحالات كل شهر ميلادي.",
       planCurrentPlan: "باقتك الحالية",
       planStartForFree: "ابدأ مجاناً",
       planStartFreeOsce: "ابدأ الحالة المجانية",

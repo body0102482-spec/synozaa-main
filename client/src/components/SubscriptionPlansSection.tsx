@@ -179,6 +179,7 @@ export function SubscriptionPlansSection({
 
       <PlanMarketingCards
         plans={plans}
+        freeAttemptsPerMonth={entitlements.freeAttemptsPerMonth}
         mode="checkout"
         currentPlanId={entitlements.plan}
         checkoutPlanId={checkoutPlanId}

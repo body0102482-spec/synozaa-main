@@ -304,7 +304,9 @@ export default function StudentDashboard() {
     const code = axiosErr.response?.data?.error;
     if (code === 'NO_ELIGIBLE_CASES') return t('noEligibleRandomCase');
     if (code === 'NO_CASES') return scope === 'section' ? t('noCasesInSection') : t('noStationsInCategory');
-    if (code === 'FREE_LIMIT_REACHED') return t('freeLimitReached');
+    if (code === 'FREE_LIMIT_REACHED') {
+      return t('freeLimitReached', { count: entitlements?.freeAttemptsPerMonth ?? 0 });
+    }
     if (code === 'CASE_QUOTA_EXCEEDED') return t('caseQuotaExceeded');
     if (code === 'SUBSCRIPTION_REQUIRED') return t('subscriptionRequired');
     return t('error');
