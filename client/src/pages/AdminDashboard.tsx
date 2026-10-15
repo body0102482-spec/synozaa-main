@@ -643,6 +643,7 @@ export default function AdminDashboard() {
           <AdminUserPlanModal
             user={planModalUser ?? { id: '', email: '', firstName: '', lastName: '', role: 'STUDENT' }}
             open={planModalUser !== null}
+            canManagePlan={planModalUser?.role === 'STUDENT'}
             onClose={() => setPlanModalUser(null)}
             onSaved={() => refreshUsers()}
           />
@@ -741,15 +742,13 @@ export default function AdminDashboard() {
                     </td>
                     <td className="text-slate-500 text-xs">{formatLastSeen(u.lastSeenAt)}</td>
                     <td>
-                      {u.role === 'STUDENT' && (
-                        <button
-                          type="button"
-                          onClick={() => setPlanModalUser(u)}
-                          className="text-xs font-semibold text-violet-600 dark:text-violet-400 hover:underline"
-                        >
-                          {t('adminManagePlan')}
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setPlanModalUser(u)}
+                        className="text-xs font-semibold text-violet-600 dark:text-violet-400 hover:underline"
+                      >
+                        {u.role === 'STUDENT' ? t('adminManagePlan') : t('adminCasesQuotaTitle')}
+                      </button>
                     </td>
                   </tr>
                 ))}

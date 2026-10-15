@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -146,6 +146,7 @@ model User {
   emailVerified Boolean        @default(false)
   preferredLang String         @default("en")
   totalXp       Float          @default(0)
+  casesQuotaOverride Int?
   freeCasesUsed Int            @default(0)
   freeUsageMonth String?
   academicYear  String?

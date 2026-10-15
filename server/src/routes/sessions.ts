@@ -118,13 +118,18 @@ router.post('/start', async (req, res) => {
   const languageValue = sessionLanguage as Language;
   let session;
   if ('attemptsRemaining' in access) {
-    session = await createFreeCaseSession(userId, caseId, languageValue, resolvedStationConfig);
+    session = await createFreeCaseSession(
+      userId,
+      caseId,
+      languageValue,
+      resolvedStationConfig,
+    );
     if (!session) {
       return res.status(403).json({
         error: 'FREE_LIMIT_REACHED',
         message: 'You have used all free case attempts this month. Upgrade to continue.',
-        attempts: 3,
-        limit: 3,
+        attempts: access.attempts,
+        limit: access.limit,
       });
     }
   } else {

@@ -3,6 +3,22 @@ import { prisma } from '../lib/prisma.js';
 
 export const FREE_ATTEMPTS_PER_MONTH = 5;
 
+export function calculateCaseQuota(
+  baseCasesQuota: number,
+  casesQuotaOverride: number | null | undefined,
+  casesQuotaUsed: number,
+) {
+  const casesQuota = Math.max(0, casesQuotaOverride ?? baseCasesQuota);
+  return {
+    baseCasesQuota,
+    casesQuotaOverride: casesQuotaOverride ?? null,
+    casesQuotaAdjustment: casesQuota - baseCasesQuota,
+    casesQuota,
+    casesQuotaUsed,
+    casesRemaining: Math.max(0, casesQuota - casesQuotaUsed),
+  };
+}
+
 export const PLAN_CATALOG = {
   FREE: { priceEgp: 0, casesQuota: FREE_ATTEMPTS_PER_MONTH, durationMonths: 0, labelEn: 'Free', labelAr: 'مجاني' },
   PACKAGE_50: { priceEgp: 150, casesQuota: 30, durationMonths: 2, labelEn: 'Basic', labelAr: 'Basic' },
@@ -186,7 +202,7 @@ async function ensureFreeUsageMonth(tx: Prisma.TransactionClient, userId: string
     await tx.user.updateMany({
       where: { id: userId, freeUsageMonth: user.freeUsageMonth },
       data: {
-        freeCasesUsed: Math.min(legacyMonthUsage, FREE_ATTEMPTS_PER_MONTH),
+        freeCasesUsed: legacyMonthUsage,
         freeUsageMonth: month,
       },
     });
@@ -213,13 +229,21 @@ async function getUsedCaseCredits(userId: string, since?: Date | null) {
 }
 
 export async function getUserEntitlements(userId: string) {
-  const subscription = await getActiveSubscription(userId);
+  const [subscription, user] = await Promise.all([
+    getActiveSubscription(userId),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { casesQuotaOverride: true },
+    }),
+  ]);
   const plan = subscription?.plan ?? 'FREE';
   const config = await getPlanDefinition(plan);
   const isFree = !isPaidPlan(plan);
   const periodStart = !isFree && subscription?.startDate ? subscription.startDate : null;
   const casesUnlocked = await getUsedCaseCredits(userId, periodStart);
-  const casesQuota = subscription?.casesQuota ?? config.casesQuota;
+  const baseCasesQuota = isFree
+    ? FREE_ATTEMPTS_PER_MONTH
+    : subscription?.casesQuota ?? config.casesQuota;
 
   const caseAccess = await prisma.caseAccess.findMany({
     where: { userId },
@@ -241,19 +265,21 @@ export async function getUserEntitlements(userId: string) {
   }
 
   const freeAttemptsUsed = isFree ? await getFreeAttemptsUsed(userId) : 0;
-  const freeAttemptsRemaining = Math.max(0, FREE_ATTEMPTS_PER_MONTH - freeAttemptsUsed);
+  const quotaUsage = isFree ? freeAttemptsUsed : casesUnlocked;
+  const effectiveQuota = calculateCaseQuota(baseCasesQuota, user?.casesQuotaOverride, quotaUsage);
+  const freeAttemptsRemaining = isFree ? effectiveQuota.casesRemaining : FREE_ATTEMPTS_PER_MONTH;
 
   const planEndDate = await resolvePlanEndDate(subscription);
 
   return {
     plan,
     isFree,
-    freeAttemptsPerMonth: FREE_ATTEMPTS_PER_MONTH,
+    freeAttemptsPerMonth: isFree ? effectiveQuota.casesQuota : FREE_ATTEMPTS_PER_MONTH,
     freeAttemptsRemaining,
     // Free entitlements stay attempt-based; paid plans use credit quotas.
-    casesQuota: isFree ? 0 : casesQuota,
+    ...effectiveQuota,
+    casesQuotaUsed: quotaUsage,
     casesUnlocked,
-    casesRemaining: isFree ? 0 : Math.max(0, casesQuota - casesUnlocked),
     priceEgp: subscription?.priceEgp ?? config.priceEgp,
     planEndDate: planEndDate?.toISOString() ?? null,
     planStartDate: subscription?.startDate?.toISOString() ?? null,
@@ -280,36 +306,54 @@ export async function checkCanStartCase(userId: string, caseId: string) {
     }
 
     const attempts = await getFreeAttemptsUsed(userId);
-    if (attempts >= FREE_ATTEMPTS_PER_MONTH) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { casesQuotaOverride: true },
+    });
+    const quota = calculateCaseQuota(
+      FREE_ATTEMPTS_PER_MONTH,
+      user?.casesQuotaOverride,
+      attempts,
+    );
+    if (attempts >= quota.casesQuota) {
       return {
         allowed: false as const,
         code: 'FREE_LIMIT_REACHED' as const,
         attempts,
-        limit: FREE_ATTEMPTS_PER_MONTH,
+        limit: quota.casesQuota,
       };
     }
     return {
       allowed: true as const,
       attempts,
-      attemptsRemaining: FREE_ATTEMPTS_PER_MONTH - attempts,
+      attemptsRemaining: quota.casesRemaining,
+      limit: quota.casesQuota,
     };
   }
 
   const periodStart = subscription?.startDate ?? null;
   const casesUnlocked = await getUsedCaseCredits(userId, periodStart);
-  const quota = subscription?.casesQuota ?? config.casesQuota;
-  if (casesUnlocked >= quota) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { casesQuotaOverride: true },
+  });
+  const quota = calculateCaseQuota(
+    subscription?.casesQuota ?? config.casesQuota,
+    user?.casesQuotaOverride,
+    casesUnlocked,
+  );
+  if (casesUnlocked >= quota.casesQuota) {
     return {
       allowed: false as const,
       code: 'CASE_QUOTA_EXCEEDED' as const,
       casesUnlocked,
-      casesQuota: quota,
+      casesQuota: quota.casesQuota,
     };
   }
 
   return {
     allowed: true as const,
-    casesRemaining: quota - casesUnlocked,
+    casesRemaining: quota.casesRemaining,
   };
 }
 
@@ -330,11 +374,20 @@ export async function createFreeCaseSession(
   return prisma.$transaction(async (tx) => {
     const now = new Date();
     await ensureFreeUsageMonth(tx, userId, now);
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: { casesQuotaOverride: true },
+    });
+    const caseQuota = calculateCaseQuota(
+      FREE_ATTEMPTS_PER_MONTH,
+      user?.casesQuotaOverride,
+      0,
+    ).casesQuota;
     const claimed = await tx.user.updateMany({
       where: {
         id: userId,
         freeUsageMonth: getServerCalendarMonth(now),
-        freeCasesUsed: { lt: FREE_ATTEMPTS_PER_MONTH },
+        freeCasesUsed: { lt: caseQuota },
       },
       data: { freeCasesUsed: { increment: 1 } },
     });

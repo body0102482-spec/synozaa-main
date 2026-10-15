@@ -15,6 +15,7 @@
     "db:prune-users": "tsx scripts/prune-users.ts",
     "db:delete-user": "tsx scripts/delete-user.ts",
     "grant-plan": "tsx scripts/grant-plan.ts",
+    "test:subscription": "tsx --test src/services/subscriptionService.test.ts",
     "test:realtime": "tsx scripts/test-realtime-live-call.ts",
     "test:openrouter-audio": "tsx scripts/test-openrouter-audio.ts",
     "test:openrouter-voice-route-live": "tsx scripts/test-openrouter-voice-route-live.ts"

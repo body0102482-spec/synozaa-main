@@ -34,7 +34,11 @@ type EntitlementsPayload = {
   entitlements: {
     plan: string;
     isFree: boolean;
+    baseCasesQuota: number;
+    casesQuotaOverride: number | null;
+    casesQuotaAdjustment: number;
     casesQuota: number;
+    casesQuotaUsed: number;
     casesUnlocked: number;
     casesRemaining: number;
     planEndDate: string | null;
@@ -48,6 +52,7 @@ type EntitlementsPayload = {
 type Props = {
   user: AdminUserSummary;
   open: boolean;
+  canManagePlan: boolean;
   onClose: () => void;
   onSaved: () => void;
 };
@@ -68,7 +73,7 @@ function toDateInputValue(value: string | null | undefined) {
   return d.toISOString().slice(0, 10);
 }
 
-export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
+export function AdminUserPlanModal({ user, open, canManagePlan, onClose, onSaved }: Props) {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language?.startsWith('ar');
   const locale = isAr ? 'ar-EG' : 'en-US';
@@ -79,6 +84,7 @@ export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
   const [data, setData] = useState<EntitlementsPayload | null>(null);
   const [selectedPlan, setSelectedPlan] = useState('FREE');
   const [endDateInput, setEndDateInput] = useState('');
+  const [casesQuotaInput, setCasesQuotaInput] = useState('');
 
   useEffect(() => {
     if (!open) return;
@@ -93,10 +99,11 @@ export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
         const currentPlan = payload.entitlements.plan ?? 'FREE';
         setSelectedPlan(currentPlan);
         setEndDateInput(toDateInputValue(payload.entitlements.planEndDate ?? payload.subscription?.endDate));
+        setCasesQuotaInput(String(payload.entitlements.casesQuota));
       })
-      .catch(() => setError(t('adminPlanUpdateError')))
+      .catch(() => setError(t(canManagePlan ? 'adminPlanUpdateError' : 'adminCasesQuotaUpdateError')))
       .finally(() => setLoading(false));
-  }, [open, user.id, t]);
+  }, [canManagePlan, open, user.id, t]);
 
   const planOptions = useMemo(() => data?.plans ?? [], [data?.plans]);
   const selectedPlanMeta = planOptions.find((p) => p.id === selectedPlan);
@@ -122,6 +129,34 @@ export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
     }
   };
 
+  const saveCasesQuota = async (casesQuotaOverride: number | null) => {
+    setSaving(true);
+    setError('');
+    try {
+      const response = await api.patch(`/admin/users/${user.id}/cases-quota`, {
+        casesQuotaOverride,
+      });
+      const entitlements = response.data.entitlements as EntitlementsPayload['entitlements'];
+      setData((current) => (current ? { ...current, entitlements } : current));
+      setCasesQuotaInput(String(entitlements.casesQuota));
+      onSaved();
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setError(message || t('adminCasesQuotaUpdateError'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveCasesQuota = () => {
+    const casesQuota = Number(casesQuotaInput);
+    if (!Number.isSafeInteger(casesQuota) || casesQuota < 0) {
+      setError(t('adminCasesQuotaInvalid'));
+      return;
+    }
+    void saveCasesQuota(casesQuota);
+  };
+
   if (!open) return null;
 
   return (
@@ -129,7 +164,9 @@ export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
       <div className="w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white">{t('adminManagePlan')}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white">
+              {canManagePlan ? t('adminManagePlan') : t('adminCasesQuotaTitle')}
+            </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               {user.firstName} {user.lastName} · {user.email}
             </p>
@@ -145,66 +182,131 @@ export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
           {!loading && data && (
             <>
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
-                  <p className="text-xs text-slate-500">{t('adminCurrentPlan')}</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {planOptions.find((p) => p.id === data.entitlements.plan)?.[isAr ? 'labelAr' : 'labelEn'] ??
-                      data.entitlements.plan}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
-                  <p className="text-xs text-slate-500">{t('adminPlanValidUntil')}</p>
-                  <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {formatDate(data.entitlements.planEndDate, locale)}
-                  </p>
-                </div>
+                {canManagePlan && (
+                  <>
+                    <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
+                      <p className="text-xs text-slate-500">{t('adminCurrentPlan')}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white mt-1">
+                        {planOptions.find((p) => p.id === data.entitlements.plan)?.[isAr ? 'labelAr' : 'labelEn'] ??
+                          data.entitlements.plan}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
+                      <p className="text-xs text-slate-500">{t('adminPlanValidUntil')}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white mt-1">
+                        {formatDate(data.entitlements.planEndDate, locale)}
+                      </p>
+                    </div>
+                  </>
+                )}
                 <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
                   <p className="text-xs text-slate-500">{t('adminCasesUsed')}</p>
                   <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {data.entitlements.isFree ? '—' : data.entitlements.casesUnlocked}
+                    {data.entitlements.casesQuotaUsed}
                   </p>
                 </div>
                 <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
                   <p className="text-xs text-slate-500">{t('adminCasesRemaining')}</p>
                   <p className="font-semibold text-slate-900 dark:text-white mt-1">
-                    {data.entitlements.isFree ? '—' : data.entitlements.casesRemaining}
+                    {data.entitlements.casesRemaining}
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="admin-plan-select">
-                  {t('adminChangePlan')}
+              <div className="rounded-xl border border-violet-200 dark:border-violet-900/60 p-4 space-y-3">
+                <div>
+                  <h4 className="font-semibold text-slate-900 dark:text-white">{t('adminCasesQuotaTitle')}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {t('adminCasesQuotaHint')}
+                    {data.entitlements.isFree ? ` ${t('adminCasesQuotaFreeMonthly')}` : ''}
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div className="rounded-lg bg-slate-50 dark:bg-slate-800/60 p-2">
+                    <p className="text-xs text-slate-500">{t('adminCasesQuotaOriginal')}</p>
+                    <p className="font-semibold mt-1">{data.entitlements.baseCasesQuota}</p>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 dark:bg-slate-800/60 p-2">
+                    <p className="text-xs text-slate-500">{t('adminCasesQuotaAdjustment')}</p>
+                    <p className="font-semibold mt-1">
+                      {data.entitlements.casesQuotaAdjustment > 0 ? '+' : ''}
+                      {data.entitlements.casesQuotaAdjustment}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-violet-50 dark:bg-violet-900/20 p-2">
+                    <p className="text-xs text-slate-500">{t('adminCasesQuotaFinal')}</p>
+                    <p className="font-semibold mt-1">{data.entitlements.casesQuota}</p>
+                  </div>
+                </div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="admin-cases-quota">
+                  {t('adminCasesQuotaSet')}
                 </label>
-                <select
-                  id="admin-plan-select"
+                <input
+                  id="admin-cases-quota"
+                  type="number"
+                  min="0"
+                  step="1"
                   className="input-field"
-                  value={selectedPlan}
-                  onChange={(e) => {
-                    setSelectedPlan(e.target.value);
-                    const meta = planOptions.find((p) => p.id === e.target.value);
-                    if (meta && meta.durationMonths > 0) {
-                      const end = new Date();
-                      end.setMonth(end.getMonth() + meta.durationMonths);
-                      setEndDateInput(end.toISOString().slice(0, 10));
-                    } else if (e.target.value === 'FREE') {
-                      setEndDateInput('');
-                    }
-                  }}
-                >
-                  {planOptions.map((plan) => (
-                    <option key={plan.id} value={plan.id}>
-                      {planLabel(plan)}
-                      {plan.casesQuota > 0 ? ` · ${plan.casesQuota} cases` : ''}
-                    </option>
-                  ))}
-                </select>
-                {selectedPlan === 'FREE' && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('adminPlanFreeHint')}</p>
-                )}
+                  value={casesQuotaInput}
+                  onChange={(e) => setCasesQuotaInput(e.target.value)}
+                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="btn-primary"
+                    onClick={handleSaveCasesQuota}
+                    disabled={loading || saving || !data}
+                  >
+                    {saving ? t('loading') : t('adminCasesQuotaSave')}
+                  </button>
+                  {data.entitlements.casesQuotaOverride !== null && (
+                    <button
+                      type="button"
+                      className="btn-secondary"
+                      onClick={() => void saveCasesQuota(null)}
+                      disabled={loading || saving}
+                    >
+                      {t('adminCasesQuotaReset')}
+                    </button>
+                  )}
+                </div>
               </div>
 
-              {isPaidSelection && (
+              {canManagePlan && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="admin-plan-select">
+                    {t('adminChangePlan')}
+                  </label>
+                  <select
+                    id="admin-plan-select"
+                    className="input-field"
+                    value={selectedPlan}
+                    onChange={(e) => {
+                      setSelectedPlan(e.target.value);
+                      const meta = planOptions.find((p) => p.id === e.target.value);
+                      if (meta && meta.durationMonths > 0) {
+                        const end = new Date();
+                        end.setMonth(end.getMonth() + meta.durationMonths);
+                        setEndDateInput(end.toISOString().slice(0, 10));
+                      } else if (e.target.value === 'FREE') {
+                        setEndDateInput('');
+                      }
+                    }}
+                  >
+                    {planOptions.map((plan) => (
+                      <option key={plan.id} value={plan.id}>
+                        {planLabel(plan)}
+                        {plan.casesQuota > 0 ? ` · ${plan.casesQuota} cases` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedPlan === 'FREE' && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{t('adminPlanFreeHint')}</p>
+                  )}
+                </div>
+              )}
+
+              {canManagePlan && isPaidSelection && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="admin-plan-end">
                     {t('adminPlanValidUntil')}
@@ -235,9 +337,11 @@ export function AdminUserPlanModal({ user, open, onClose, onSaved }: Props) {
           <button type="button" onClick={onClose} className="btn-secondary">
             {t('cancel')}
           </button>
-          <button type="button" onClick={handleSave} disabled={loading || saving || !data} className="btn-primary">
-            {saving ? t('loading') : t('save')}
-          </button>
+          {canManagePlan && (
+            <button type="button" onClick={handleSave} disabled={loading || saving || !data} className="btn-primary">
+              {saving ? t('loading') : t('save')}
+            </button>
+          )}
         </div>
       </div>
     </div>

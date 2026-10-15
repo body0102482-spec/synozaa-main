@@ -27,6 +27,7 @@ type ActivityPayload = {
   entitlements: {
     plan: string;
     casesQuota: number;
+    casesQuotaUsed: number;
     casesUnlocked: number;
     casesRemaining: number;
     planEndDate: string | null;
@@ -98,7 +99,7 @@ export function AdminStudentDetailModal({ user, open, onClose }: Props) {
                 </div>
                 <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
                   <p className="text-xs text-slate-500">{t('adminCasesUsed')}</p>
-                  <p className="font-semibold mt-1">{data.entitlements.casesUnlocked} / {data.entitlements.casesQuota || '—'}</p>
+                  <p className="font-semibold mt-1">{data.entitlements.casesQuotaUsed} / {data.entitlements.casesQuota}</p>
                 </div>
                 <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-3">
                   <p className="text-xs text-slate-500">{t('adminPlanValidUntil')}</p>

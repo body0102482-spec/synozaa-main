@@ -187,10 +187,15 @@ export default function StudentDashboard() {
     const onPageShow = (event: PageTransitionEvent) => {
       if (event.persisted) loadEntitlements();
     };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') loadEntitlements();
+    };
     window.addEventListener('pageshow', onPageShow);
+    document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       window.removeEventListener(ENTITLEMENTS_CHANGED_EVENT, onEntitlementsChanged);
       window.removeEventListener('pageshow', onPageShow);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
 
@@ -392,8 +397,6 @@ export default function StudentDashboard() {
       if (!c.isFreeTier) return false;
       return entitlements.freeAttemptsRemaining > 0;
     }
-    const attempts = getCaseAttempts(c.id);
-    if (attempts > 0) return true;
     return entitlements.casesRemaining > 0;
   };
 

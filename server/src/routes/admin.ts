@@ -425,6 +425,31 @@ router.get('/users/:userId/entitlements', async (req, res) => {
   });
 });
 
+router.patch('/users/:userId/cases-quota', async (req, res) => {
+  const { casesQuotaOverride } = req.body ?? {};
+  if (
+    casesQuotaOverride !== null &&
+    (!Number.isSafeInteger(casesQuotaOverride) ||
+      casesQuotaOverride < 0 ||
+      casesQuotaOverride > 2_147_483_647)
+  ) {
+    return res.status(400).json({ error: 'Case quota must be a non-negative integer or null' });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: req.params.userId },
+    select: { id: true },
+  });
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { casesQuotaOverride },
+  });
+  const entitlements = await getUserEntitlements(user.id);
+  res.json({ entitlements });
+});
+
 router.patch('/users/:id', async (req, res) => {
   const { role, isActive, academicYear, university, phone } = req.body;
   const data: Prisma.UserUpdateInput = {};
