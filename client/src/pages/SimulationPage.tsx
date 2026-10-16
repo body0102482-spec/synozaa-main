@@ -250,6 +250,7 @@ export default function SimulationPage() {
   const [realtimeFallback, setRealtimeFallback] = useState(false);
   const [voiceProvider, setVoiceProvider] = useState<'openai_realtime' | 'openrouter_audio'>('openai_realtime');
   const [secondsLeft, setSecondsLeft] = useState(STATION_SECONDS);
+  const [timerInitializedSessionId, setTimerInitializedSessionId] = useState<string | null>(null);
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
   const [rankProgress, setRankProgress] = useState<RankSnapshot | null>(null);
   const [promotionModal, setPromotionModal] = useState<RankSnapshot | null>(null);
@@ -267,6 +268,11 @@ export default function SimulationPage() {
   const stopListeningRef = useRef<() => void>(() => {});
 
   const sessionLocked = !!result || completing || secondsLeft <= 0;
+  const sessionLoadedForRoute = session?.id === sessionId;
+  const timerInitialized =
+    sessionLoadedForRoute && timerInitializedSessionId === sessionId;
+  const canCompleteSession =
+    sessionLoadedForRoute && (!!session?.result || timerInitialized);
 
   const stationConfig = useMemo(
     () => getSessionStationConfig(session ?? { case: { stationConfig: '{}' } }),
@@ -642,6 +648,11 @@ export default function SimulationPage() {
   );
 
   useEffect(() => {
+    autoCompleteTriggeredRef.current = false;
+    setSession(null);
+    setResult(null);
+    setSecondsLeft(STATION_SECONDS);
+    setTimerInitializedSessionId(null);
     loadSession();
   }, [loadSession]);
 
@@ -851,6 +862,7 @@ export default function SimulationPage() {
   }, [sessionLocked, patientLiveCall, examinerLiveCall, stopListening]);
 
   const completeSession = useCallback(async (options?: { timedOut?: boolean }) => {
+    if (!canCompleteSession) return;
     setCompleting(true);
     setCompleteError("");
     const evaluationLanguage = 'EN';
@@ -878,7 +890,7 @@ export default function SimulationPage() {
     } finally {
       setCompleting(false);
     }
-  }, [sessionId, t]);
+  }, [canCompleteSession, sessionId, t]);
 
   const triggerTimeUpComplete = useCallback(() => {
     if (autoCompleteTriggeredRef.current) return;
@@ -887,26 +899,35 @@ export default function SimulationPage() {
   }, [completeSession]);
 
   useEffect(() => {
-    if (!session?.startedAt || result) return;
+    if (!sessionLoadedForRoute || !session?.startedAt || result) return;
     const startedAtMs = new Date(session.startedAt).getTime();
+    if (!Number.isFinite(startedAtMs)) {
+      console.error('[session timer] Invalid startedAt for session', session.id);
+      return;
+    }
     const updateTimer = () => {
       const elapsed = Math.floor((Date.now() - startedAtMs) / 1000);
       const remaining = Math.max(0, STATION_SECONDS - elapsed);
       setSecondsLeft(remaining);
-      if (remaining <= 0) {
-        triggerTimeUpComplete();
-      }
+      setTimerInitializedSessionId(session.id);
     };
     updateTimer();
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, [session?.startedAt, result, triggerTimeUpComplete]);
+  }, [sessionLoadedForRoute, session?.id, session?.startedAt, result]);
 
   useEffect(() => {
-    if (!session || result || completing) return;
-    if (secondsLeft > 0) return;
+    if (!timerInitialized || !sessionLoadedForRoute || result || completing) return;
+    if (secondsLeft > 0 || !Number.isFinite(secondsLeft)) return;
     triggerTimeUpComplete();
-  }, [session, result, completing, secondsLeft, triggerTimeUpComplete]);
+  }, [
+    timerInitialized,
+    sessionLoadedForRoute,
+    result,
+    completing,
+    secondsLeft,
+    triggerTimeUpComplete,
+  ]);
 
   if (!session) {
     return (
