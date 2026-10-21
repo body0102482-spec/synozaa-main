@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FileText, Plus, Trash2, Pencil, Upload, Save, X, ClipboardPaste, Music, Search, ArrowUpDown, Undo2, ChevronUp, ChevronDown } from 'lucide-react';
+import { FileText, Plus, Trash2, Pencil, Upload, Save, X, ClipboardPaste, Music, Search, ArrowUpDown, Undo2, ChevronUp, ChevronDown, Download, LoaderCircle } from 'lucide-react';
 import api from '../../lib/api';
+import { downloadHistorySheet, type HistorySheetMetadata } from '../../lib/historySheet';
 import {
   ALL_MANEUVERS,
   DEFAULT_STATION_CONFIG,
@@ -44,6 +45,8 @@ interface CaseListRow {
   difficulty?: { nameEn: string };
   category?: { id: string; nameEn: string; nameAr?: string } | null;
 }
+
+type AdminHistorySheet = HistorySheetMetadata;
 
 type CaseStatusFilter = 'all' | 'published' | 'draft' | 'free';
 type CaseSortKey = 'newest' | 'oldest' | 'titleAz' | 'titleZa';
@@ -324,6 +327,12 @@ export function AdminCasesTab() {
   const [error, setError] = useState('');
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [maxVideoUploadSizeMb, setMaxVideoUploadSizeMb] = useState<number | null>(null);
+  const [historySheet, setHistorySheet] = useState<AdminHistorySheet | null>(null);
+  const [historySheetUploading, setHistorySheetUploading] = useState(false);
+  const [historySheetDownloading, setHistorySheetDownloading] = useState(false);
+  const [historySheetError, setHistorySheetError] = useState('');
+  const [historySheetNotice, setHistorySheetNotice] = useState('');
+  const [maxHistorySheetUploadSizeMb, setMaxHistorySheetUploadSizeMb] = useState<number | null>(null);
   const [importSource, setImportSource] = useState('');
   const [importMessage, setImportMessage] = useState('');
   const [importError, setImportError] = useState('');
@@ -445,6 +454,21 @@ export function AdminCasesTab() {
     };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    void api
+      .get<{ maxUploadSizeMb: number }>('/admin/cases/history-sheet/config')
+      .then((response) => {
+        if (active) setMaxHistorySheetUploadSizeMb(response.data.maxUploadSizeMb);
+      })
+      .catch(() => {
+        if (active) setHistorySheetError(t('historySheetConfigLoadFailed'));
+      });
+    return () => {
+      active = false;
+    };
+  }, [t]);
+
   const loadLookups = useCallback(async () => {
     const [specRes, diffRes, catRes, uniRes] = await Promise.all([
       api.get('/cases/specialties'),
@@ -488,11 +512,23 @@ export function AdminCasesTab() {
     setUniversityOverrides(r.data.overrides ?? []);
   }, []);
 
+  const loadHistorySheet = useCallback(async (caseId: string) => {
+    const r = await api.get<{ historySheet: AdminHistorySheet | null }>(
+      `/admin/cases/${caseId}/history-sheet`,
+    );
+    setHistorySheet(r.data.historySheet);
+  }, []);
+
   const startCreate = async () => {
     const { specs, diffs, cats } = await loadLookups();
     setEditingId('new');
     setFormHistory([]);
     setForm(emptyForm(specs[0]?.id ?? '', diffs[0]?.id ?? '', cats[0]?.id ?? ''));
+    setHistorySheet(null);
+    setHistorySheetUploading(false);
+    setHistorySheetDownloading(false);
+    setHistorySheetError('');
+    setHistorySheetNotice('');
     setUniversityOverrides([]);
     setSelectedOverrideUniversityId('');
     setOverrideDraft(null);
@@ -510,7 +546,17 @@ export function AdminCasesTab() {
       setEditingId(id);
       setFormHistory([]);
       setForm(normalizeCaseForm(r.data.form as CaseFormPayload));
-      await loadUniversityOverrides(id);
+      setHistorySheet(null);
+      setHistorySheetUploading(false);
+      setHistorySheetDownloading(false);
+      setHistorySheetError('');
+      setHistorySheetNotice('');
+      await Promise.all([
+        loadUniversityOverrides(id),
+        loadHistorySheet(id).catch(() => {
+          setHistorySheetError(t('historySheetLoadFailed'));
+        }),
+      ]);
       setSelectedOverrideUniversityId('');
       setOverrideDraft(null);
       setImportSource('');
@@ -527,6 +573,11 @@ export function AdminCasesTab() {
     setEditingId(null);
     setFormHistory([]);
     setForm(emptyForm());
+    setHistorySheet(null);
+    setHistorySheetUploading(false);
+    setHistorySheetDownloading(false);
+    setHistorySheetError('');
+    setHistorySheetNotice('');
     setUniversityOverrides([]);
     setSelectedOverrideUniversityId('');
     setOverrideDraft(null);
@@ -722,6 +773,78 @@ export function AdminCasesTab() {
     }
   };
 
+  const uploadHistorySheet = async (file: File) => {
+    if (!editingId || editingId === 'new') {
+      setHistorySheetError(t('historySheetSaveCaseFirst'));
+      return;
+    }
+    if (
+      maxHistorySheetUploadSizeMb !== null &&
+      file.size > maxHistorySheetUploadSizeMb * 1024 * 1024
+    ) {
+      setHistorySheetError(t('historySheetTooLarge', { max: maxHistorySheetUploadSizeMb }));
+      return;
+    }
+
+    setHistorySheetUploading(true);
+    setHistorySheetError('');
+    setHistorySheetNotice('');
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    try {
+      const response = await api.post<{ historySheet: AdminHistorySheet; warning?: string }>(
+        `/admin/cases/${editingId}/history-sheet`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' }, timeout: 120_000 },
+      );
+      setHistorySheet(response.data.historySheet);
+      setHistorySheetNotice(response.data.warning || t('historySheetUploadSuccess'));
+    } catch (uploadError) {
+      const message = (uploadError as { response?: { data?: { error?: string } } })
+        ?.response?.data?.error;
+      setHistorySheetError(message || t('historySheetUploadFailed'));
+    } finally {
+      setHistorySheetUploading(false);
+    }
+  };
+
+  const removeHistorySheet = async () => {
+    if (!editingId || editingId === 'new' || !historySheet || historySheetUploading || historySheetDownloading) return;
+    if (!window.confirm(t('historySheetDeleteConfirm'))) return;
+
+    setHistorySheetUploading(true);
+    setHistorySheetError('');
+    setHistorySheetNotice('');
+    try {
+      const response = await api.delete<{ warning?: string }>(
+        `/admin/cases/${editingId}/history-sheet`,
+      );
+      setHistorySheet(null);
+      setHistorySheetNotice(response.data.warning || t('historySheetRemoved'));
+    } catch (deleteError) {
+      const message = (deleteError as { response?: { data?: { error?: string } } })
+        ?.response?.data?.error;
+      setHistorySheetError(message || t('historySheetRemoveFailed'));
+    } finally {
+      setHistorySheetUploading(false);
+    }
+  };
+
+  const openHistorySheet = async () => {
+    if (!editingId || editingId === 'new' || !historySheet || historySheetUploading || historySheetDownloading) return;
+    setHistorySheetDownloading(true);
+    setHistorySheetError('');
+    try {
+      await downloadHistorySheet(editingId, historySheet.fileName);
+    } catch (downloadError) {
+      setHistorySheetError(
+        downloadError instanceof Error ? downloadError.message : t('historySheetDownloadFailed'),
+      );
+    } finally {
+      setHistorySheetDownloading(false);
+    }
+  };
+
   const updateVital = (key: keyof VitalSignForm, value: string) => {
     setForm((prev) => ({ ...prev, vitalSigns: { ...prev.vitalSigns, [key]: value } }));
   };
@@ -771,7 +894,12 @@ export function AdminCasesTab() {
             >
               <Undo2 size={16} /> {t('adminCaseUndo')}
             </button>
-            <button type="button" onClick={cancelEdit} className="btn-secondary inline-flex items-center gap-2">
+            <button
+              type="button"
+              onClick={cancelEdit}
+              disabled={historySheetUploading || historySheetDownloading}
+              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
+            >
               <X size={16} /> {t('cancel')}
             </button>
             <button type="button" onClick={saveCase} disabled={saving} className="btn-primary inline-flex items-center gap-2">
@@ -818,6 +946,93 @@ export function AdminCasesTab() {
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.isFreeTier} onChange={(e) => setForm({ ...form, isFreeTier: e.target.checked })} /> {t('adminCaseFreeTier')}</label>
             </div>
           </div>
+        </Section>
+
+        <Section title={t('historySheetTitle')}>
+          {editingId === 'new' ? (
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {t('historySheetSaveCaseFirst')}
+            </p>
+          ) : historySheet ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-cyan-100 dark:border-cyan-900/60 bg-cyan-50/70 dark:bg-cyan-950/20 p-4">
+              <div className="flex min-w-0 items-start gap-3">
+                <FileText size={20} className="mt-0.5 shrink-0 text-teal-700 dark:text-teal-300" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-slate-900 dark:text-white" title={historySheet.fileName}>
+                    {historySheet.fileName}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {historySheet.mimeType === 'application/pdf' ? 'PDF' : 'DOCX'}
+                    {' · '}
+                    {(historySheet.fileSize / (1024 * 1024)).toFixed(2)} MB
+                    {' · '}
+                    {t('historySheetLastUpdated')} {new Date(historySheet.updatedAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => void openHistorySheet()}
+                  disabled={historySheetUploading || historySheetDownloading}
+                  className="btn-secondary inline-flex items-center gap-2"
+                >
+                  {historySheetDownloading ? (
+                    <LoaderCircle size={15} className="animate-spin" />
+                  ) : (
+                    <Download size={15} />
+                  )}
+                  {t('historySheetOpenDownload')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void removeHistorySheet()}
+                  disabled={historySheetUploading || historySheetDownloading}
+                  className="btn-secondary inline-flex items-center gap-2 text-red-600"
+                >
+                  <Trash2 size={15} /> {t('delete')}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
+              {t('historySheetUnavailable')}
+            </p>
+          )}
+          {editingId !== 'new' && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <label className={`btn-secondary inline-flex items-center gap-2 ${historySheetUploading || historySheetDownloading ? 'pointer-events-none opacity-60' : 'cursor-pointer'}`}>
+                {historySheetUploading ? (
+                  <LoaderCircle size={16} className="animate-spin" />
+                ) : (
+                  <Upload size={16} />
+                )}
+                {historySheetUploading
+                  ? t('historySheetUploading')
+                  : historySheet
+                    ? t('historySheetReplace')
+                    : t('historySheetUpload')}
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  disabled={historySheetUploading || historySheetDownloading}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) void uploadHistorySheet(file);
+                    event.target.value = '';
+                  }}
+                />
+              </label>
+              <span className="text-xs text-slate-500">
+                {maxHistorySheetUploadSizeMb === null
+                  ? t('historySheetFormats')
+                  : t('historySheetUploadLimit', { max: maxHistorySheetUploadSizeMb })}
+              </span>
+            </div>
+          )}
+          {historySheetError && <p role="alert" className="text-sm text-red-600">{historySheetError}</p>}
+          {historySheetNotice && <p role="status" className="text-sm text-emerald-600">{historySheetNotice}</p>}
         </Section>
 
         <Section title={t('adminCaseSectionPatient')}>

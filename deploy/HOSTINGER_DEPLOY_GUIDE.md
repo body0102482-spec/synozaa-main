@@ -129,3 +129,26 @@ sudo certbot --nginx -d yourdomain.com
    npx tsx src/seed.ts
    ```
 5. اضغط **Restart Application** في لوحة التحكم.
+
+---
+
+## Case History Sheets
+
+Case History Sheets are stored outside the application/public media directory. On the configured VPS, the persistent location is:
+
+```text
+/home/adminanmkavps/synoza-media/history-sheets
+```
+
+The application creates this directory as needed. Ensure it is writable by the Node.js service account and include it in the regular `synoza-media` backups. Do not move it under `client/public`, `client/dist`, or the `/exam` static-media root.
+
+Configure these optional server variables to change the storage location or upload limit:
+
+```env
+SYNOZA_HISTORY_SHEET_ROOT=/home/adminanmkavps/synoza-media/history-sheets
+HISTORY_SHEET_MAX_UPLOAD_SIZE_MB=20
+```
+
+`SYNOZA_HISTORY_SHEET_ROOT` defaults to a private sibling of the existing `SYNOZA_EXAM_MEDIA_ROOT`; no external or paid storage service is required. The file endpoint requires authentication and does not expose storage keys.
+
+Before deploying code that uses History Sheets, apply the additive MySQL schema change from `deploy/migrations/20261021000000_case_history_sheets.mysql.sql` to the production database. The code-only `deploy/push-update.py` intentionally does not run database DDL. For fresh installs, the normal Prisma schema push also creates this table. Do not run a database reset or seed operation to install this feature.

@@ -2,6 +2,12 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { Role } from '@prisma/client';
+import {
+  ensureHistorySheetStorageRoot,
+  resolveHistorySheetPath,
+} from '../lib/historySheetStorage.js';
+import { getActiveSubscription, isPaidPlan } from '../services/subscriptionService.js';
+import fs from 'node:fs/promises';
 
 const router = Router();
 
@@ -47,16 +53,74 @@ router.get('/', async (req, res) => {
           }
         : {}),
     },
-    include: { specialty: true, difficulty: true, category: true },
+    include: {
+      specialty: true,
+      difficulty: true,
+      category: true,
+      historySheet: {
+        select: { fileName: true, mimeType: true, fileSize: true, updatedAt: true },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   });
 
   res.json({ cases });
 });
 
+router.get('/:id/history-sheet', authenticate, async (req, res) => {
+  try {
+    const caseData = await prisma.case.findUnique({
+      where: { id: String(req.params.id) },
+      select: {
+        id: true,
+        isPublished: true,
+        isFreeTier: true,
+        historySheet: {
+          select: { fileName: true, mimeType: true, storageKey: true },
+        },
+      },
+    });
+    if (!caseData?.historySheet) {
+      return res.status(404).json({ error: 'History Sheet not available yet.' });
+    }
+
+    if (req.user!.role !== Role.ADMIN) {
+      if (!caseData.isPublished) {
+        return res.status(404).json({ error: 'History Sheet not available yet.' });
+      }
+      const subscription = await getActiveSubscription(req.user!.id);
+      if (!caseData.isFreeTier && !isPaidPlan(subscription?.plan ?? 'FREE')) {
+        return res.status(403).json({ error: 'A paid subscription is required to access this case.' });
+      }
+    }
+
+    await ensureHistorySheetStorageRoot();
+    const filePath = resolveHistorySheetPath(caseData.historySheet.storageKey);
+    await fs.access(filePath);
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.type(caseData.historySheet.mimeType);
+    return res.download(filePath, caseData.historySheet.fileName, (error) => {
+      if (!error) return;
+      console.error('[history-sheet] download failed', error);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Could not download the History Sheet.' });
+      }
+    });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return res.status(404).json({
+        error: 'The History Sheet file is missing. Please contact support.',
+      });
+    }
+    console.error('[history-sheet] storage unavailable', error);
+    return res.status(500).json({ error: 'Could not access the History Sheet right now.' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   const caseData = await prisma.case.findUnique({
-    where: { id: req.params.id },
+    where: { id: String(req.params.id) },
     include: { specialty: true, difficulty: true, category: true },
   });
 

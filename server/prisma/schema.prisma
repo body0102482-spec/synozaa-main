@@ -238,6 +238,19 @@ model Case {
   caseAccess          CaseAccess[]
   aiKnowledge         AiKnowledgeEntry[]
   universityOverrides CaseUniversityOverride[]
+  historySheet        HistorySheet?
+}
+
+model HistorySheet {
+  id         String   @id @default(cuid())
+  caseId     String   @unique
+  fileName   String
+  mimeType   String
+  fileSize   Int
+  storageKey String   @unique
+  uploadedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  case       Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
 }
 
 model CaseUniversityOverride {

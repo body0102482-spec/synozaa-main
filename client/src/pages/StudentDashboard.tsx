@@ -8,6 +8,8 @@ import { BoardIcon, getBoardIconBg } from '../components/BoardIcon';
 import { BlindMockOsceCard } from '../components/student/BlindMockOsceCard';
 import { StartCaseConfirmDialog } from '../components/student/StartCaseConfirmDialog';
 import { StudentCaseCard } from '../components/student/StudentCaseCard';
+import { HistorySheetSection } from '../components/student/HistorySheetSection';
+import type { HistorySheetMetadata } from '../lib/historySheet';
 import { PortalSupportCard } from '../components/student/PortalSupportCard';
 import {
   shouldConfirmCaseStart,
@@ -30,6 +32,7 @@ interface Case {
   category?: { nameEn: string; nameAr: string } | null;
   examImages?: string;
   isFreeTier?: boolean;
+  historySheet?: HistorySheetMetadata | null;
 }
 
 interface CategoryNode {
@@ -400,6 +403,9 @@ export default function StudentDashboard() {
     return entitlements.casesRemaining > 0;
   };
 
+  const canAccessHistorySheet = (c: Case) =>
+    !!entitlements && (!entitlements.isFree || !!c.isFreeTier);
+
   const caseAttemptLabel = (caseId: string) => {
     if (!entitlements) return null;
     const used = getCaseAttempts(caseId);
@@ -562,6 +568,13 @@ export default function StudentDashboard() {
                         {isAr ? c.titleAr : c.titleEn}
                       </h3>
                       <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{c.chiefComplaint}</p>
+                      <div className="mt-4">
+                        <HistorySheetSection
+                          caseId={c.id}
+                          historySheet={c.historySheet}
+                          canAccess={canAccessHistorySheet(c)}
+                        />
+                      </div>
                       {caseAttemptLabel(c.id) && (
                         <p className={`text-xs font-semibold mt-2 ${canStartCase(c) ? 'text-teal-600 dark:text-teal-400' : 'text-red-500 dark:text-red-400'}`}>
                           {caseAttemptLabel(c.id)}

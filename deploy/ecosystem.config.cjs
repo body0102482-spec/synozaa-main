@@ -10,6 +10,7 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: '5099',
         SYNOZA_EXAM_MEDIA_ROOT: '/home/adminanmkavps/synoza-media/exam',
+        SYNOZA_HISTORY_SHEET_ROOT: '/home/adminanmkavps/synoza-media/history-sheets',
       },
     },
   ],

@@ -23,6 +23,7 @@ try {
   New-Item -ItemType Directory -Force -Path "$Stage/server/prisma" | Out-Null
   New-Item -ItemType Directory -Force -Path "$Stage/server/src/data" | Out-Null
   New-Item -ItemType Directory -Force -Path "$Stage/deploy" | Out-Null
+  New-Item -ItemType Directory -Force -Path "$Stage/deploy/migrations" | Out-Null
 
   Copy-Item -Recurse "$Root/client/dist/*" "$Stage/client/dist/"
   Copy-Item -Recurse "$Root/client/public/exam/*" "$Stage/client/public/exam/"
@@ -38,6 +39,7 @@ try {
   $content = (Get-Content $installSh -Raw) -replace "`r`n", "`n"
   [System.IO.File]::WriteAllText($installSh, $content)
   Copy-Item "$Root/deploy/env.production.template" "$Stage/deploy/"
+  Copy-Item "$Root/deploy/migrations/*.sql" "$Stage/deploy/migrations/"
   # Optional local env template; production restores server/.env from live backup during push-update
   if (Test-Path "$Root/deploy/server.env.production") {
     Copy-Item "$Root/deploy/server.env.production" "$Stage/server/.env"

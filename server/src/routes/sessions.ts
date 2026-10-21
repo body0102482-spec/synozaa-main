@@ -152,7 +152,15 @@ router.get('/my', async (req, res) => {
   const sessions = await prisma.session.findMany({
     where: { userId: req.user!.id },
     include: {
-      case: { include: { specialty: true, difficulty: true } },
+      case: {
+        include: {
+          specialty: true,
+          difficulty: true,
+          historySheet: {
+            select: { fileName: true, mimeType: true, fileSize: true, updatedAt: true },
+          },
+        },
+      },
       result: true,
     },
     orderBy: { startedAt: 'desc' },
@@ -164,7 +172,15 @@ router.get('/:id', async (req, res) => {
   const session = await prisma.session.findFirst({
     where: { id: req.params.id, userId: req.user!.id },
     include: {
-      case: { include: { specialty: true, difficulty: true } },
+      case: {
+        include: {
+          specialty: true,
+          difficulty: true,
+          historySheet: {
+            select: { fileName: true, mimeType: true, fileSize: true, updatedAt: true },
+          },
+        },
+      },
       messages: { orderBy: { createdAt: 'asc' } },
       result: true,
     },

@@ -202,6 +202,12 @@ model Case {
   patientAge          Int
   patientGender       String
   patientNationality  String
+  patientBirthPlace   String?
+  patientResidence    String?
+  patientOccupation   String?
+  patientMaritalStatus String?
+  patientSmokingStatus String?
+  patientAlcoholStatus String?
   chiefComplaint      String            @db.Text
   medicalHistory      String            @db.Text
   medicationHistory   String            @db.Text
@@ -230,6 +236,19 @@ model Case {
   caseAccess          CaseAccess[]
   aiKnowledge         AiKnowledgeEntry[]
   universityOverrides CaseUniversityOverride[]
+  historySheet        HistorySheet?
+}
+
+model HistorySheet {
+  id         String   @id @default(cuid())
+  caseId     String   @unique
+  fileName   String
+  mimeType   String
+  fileSize   Int
+  storageKey String   @unique
+  uploadedAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  case       Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
 }
 
 model CaseUniversityOverride {

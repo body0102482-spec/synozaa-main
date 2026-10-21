@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Clock, Lock, Play } from 'lucide-react';
+import { HistorySheetSection } from './HistorySheetSection';
+import type { HistorySheetMetadata } from '../../lib/historySheet';
 
 export interface OsceCaseSummary {
   id: string;
@@ -12,6 +14,7 @@ export interface OsceCaseSummary {
   specialty?: { nameEn: string; nameAr: string };
   difficulty?: { nameEn: string; nameAr: string; level: number };
   examImages?: string;
+  historySheet?: HistorySheetMetadata | null;
 }
 
 const DEFAULT_COVER = '/exam/chest-inspection.svg';
@@ -101,6 +104,12 @@ export function StudentCaseCard({
             </p>
           )}
         </div>
+
+        <HistorySheetSection
+          caseId={caseData.id}
+          historySheet={caseData.historySheet}
+          canAccess={!lockedByPlan}
+        />
 
         {lockedByPlan ? (
           <Link

@@ -14,5 +14,6 @@ deploy/synoza-deploy.tar.gz
 
 # Transformers.js model cache (large ONNX files, downloaded at runtime)
 server/.cache/
+server/uploads/
 .cache/transformers/
 *.onnx

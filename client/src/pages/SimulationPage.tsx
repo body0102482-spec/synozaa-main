@@ -44,6 +44,7 @@ import {
 import api from "../lib/api";
 import { dispatchEntitlementsChanged } from "../lib/entitlementsEvents";
 import { downloadOsceReportPdf } from "../lib/osceReportPdf";
+import type { HistorySheetMetadata } from "../lib/historySheet";
 import { ConnectionStatus } from "../components/ConnectionStatus";
 import chestInspectionImg from "../assets/exam/chest-inspection.svg?url";
 import chestPalpationImg from "../assets/exam/chest-palpation.svg?url";
@@ -69,6 +70,7 @@ import {
   type RankSnapshot,
 } from '../components/student/XpBreakdownSection';
 import { RankPromotionModal } from '../components/student/RankPromotionModal';
+import { HistorySheetSection } from '../components/student/HistorySheetSection';
 import { getNextMainStageAfter, getSessionStationConfig, getSimulationStages, resolveManeuverLabel } from '../lib/stationConfig';
 
 interface Message {
@@ -103,6 +105,7 @@ interface Session {
   language: string;
   startedAt: string;
   case: {
+    id: string;
     titleEn: string;
     titleAr: string;
     patientName: string;
@@ -115,6 +118,7 @@ interface Session {
     examImages: string;
     isFreeTier?: boolean;
     stationConfig?: string;
+    historySheet?: HistorySheetMetadata | null;
   };
   messages: Message[];
   result?: Record<string, unknown> | null;
@@ -1201,7 +1205,11 @@ export default function SimulationPage() {
           )}
           {activeStage === "feedback" ? (
             feedbackResult ? (
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <HistorySheetSection
+                  caseId={session.case.id}
+                  historySheet={session.case.historySheet}
+                />
                 <FeedbackView
                   result={feedbackResult}
                   rankProgress={rankProgress}
@@ -2895,7 +2903,7 @@ function FeedbackView({
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
           <h2 className="text-base font-bold text-slate-800 dark:text-white">
-            {t("osceEvaluationReport")}
+            {t("feedbackReportTitle")}
           </h2>
           <p className="text-xs text-slate-500">
             {t("feedbackGeneratedFromChat")}
@@ -2913,7 +2921,7 @@ function FeedbackView({
             ) : (
               <Download size={16} />
             )}
-            {t("downloadReport")}
+            {t("downloadFeedbackReport")}
           </button>
           {onRegenerate && (
             <button

@@ -24,6 +24,16 @@ import {
   MAX_VIDEO_UPLOAD_SIZE_MB,
 } from "../lib/videoUploadConfig.js";
 import {
+  createHistorySheetStorageKey,
+  ensureHistorySheetStorageRoot,
+  HistorySheetValidationError,
+  MAX_HISTORY_SHEET_UPLOAD_SIZE_BYTES,
+  MAX_HISTORY_SHEET_UPLOAD_SIZE_MB,
+  removeHistorySheetFile,
+  resolveHistorySheetPath,
+  validateHistorySheetUpload,
+} from "../lib/historySheetStorage.js";
+import {
   mergeStationConfig,
   parsePartialStationConfig,
   parseStationConfig,
@@ -139,6 +149,59 @@ const handleMediaUpload = (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+const historySheetUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: MAX_HISTORY_SHEET_UPLOAD_SIZE_BYTES,
+    files: 1,
+    fields: 0,
+    parts: 1,
+  },
+  fileFilter: (_req, file, callback) => {
+    const extension = path.extname(file.originalname).toLowerCase();
+    const expectedMimeType =
+      extension === ".pdf"
+        ? "application/pdf"
+        : extension === ".docx"
+          ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          : null;
+    if (!expectedMimeType || file.mimetype.toLowerCase() !== expectedMimeType) {
+      callback(
+        Object.assign(new Error("Upload a PDF or DOCX History Sheet."), {
+          statusCode: 400,
+        }),
+      );
+      return;
+    }
+    callback(null, true);
+  },
+});
+
+const handleHistorySheetUpload = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  historySheetUpload.single("file")(req, res, (error: unknown) => {
+    if (!error) {
+      next();
+      return;
+    }
+
+    const tooLarge =
+      error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE";
+    const status = tooLarge
+      ? 413
+      : (error as { statusCode?: number }).statusCode ?? 400;
+    const message = tooLarge
+      ? `History Sheet exceeds the maximum allowed size of ${MAX_HISTORY_SHEET_UPLOAD_SIZE_MB} MB.`
+      : error instanceof Error
+        ? error.message
+        : "Could not upload the History Sheet.";
+    res.status(status).json({ error: message });
+  });
+};
+
 async function saveExamMediaFile(input: {
   file: Express.Multer.File;
   caseSlug: string;
@@ -208,6 +271,10 @@ router.get("/media/config", (_req, res) => {
   res.json({ maxVideoUploadSizeMb: MAX_VIDEO_UPLOAD_SIZE_MB });
 });
 
+router.get("/history-sheet/config", (_req, res) => {
+  res.json({ maxUploadSizeMb: MAX_HISTORY_SHEET_UPLOAD_SIZE_MB });
+});
+
 router.post("/media/upload", handleMediaUpload, async (req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ error: "A media file is required." });
@@ -250,6 +317,168 @@ router.post("/:id/media", handleMediaUpload, async (req, res) => {
     const status = (error as { status?: number }).status ?? 500;
     const message = error instanceof Error ? error.message : "Upload failed";
     res.status(status).json({ error: message });
+  }
+});
+
+router.get("/:id/history-sheet", async (req, res) => {
+  try {
+    const caseData = await prisma.case.findUnique({
+      where: { id: String(req.params.id) },
+      select: {
+        id: true,
+        historySheet: {
+          select: {
+            fileName: true,
+            mimeType: true,
+            fileSize: true,
+            uploadedAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+    if (!caseData) return res.status(404).json({ error: "Case not found." });
+    return res.json({ historySheet: caseData.historySheet });
+  } catch (error) {
+    console.error("[history-sheet] metadata lookup failed", error);
+    return res.status(500).json({ error: "Could not load History Sheet metadata." });
+  }
+});
+
+router.post(
+  "/:id/history-sheet",
+  handleHistorySheetUpload,
+  async (req, res) => {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "A History Sheet file is required." });
+    }
+    const caseId = String(req.params.id);
+    let storedPath: string | null = null;
+    try {
+      const caseData = await prisma.case.findUnique({
+        where: { id: caseId },
+        select: { id: true },
+      });
+      if (!caseData) return res.status(404).json({ error: "Case not found." });
+
+      const validated = validateHistorySheetUpload(file);
+      const root = await ensureHistorySheetStorageRoot();
+      const storageKey = createHistorySheetStorageKey(validated.extension);
+      const finalPath = resolveHistorySheetPath(storageKey);
+      const temporaryPath = path.join(root, `${storageKey}.tmp`);
+      try {
+        await fs.writeFile(temporaryPath, file.buffer, { flag: "wx" });
+        await fs.rename(temporaryPath, finalPath);
+      } catch (error) {
+        try {
+          await fs.unlink(temporaryPath);
+        } catch (cleanupError) {
+          if ((cleanupError as NodeJS.ErrnoException).code !== "ENOENT") {
+            console.error("[history-sheet] temporary file cleanup failed", cleanupError);
+          }
+        }
+        throw error;
+      }
+      storedPath = finalPath;
+
+      const previous = await prisma.historySheet.findUnique({
+        where: { caseId },
+        select: { storageKey: true },
+      });
+      const historySheet = await prisma.historySheet.upsert({
+        where: { caseId },
+        create: {
+          caseId,
+          fileName: validated.fileName,
+          mimeType: validated.mimeType,
+          fileSize: file.size,
+          storageKey,
+        },
+        update: {
+          fileName: validated.fileName,
+          mimeType: validated.mimeType,
+          fileSize: file.size,
+          storageKey,
+        },
+        select: {
+          fileName: true,
+          mimeType: true,
+          fileSize: true,
+          uploadedAt: true,
+          updatedAt: true,
+        },
+      });
+
+      let warning: string | undefined;
+      if (previous && previous.storageKey !== storageKey) {
+        try {
+          await removeHistorySheetFile(previous.storageKey);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            console.error("[history-sheet] replaced file cleanup failed", error);
+            warning = "The new History Sheet is active, but the replaced file could not be cleaned up.";
+          }
+        }
+      }
+
+      return res.status(201).json({
+        historySheet,
+        ...(warning ? { warning } : {}),
+      });
+    } catch (error) {
+      if (storedPath) {
+        try {
+          await fs.unlink(storedPath);
+        } catch (cleanupError) {
+          console.error("[history-sheet] failed upload cleanup failed", cleanupError);
+        }
+      }
+      if (error instanceof HistorySheetValidationError) {
+        return res.status(error.statusCode).json({ error: error.message });
+      }
+      console.error("[history-sheet] upload failed", error);
+      return res.status(500).json({
+        error: "Could not save the History Sheet. The existing attachment was not changed.",
+      });
+    }
+  },
+);
+
+router.delete("/:id/history-sheet", async (req, res) => {
+  const caseId = String(req.params.id);
+  try {
+    const current = await prisma.historySheet.findUnique({
+      where: { caseId },
+      select: { storageKey: true },
+    });
+    if (!current) {
+      const caseExists = await prisma.case.findUnique({
+        where: { id: caseId },
+        select: { id: true },
+      });
+      return res
+        .status(404)
+        .json({ error: caseExists ? "History Sheet not found." : "Case not found." });
+    }
+
+    await prisma.historySheet.delete({ where: { caseId } });
+    let warning: string | undefined;
+    try {
+      await removeHistorySheetFile(current.storageKey);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+        console.error("[history-sheet] deleted file cleanup failed", error);
+        warning = "The attachment was removed, but its stored file could not be cleaned up.";
+      }
+    }
+    return res.json({
+      historySheet: null,
+      ...(warning ? { warning } : {}),
+    });
+  } catch (error) {
+    console.error("[history-sheet] delete failed", error);
+    return res.status(500).json({ error: "Could not remove the History Sheet." });
   }
 });
 
@@ -385,7 +614,11 @@ router.delete("/:id", async (req, res) => {
     const caseId = req.params.id;
     const existing = await prisma.case.findUnique({
       where: { id: caseId },
-      select: { id: true, titleEn: true },
+      select: {
+        id: true,
+        titleEn: true,
+        historySheet: { select: { storageKey: true } },
+      },
     });
     if (!existing) {
       return res.status(404).json({ error: "Case not found" });
@@ -412,6 +645,16 @@ router.delete("/:id", async (req, res) => {
       await tx.aiKnowledgeEntry.deleteMany({ where: { caseId } });
       await tx.case.delete({ where: { id: caseId } });
     });
+
+    if (existing.historySheet) {
+      try {
+        await removeHistorySheetFile(existing.historySheet.storageKey);
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+          console.error("[history-sheet] case deletion cleanup failed", error);
+        }
+      }
+    }
 
     res.json({ message: "Case deleted", id: caseId, titleEn: existing.titleEn });
   } catch (error) {

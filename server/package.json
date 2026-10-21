@@ -12,6 +12,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx src/seed.ts",
+    "test:history-sheet": "tsx --test src/lib/historySheetStorage.test.ts",
     "db:prune-users": "tsx scripts/prune-users.ts",
     "db:delete-user": "tsx scripts/delete-user.ts",
     "grant-plan": "tsx scripts/grant-plan.ts",

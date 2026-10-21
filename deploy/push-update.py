@@ -85,6 +85,7 @@ cd "$APP"
 if [ -f server/.env ]; then cp server/.env /tmp/synoza-server.env.bak; fi
 # Preserve uploaded media outside the wiped app tree
 mkdir -p /home/adminanmkavps/synoza-media/exam/cases
+mkdir -p /home/adminanmkavps/synoza-media/history-sheets
 mkdir -p /home/adminanmkavps/synoza-media/knowledge
 if [ -d "$APP/client/public/exam/cases" ]; then
   cp -an "$APP/client/public/exam/cases/." /home/adminanmkavps/synoza-media/exam/cases/ 2>/dev/null || true
@@ -100,6 +101,8 @@ if [ -f /tmp/synoza-server.env.bak ]; then
   grep -q '^EMAIL_SITE_URL=' server/.env || echo 'EMAIL_SITE_URL=https://synozaa.com' >> server/.env
   grep -q '^CLIENT_URL=' server/.env || echo 'CLIENT_URL=https://synozaa.com' >> server/.env
   grep -q '^SYNOZA_EXAM_MEDIA_ROOT=' server/.env || echo 'SYNOZA_EXAM_MEDIA_ROOT=/home/adminanmkavps/synoza-media/exam' >> server/.env
+  grep -q '^SYNOZA_HISTORY_SHEET_ROOT=' server/.env || echo 'SYNOZA_HISTORY_SHEET_ROOT=/home/adminanmkavps/synoza-media/history-sheets' >> server/.env
+  grep -q '^HISTORY_SHEET_MAX_UPLOAD_SIZE_MB=' server/.env || echo 'HISTORY_SHEET_MAX_UPLOAD_SIZE_MB=20' >> server/.env
   grep -q '^SYNOZA_AI_KNOWLEDGE_ROOT=' server/.env || echo 'SYNOZA_AI_KNOWLEDGE_ROOT=/home/adminanmkavps/synoza-media/knowledge' >> server/.env
   sed -i 's|^CLIENT_URL=.*|CLIENT_URL=https://synozaa.com|' server/.env
   sed -i 's|^EMAIL_SITE_URL=.*|EMAIL_SITE_URL=https://synozaa.com|' server/.env
@@ -107,6 +110,7 @@ fi
 cd "$APP/server"
 export NODE_ENV=production
 export SYNOZA_EXAM_MEDIA_ROOT=/home/adminanmkavps/synoza-media/exam
+export SYNOZA_HISTORY_SHEET_ROOT=/home/adminanmkavps/synoza-media/history-sheets
 export SYNOZA_AI_KNOWLEDGE_ROOT=/home/adminanmkavps/synoza-media/knowledge
 npm install --omit=dev
 npm install prisma @prisma/client tsx --no-save
