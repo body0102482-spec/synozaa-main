@@ -28,6 +28,28 @@ export interface SessionMessage {
   createdAt?: Date | string;
 }
 
+export type RealtimePatientCase = Pick<
+  Case,
+  | 'patientName'
+  | 'patientAge'
+  | 'patientGender'
+  | 'patientNationality'
+  | 'patientBirthPlace'
+  | 'patientResidence'
+  | 'patientOccupation'
+  | 'patientMaritalStatus'
+  | 'patientSmokingStatus'
+  | 'patientAlcoholStatus'
+  | 'medicationHistory'
+  | 'familyHistory'
+  | 'socialHistory'
+  | 'surgicalHistory'
+  | 'chiefComplaint'
+  | 'medicalHistory'
+  | 'patientPersonality'
+  | 'scenarioPrompt'
+>;
+
 export interface EvaluationSessionContext {
   completedManeuvers?: string[];
   durationSeconds?: number;
@@ -3344,7 +3366,11 @@ function mockPatientResponse(
     : 'Yes doctor, I am listening.';
 }
 
-export function buildRealtimePatientInstructions(caseData: Case, sessionLanguage: string): string {
+export function buildRealtimePatientInstructions(
+  caseData: RealtimePatientCase,
+  sessionLanguage: string,
+  patientBehavior?: PatientBehavior | null,
+): string {
   const lang: Language = sessionLanguage === 'EN' ? 'EN' : 'AR';
   const structuredContext = [
     ['Sex', caseData.patientGender], ['Nationality', caseData.patientNationality],
@@ -3354,13 +3380,22 @@ export function buildRealtimePatientInstructions(caseData: Case, sessionLanguage
     ['Medication history', caseData.medicationHistory], ['Family history', caseData.familyHistory],
     ['Social history', caseData.socialHistory], ['Surgical history', caseData.surgicalHistory],
   ].map(([label, value]) => `- ${label}: ${String(value || 'Not specified — make a realistic, safe assumption in character if asked')}`).join('\n');
+  const personaContext = patientBehavior
+    ? lang === 'EN'
+      ? `\n\nPERSONALITY: ${caseData.patientPersonality || 'A cooperative Egyptian patient, anxious about the symptoms.'}
+SCENARIO: ${caseData.scenarioPrompt || 'A standard OSCE patient encounter.'}
+${formatPatientBehaviorPrompt(patientBehavior)}`
+      : `\n\nالشخصية: ${caseData.patientPersonality || 'مريض مصري متعاون وقلق من الأعراض.'}
+السياق: ${caseData.scenarioPrompt || 'مقابلة OSCE مع مريض.'}
+${formatPatientBehaviorPrompt(patientBehavior)}`
+    : '';
   if (lang === 'EN') {
     return `You are ${caseData.patientName}, a ${caseData.patientAge}-year-old PATIENT in an OSCE voice call. You are NOT the doctor. You NEVER interview or examine the doctor.
 
 Background (only if asked about that specific topic):
 - Chief complaint: ${caseData.chiefComplaint}
 - History: ${caseData.medicalHistory}
-${structuredContext}
+${structuredContext}${personaContext}
 
 STRICT RULES:
 1. Wait for the doctor's question, then answer naturally.
@@ -3378,7 +3413,7 @@ STRICT RULES:
 الخلفية (ممنوع تذكرها إلا لو الدكتور سأل عن نفس الموضوع بالتحديد):
 - الشكوى: ${caseData.chiefComplaint}
 - التاريخ: ${caseData.medicalHistory}
-${structuredContext}
+${structuredContext}${personaContext}
 
 قواعد صارمة للمكالمة الصوتية:
 1. استنى سؤال الدكتور، وبعدين أجب بشكل طبيعي بالعامية المصرية (Egyptian colloquial Arabic) فقط.
@@ -6465,4 +6500,3 @@ export function studentGaveUpAnswer(answer: string): boolean {
   if (!normalized) return false;
   return GAVE_UP_ANSWER_PATTERNS.some((pattern) => pattern.test(normalized));
 }
-

@@ -44,6 +44,11 @@ enum SessionStatus {
   ABANDONED
 }
 
+enum SessionType {
+  CHAT
+  LIVE_VOICE
+}
+
 enum MessageRole {
   STUDENT
   PATIENT
@@ -269,25 +274,30 @@ model CaseUniversityOverride {
 }
 
 model Session {
-  id                     String        @id @default(cuid())
-  userId                 String
-  caseId                 String
-  status                 SessionStatus @default(IN_PROGRESS)
-  currentStage           String        @default("history")
-  activeManeuver         String?
-  completedManeuvers     String        @default("[]")
-  resolvedStationConfig  String        @default("{}")
-  language               Language      @default(AUTO)
-  startedAt       DateTime      @default(now())
-  completedAt     DateTime?
-  durationSeconds Int           @default(0)
-  aiPromptTokens     Int        @default(0)
-  aiCompletionTokens Int        @default(0)
-  aiTotalTokens      Int        @default(0)
-  user            User          @relation(fields: [userId], references: [id])
-  case            Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  messages        Message[]
-  result          Result?
+  id                    String        @id @default(cuid())
+  userId                String
+  caseId                String
+  status                SessionStatus @default(IN_PROGRESS)
+  sessionType           SessionType   @default(CHAT)
+  creditCost            Int           @default(1)
+  idempotencyKey        String?
+  currentStage          String        @default("history")
+  activeManeuver        String?
+  completedManeuvers    String        @default("[]")
+  resolvedStationConfig String        @default("{}")
+  language              Language      @default(AUTO)
+  startedAt             DateTime      @default(now())
+  completedAt           DateTime?
+  durationSeconds       Int           @default(0)
+  aiPromptTokens        Int           @default(0)
+  aiCompletionTokens    Int           @default(0)
+  aiTotalTokens         Int           @default(0)
+  user                  User          @relation(fields: [userId], references: [id])
+  case                  Case          @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  messages              Message[]
+  result                Result?
+
+  @@unique([userId, idempotencyKey])
 }
 
 model Message {

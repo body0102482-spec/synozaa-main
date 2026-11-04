@@ -75,6 +75,8 @@ To enable real AI:
 2. Add your `OPENAI_API_KEY`
 3. Or configure via Admin Dashboard → AI Settings
 
+To enable Google Live Voice for `LIVE_VOICE` sessions, set `GEMINI_API_KEY` in the server environment. The backend exchanges it for a short-lived, single-use token; do not put the permanent key in the client environment.
+
 ## Contact
 
 Phone: **01024828652**

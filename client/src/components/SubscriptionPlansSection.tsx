@@ -4,6 +4,7 @@ import { Crown, Phone, Sparkles, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { IconBox } from './IconBox';
 import api from '../lib/api';
+import { startSession } from '../lib/sessionStart';
 import { dispatchEntitlementsChanged } from '../lib/entitlementsEvents';
 import { PlanMarketingCards, type PlanOption } from './PlanMarketingCards';
 
@@ -72,7 +73,7 @@ export function SubscriptionPlansSection({
   const startFreeCase = async (caseId: string) => {
     setStartingCaseId(caseId);
     try {
-      const res = await api.post('/sessions/start', { caseId, language: 'AR' });
+      const res = await startSession(caseId);
       if (res.data.entitlements) {
         dispatchEntitlementsChanged(res.data.entitlements);
       } else {

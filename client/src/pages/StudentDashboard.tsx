@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Clock, Play, Lock } from 'lucide-react';
 import api from '../lib/api';
+import { startSession } from '../lib/sessionStart';
 import { boardDisplayName } from '../lib/boardLabels';
 import { BoardIcon, getBoardIconBg } from '../components/BoardIcon';
 import { BlindMockOsceCard } from '../components/student/BlindMockOsceCard';
-import { StartCaseConfirmDialog } from '../components/student/StartCaseConfirmDialog';
+import { StartCaseConfirmDialog, type SessionTypeOption } from '../components/student/StartCaseConfirmDialog';
 import { StudentCaseCard } from '../components/student/StudentCaseCard';
 import { HistorySheetSection } from '../components/student/HistorySheetSection';
 import type { HistorySheetMetadata } from '../lib/historySheet';
@@ -168,6 +169,7 @@ export default function StudentDashboard() {
   const [randomSectionIds, setRandomSectionIds] = useState<string[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingStart, setPendingStart] = useState<PendingCaseStart | null>(null);
+  const [selectedSessionType, setSelectedSessionType] = useState<SessionTypeOption>('CHAT');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const randomErrorRef = useRef<HTMLDivElement>(null);
 
@@ -320,8 +322,8 @@ export default function StudentDashboard() {
     return t('error');
   };
 
-  const launchSession = async (caseId: string) => {
-    const res = await api.post('/sessions/start', { caseId, language: 'AR' });
+  const launchSession = async (caseId: string, sessionType: SessionTypeOption = selectedSessionType) => {
+    const res = await startSession(caseId, 'AR', sessionType);
     if (res.data.entitlements) {
       setEntitlements(res.data.entitlements);
       dispatchEntitlementsChanged(res.data.entitlements);
@@ -331,16 +333,16 @@ export default function StudentDashboard() {
     navigate(`/simulation/${res.data.session.id}`, { state: { fromCaseStart: true } });
   };
 
-  const startStation = async (caseId: string) => {
+  const startStation = async (caseId: string, sessionType: SessionTypeOption = selectedSessionType) => {
     setStartError(null);
     try {
-      await launchSession(caseId);
+      await launchSession(caseId, sessionType);
     } catch (err: unknown) {
       showStartError(resolveStartError(err));
     }
   };
 
-  const startRandomCase = async (categoryIds?: string[]) => {
+  const startRandomCase = async (categoryIds?: string[], sessionType: SessionTypeOption = selectedSessionType) => {
     const ids = (categoryIds ?? []).filter(Boolean);
     setStartError(null);
     setRandomLoading(ids.length ? 'section' : 'all');
@@ -356,7 +358,7 @@ export default function StudentDashboard() {
         showStartError(t('error'));
         return;
       }
-      await launchSession(caseId);
+      await launchSession(caseId, sessionType);
     } catch (err: unknown) {
       showStartError(resolveStartError(err, ids.length ? 'section' : 'all'));
     } finally {
@@ -371,11 +373,11 @@ export default function StudentDashboard() {
     setConfirmLoading(true);
     try {
       if (pending.type === 'random') {
-        await startRandomCase(pending.categoryIds);
+        await startRandomCase(pending.categoryIds, selectedSessionType);
       } else {
         setConfirmOpen(false);
         setPendingStart(null);
-        await startStation(pending.caseId);
+        await startStation(pending.caseId, selectedSessionType);
       }
     } finally {
       if (pending.type !== 'random') setConfirmLoading(false);
@@ -428,9 +430,11 @@ export default function StudentDashboard() {
         pending={pendingStart}
         entitlements={entitlements}
         confirming={confirmLoading}
+        selectedSessionType={selectedSessionType}
         title={t('startCaseConfirmTitle')}
         confirmLabel={t('startCaseConfirmButton')}
         cancelLabel={t('stayInExam')}
+        onSessionTypeChange={setSelectedSessionType}
         onConfirm={() => pendingStart && void executePendingStart(pendingStart)}
         onCancel={() => {
           if (confirmLoading) return;

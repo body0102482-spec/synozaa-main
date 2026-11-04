@@ -1,7 +1,97 @@
-import type { Language, Prisma, SubscriptionPlan } from '@prisma/client';
+import type { Language, Prisma, SessionType, SubscriptionPlan } from '@prisma/client';
 import { prisma } from '../lib/prisma.js';
 
 export const FREE_ATTEMPTS_PER_MONTH = 5;
+
+export class SessionStartError extends Error {
+  constructor(
+    public readonly code: 'INVALID_SESSION_TYPE' | 'IDEMPOTENCY_KEY_CONFLICT' | 'INSUFFICIENT_CREDITS' | 'SUBSCRIPTION_REQUIRED' | 'SESSION_START_CONFLICT',
+    public readonly details?: { required?: number; available?: number },
+  ) {
+    super(code);
+    this.name = 'SessionStartError';
+  }
+}
+
+export function normalizeSessionType(value: unknown): SessionType {
+  if (value === undefined || value === null) return 'CHAT';
+  if (typeof value !== 'string') throw new SessionStartError('INVALID_SESSION_TYPE');
+  const normalized = value.trim().toUpperCase();
+  if (normalized === 'CHAT' || normalized === 'LIVE_VOICE') return normalized;
+  throw new SessionStartError('INVALID_SESSION_TYPE');
+}
+
+export function getSessionCreditCost(sessionType: SessionType): number {
+  return sessionType === 'LIVE_VOICE' ? 3 : 1;
+}
+
+export type SessionStartTransactionRunner = <T>(
+  operation: (tx: Prisma.TransactionClient) => Promise<T>,
+) => Promise<T>;
+
+const runSerializableSessionTransaction: SessionStartTransactionRunner = (operation) =>
+  prisma.$transaction(operation, { isolationLevel: 'Serializable' });
+
+const SESSION_START_INCLUDE = {
+  case: { include: { specialty: true, difficulty: true } },
+  messages: { orderBy: { createdAt: 'asc' as const } },
+};
+
+function isPrismaErrorCode(error: unknown, code: string): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === code
+  );
+}
+
+function assertMatchingIdempotentSession(
+  existing: { caseId: string; sessionType: SessionType },
+  caseId: string,
+  sessionType: SessionType,
+) {
+  if (existing.caseId !== caseId || existing.sessionType !== sessionType) {
+    throw new SessionStartError('IDEMPOTENCY_KEY_CONFLICT');
+  }
+}
+
+async function runSessionStartTransaction<T>(
+  operation: (tx: Prisma.TransactionClient) => Promise<T>,
+  transactionRunner: SessionStartTransactionRunner,
+  recoverExisting: () => Promise<T | null>,
+): Promise<T> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await transactionRunner(operation);
+    } catch (error) {
+      if (isPrismaErrorCode(error, 'P2034') && attempt < 2) continue;
+      if (isPrismaErrorCode(error, 'P2002')) {
+        const existing = await recoverExisting();
+        if (existing !== null) return existing;
+      }
+      if (isPrismaErrorCode(error, 'P2034')) {
+        throw new SessionStartError('SESSION_START_CONFLICT');
+      }
+      throw error;
+    }
+  }
+  throw new SessionStartError('SESSION_START_CONFLICT');
+}
+
+export async function findSessionStartByIdempotencyKey(
+  userId: string,
+  key: string,
+  caseId: string,
+  sessionType: SessionType,
+) {
+  const existing = await prisma.session.findFirst({
+    where: { userId, idempotencyKey: key },
+    include: SESSION_START_INCLUDE,
+  });
+  if (existing) assertMatchingIdempotentSession(existing, caseId, sessionType);
+  return existing;
+}
 
 export function calculateCaseQuota(
   baseCasesQuota: number,
@@ -220,12 +310,14 @@ async function getFreeAttemptsUsed(userId: string) {
 }
 
 async function getUsedCaseCredits(userId: string, since?: Date | null) {
-  return prisma.session.count({
+  const usage = await prisma.session.aggregate({
     where: {
       userId,
       ...(since ? { startedAt: { gte: since } } : {}),
     },
+    _sum: { creditCost: true },
   });
+  return usage._sum.creditCost ?? 0;
 }
 
 export async function getUserEntitlements(userId: string) {
@@ -370,8 +462,20 @@ export async function createFreeCaseSession(
   caseId: string,
   language: Language,
   resolvedStationConfig: string,
+  sessionType: SessionType,
+  idempotencyKey: string,
+  transactionRunner: SessionStartTransactionRunner = runSerializableSessionTransaction,
 ) {
-  return prisma.$transaction(async (tx) => {
+  return runSessionStartTransaction(async (tx) => {
+    const existing = await tx.session.findFirst({
+      where: { userId, idempotencyKey },
+      include: SESSION_START_INCLUDE,
+    });
+    if (existing) {
+      assertMatchingIdempotentSession(existing, caseId, sessionType);
+      return existing;
+    }
+
     const now = new Date();
     await ensureFreeUsageMonth(tx, userId, now);
     const user = await tx.user.findUnique({
@@ -394,11 +498,16 @@ export async function createFreeCaseSession(
     if (claimed.count !== 1) return null;
 
     const session = await tx.session.create({
-      data: { userId, caseId, language, resolvedStationConfig },
-      include: {
-        case: { include: { specialty: true, difficulty: true } },
-        messages: { orderBy: { createdAt: 'asc' } },
+      data: {
+        userId,
+        caseId,
+        language,
+        resolvedStationConfig,
+        sessionType,
+        creditCost: getSessionCreditCost(sessionType),
+        idempotencyKey,
       },
+      include: SESSION_START_INCLUDE,
     });
     await tx.caseAccess.upsert({
       where: { userId_caseId: { userId, caseId } },
@@ -406,7 +515,84 @@ export async function createFreeCaseSession(
       update: { attempts: { increment: 1 } },
     });
     return session;
-  });
+  },
+  transactionRunner,
+  () => findSessionStartByIdempotencyKey(userId, idempotencyKey, caseId, sessionType));
+}
+
+export async function createPaidCaseSession(
+  userId: string,
+  caseId: string,
+  language: Language,
+  resolvedStationConfig: string,
+  sessionType: SessionType,
+  idempotencyKey: string,
+  transactionRunner: SessionStartTransactionRunner = runSerializableSessionTransaction,
+) {
+  const creditCost = getSessionCreditCost(sessionType);
+  return runSessionStartTransaction(async (tx) => {
+    const existing = await tx.session.findFirst({
+      where: { userId, idempotencyKey },
+      include: SESSION_START_INCLUDE,
+    });
+    if (existing) {
+      assertMatchingIdempotentSession(existing, caseId, sessionType);
+      return existing;
+    }
+
+    const subscription = await tx.subscription.findFirst({
+      where: { userId, status: 'ACTIVE' },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (!subscription || !isPaidPlan(subscription.plan)) {
+      throw new SessionStartError('SUBSCRIPTION_REQUIRED');
+    }
+
+    const [user, usage] = await Promise.all([
+      tx.user.findUnique({
+        where: { id: userId },
+        select: { casesQuotaOverride: true },
+      }),
+      tx.session.aggregate({
+        where: { userId, startedAt: { gte: subscription.startDate } },
+        _sum: { creditCost: true },
+      }),
+    ]);
+    const usedCredits = usage._sum.creditCost ?? 0;
+    const quota = calculateCaseQuota(
+      subscription.casesQuota,
+      user?.casesQuotaOverride,
+      usedCredits,
+    ).casesQuota;
+    const availableCredits = Math.max(0, quota - usedCredits);
+    if (availableCredits < creditCost) {
+      throw new SessionStartError('INSUFFICIENT_CREDITS', {
+        required: creditCost,
+        available: availableCredits,
+      });
+    }
+
+    const session = await tx.session.create({
+      data: {
+        userId,
+        caseId,
+        language,
+        resolvedStationConfig,
+        sessionType,
+        creditCost,
+        idempotencyKey,
+      },
+      include: SESSION_START_INCLUDE,
+    });
+    await tx.caseAccess.upsert({
+      where: { userId_caseId: { userId, caseId } },
+      create: { userId, caseId, attempts: 1 },
+      update: { attempts: { increment: 1 } },
+    });
+    return session;
+  },
+  transactionRunner,
+  () => findSessionStartByIdempotencyKey(userId, idempotencyKey, caseId, sessionType));
 }
 
 export async function pickRandomEligibleCase(

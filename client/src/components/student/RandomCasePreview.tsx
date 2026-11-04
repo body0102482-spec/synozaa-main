@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Shuffle, Loader2 } from 'lucide-react';
 import api from '../../lib/api';
+import { startSession } from '../../lib/sessionStart';
 import { dispatchEntitlementsChanged } from '../../lib/entitlementsEvents';
 import { StartCaseConfirmDialog } from './StartCaseConfirmDialog';
 import { shouldConfirmCaseStart } from '../../lib/startCaseConfirm';
@@ -38,7 +39,7 @@ export function RandomCasePreview({ entitlements, categoryRootId }: RandomCasePr
         setError(t('error'));
         return;
       }
-      const sessionRes = await api.post('/sessions/start', { caseId, language: 'AR' });
+      const sessionRes = await startSession(caseId);
       if (sessionRes.data.entitlements) {
         dispatchEntitlementsChanged(sessionRes.data.entitlements);
       } else {

@@ -12,11 +12,24 @@ import {
   sanitizeRealtimePatientTranscript,
   unwrapExaminerPlainText,
 } from '../services/aiService.js';
-import { checkCanStartCase, createFreeCaseSession, getUserEntitlements, recordCaseAttempt } from '../services/subscriptionService.js';
+import {
+  checkCanStartCase,
+  createFreeCaseSession,
+  createPaidCaseSession,
+  findSessionStartByIdempotencyKey,
+  getUserEntitlements,
+  normalizeSessionType,
+  SessionStartError,
+} from '../services/subscriptionService.js';
 import { serializeResolvedStationConfigForUser } from '../services/caseResolveService.js';
 import { applySessionXp, getRankProgress } from '../services/xpService.js';
 import { processTextTurn, processVoiceTurn } from '../services/voiceTurnService.js';
 import { createRealtimePatientCallAnswer, isRealtimeConfigured } from '../services/realtimePatientService.js';
+import {
+  buildGeminiLiveSessionConfig,
+  createGeminiLiveEphemeralToken,
+  isLiveVoiceSessionType,
+} from '../services/geminiLiveService.js';
 import { createOpenRouterPatientAudioTurn, isOpenRouterAudioEnabled, OpenRouterAudioError, openRouterAudioInputFormat, transcribeOpenRouterAudio } from '../services/openRouterAudioService.js';
 import {
   buildExaminerVivaOpening,
@@ -71,9 +84,122 @@ router.get('/:id/voice-provider', (_req, res) => {
   return res.json({ provider: 'live_call' });
 });
 
+router.post('/:id/live-voice/token', async (req, res) => {
+  try {
+    const session = await prisma.session.findFirst({
+      where: { id: req.params.id, userId: req.user!.id, status: 'IN_PROGRESS' },
+      include: { case: true },
+    });
+    if (!session) return res.status(404).json({ error: 'Active session not found' });
+    if (!isLiveVoiceSessionType(session.sessionType)) {
+      return res.status(403).json({ error: 'LIVE_VOICE_SESSION_REQUIRED' });
+    }
+
+    const stationConfig = getSessionStationConfig(session);
+    const config = buildGeminiLiveSessionConfig(
+      session.case,
+      session.language,
+      stationConfig.patientBehavior,
+    );
+    const token = await createGeminiLiveEphemeralToken(config);
+    return res.json(token);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Gemini Live is unavailable';
+    if (message === 'gemini-live-unavailable') {
+      return res.status(503).json({ error: 'Gemini Live is not configured' });
+    }
+    if (message === 'gemini-live-token-failed' || message === 'gemini-live-token-invalid') {
+      return res.status(502).json({ error: 'Gemini Live could not create a secure call token' });
+    }
+    console.error('[live-voice/token]', error);
+    return res.status(500).json({ error: 'Failed to start Live Voice' });
+  }
+});
+
+router.post('/:id/live-voice/message', async (req, res) => {
+  try {
+    const { content, role } = req.body as {
+      content?: string;
+      role?: 'STUDENT' | 'PATIENT';
+    };
+    const text = content?.trim();
+    if (!text || (role !== 'STUDENT' && role !== 'PATIENT')) {
+      return res.status(400).json({ error: 'Valid voice transcript and role required' });
+    }
+
+    const session = await prisma.session.findFirst({
+      where: { id: req.params.id, userId: req.user!.id, status: 'IN_PROGRESS' },
+      include: { case: true },
+    });
+    if (!session) return res.status(404).json({ error: 'Active session not found' });
+    if (session.sessionType !== 'LIVE_VOICE') {
+      return res.status(403).json({ error: 'LIVE_VOICE_SESSION_REQUIRED' });
+    }
+
+    let contentToSave = text;
+    if (role === 'PATIENT') {
+      const lastStudentMessage = await prisma.message.findFirst({
+        where: { sessionId: session.id, role: MessageRole.STUDENT, stage: 'history' },
+        orderBy: { createdAt: 'desc' },
+      });
+      contentToSave = sanitizeRealtimePatientTranscript(
+        session.case,
+        lastStudentMessage?.content ?? '',
+        text,
+        session.language,
+      );
+    }
+    const message = await prisma.message.create({
+      data: {
+        sessionId: session.id,
+        role: role === 'PATIENT' ? MessageRole.PATIENT : MessageRole.STUDENT,
+        content: contentToSave,
+        stage: 'history',
+      },
+    });
+    return res.json({ message });
+  } catch (error) {
+    console.error('[live-voice/message]', error);
+    return res.status(500).json({ error: 'Failed to save Live Voice transcript' });
+  }
+});
+
 router.post('/start', async (req, res) => {
-  const { caseId, language = 'AUTO' } = req.body;
+  const { caseId, language = 'AUTO' } = req.body ?? {};
   const userId = req.user!.id;
+  let sessionType: ReturnType<typeof normalizeSessionType>;
+  try {
+    sessionType = normalizeSessionType(req.body?.sessionType);
+  } catch (error) {
+    if (error instanceof SessionStartError && error.code === 'INVALID_SESSION_TYPE') {
+      return res.status(400).json({ error: error.code });
+    }
+    throw error;
+  }
+
+  const idempotencyKey = String(req.get('Idempotency-Key') || '').trim();
+  if (!idempotencyKey || idempotencyKey.length > 128) {
+    return res.status(400).json({ error: 'IDEMPOTENCY_KEY_REQUIRED' });
+  }
+
+  let existingSession;
+  try {
+    existingSession = await findSessionStartByIdempotencyKey(
+      userId,
+      idempotencyKey,
+      String(caseId || ''),
+      sessionType,
+    );
+  } catch (error) {
+    if (error instanceof SessionStartError && error.code === 'IDEMPOTENCY_KEY_CONFLICT') {
+      return res.status(409).json({ error: error.code });
+    }
+    throw error;
+  }
+  if (existingSession) {
+    const entitlements = await getUserEntitlements(userId);
+    return res.json({ session: existingSession, entitlements });
+  }
 
   const caseData = await prisma.case.findUnique({ where: { id: caseId, isPublished: true } });
   if (!caseData) return res.status(404).json({ error: 'Case not found' });
@@ -117,30 +243,54 @@ router.post('/start', async (req, res) => {
 
   const languageValue = sessionLanguage as Language;
   let session;
-  if ('attemptsRemaining' in access) {
-    session = await createFreeCaseSession(
-      userId,
-      caseId,
-      languageValue,
-      resolvedStationConfig,
-    );
-    if (!session) {
-      return res.status(403).json({
-        error: 'FREE_LIMIT_REACHED',
-        message: 'You have used all free case attempts this month. Upgrade to continue.',
-        attempts: access.attempts,
-        limit: access.limit,
-      });
+  try {
+    if ('attemptsRemaining' in access) {
+      session = await createFreeCaseSession(
+        userId,
+        caseId,
+        languageValue,
+        resolvedStationConfig,
+        sessionType,
+        idempotencyKey,
+      );
+      if (!session) {
+        return res.status(403).json({
+          error: 'FREE_LIMIT_REACHED',
+          message: 'You have used all free case attempts this month. Upgrade to continue.',
+          attempts: access.attempts,
+          limit: access.limit,
+        });
+      }
+    } else {
+      session = await createPaidCaseSession(
+        userId,
+        caseId,
+        languageValue,
+        resolvedStationConfig,
+        sessionType,
+        idempotencyKey,
+      );
     }
-  } else {
-    session = await prisma.session.create({
-      data: { userId, caseId, language: languageValue, resolvedStationConfig },
-      include: {
-        case: { include: { specialty: true, difficulty: true } },
-        messages: { orderBy: { createdAt: 'asc' } },
-      },
-    });
-    await recordCaseAttempt(userId, caseId);
+  } catch (error) {
+    if (error instanceof SessionStartError) {
+      if (error.code === 'INSUFFICIENT_CREDITS') {
+        return res.status(403).json({
+          error: error.code,
+          requiredCredits: error.details?.required,
+          availableCredits: error.details?.available,
+        });
+      }
+      if (error.code === 'IDEMPOTENCY_KEY_CONFLICT') {
+        return res.status(409).json({ error: error.code });
+      }
+      if (error.code === 'SESSION_START_CONFLICT') {
+        return res.status(503).json({ error: error.code });
+      }
+      if (error.code === 'SUBSCRIPTION_REQUIRED') {
+        return res.status(403).json({ error: error.code });
+      }
+    }
+    throw error;
   }
 
   const entitlements = await getUserEntitlements(userId);

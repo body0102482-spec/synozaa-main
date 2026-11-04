@@ -59,7 +59,7 @@ import { SpeechLanguageToggle } from '../components/SpeechLanguageToggle';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useSpeechInput } from '../hooks/useSpeechInput';
 import { useLiveVoiceCall } from '../hooks/useLivePatientCall';
-import { useOpenAIRealtimeCall } from '../hooks/useOpenAIRealtimeCall';
+import { useGeminiLiveVoiceCall } from '../hooks/useGeminiLiveVoiceCall';
 import { stopSpeaking } from '../lib/speech';
 import { IS_MOBILE, unlockMobileAudio } from '../lib/mobileAudio';
 import type { VoiceTurnResponse } from '../lib/voiceTurn';
@@ -102,6 +102,7 @@ interface Session {
   activeManeuver: string | null;
   completedManeuvers: string;
   resolvedStationConfig?: string;
+  sessionType?: 'CHAT' | 'LIVE_VOICE';
   language: string;
   startedAt: string;
   case: {
@@ -304,6 +305,7 @@ export default function SimulationPage() {
         : activeStage === 'examination' || activeStage === 'diagnosis'
           ? 'examiner'
           : null;
+  const isLiveVoiceSession = session?.sessionType === 'LIVE_VOICE';
 
   // Always honor the speech-language toggle for mic + live call STT.
   // Previously patient context hardcoded ar-EG/AR, so EN speech was transcribed as Arabic letters.
@@ -520,7 +522,7 @@ export default function SimulationPage() {
     sessionLang: micSessionLang,
     sendMessage,
     speakReplies: false,
-    disabled: voiceCallContext !== 'patient' || sessionLocked,
+    disabled: isLiveVoiceSession || voiceCallContext !== 'patient' || sessionLocked,
     onError: handleLiveCallError,
   });
 
@@ -530,20 +532,44 @@ export default function SimulationPage() {
     sessionLang: micSessionLang,
     sendMessage,
     speakReplies: false,
-    disabled: voiceCallContext !== 'examiner' || sessionLocked,
+    disabled: isLiveVoiceSession || voiceCallContext !== 'examiner' || sessionLocked,
     onError: handleLiveCallError,
   });
 
   const isPatientLiveCall = voiceCallContext === 'patient';
-  const activeLiveCall = isPatientLiveCall ? patientLiveCall : examinerLiveCall;
+  const geminiLiveCall = useGeminiLiveVoiceCall({
+    sessionId: sessionId || '',
+    disabled: !isLiveVoiceSession || voiceCallContext !== 'patient' || sessionLocked,
+    onMessage: (message) => {
+      setSession((current) => {
+        if (!current || current.messages.some((item) => item.id === message.id)) return current;
+        return { ...current, messages: [...current.messages, message] };
+      });
+    },
+    onError: handleLiveCallError,
+  });
+  const activeLiveCall = isLiveVoiceSession
+    ? geminiLiveCall
+    : isPatientLiveCall
+      ? patientLiveCall
+      : examinerLiveCall;
+  const liveCallAvailable = isLiveVoiceSession
+    ? voiceCallContext === 'patient'
+    : !!voiceCallContext;
 
   useEffect(() => {
-    if (!voiceCallContext) {
+    if (!voiceCallContext || isLiveVoiceSession) {
       patientLiveCall.stopCall();
       examinerLiveCall.stopCall();
       stopListening();
     }
-  }, [voiceCallContext, patientLiveCall.stopCall, examinerLiveCall.stopCall, stopListening]);
+  }, [isLiveVoiceSession, voiceCallContext, patientLiveCall.stopCall, examinerLiveCall.stopCall, stopListening]);
+
+  useEffect(() => {
+    if (sessionLocked || (isLiveVoiceSession && voiceCallContext !== 'patient')) {
+      geminiLiveCall.stopCall();
+    }
+  }, [geminiLiveCall.stopCall, isLiveVoiceSession, sessionLocked, voiceCallContext]);
 
   useEffect(() => {
     // Language toggle must never leave STT running or auto-accept phantom results.
@@ -603,8 +629,8 @@ export default function SimulationPage() {
     isLiveCallBusy: activeLiveCall.isBusy,
     isLiveCallMicListening: activeLiveCall.isMicListening,
     isLiveCallSpeaking: activeLiveCall.isSpeaking,
-    isLiveCallSupported: activeLiveCall.isSupported,
-    onToggleLiveCall: voiceCallContext ? toggleLiveCall : undefined,
+    isLiveCallSupported: activeLiveCall.isSupported && liveCallAvailable,
+    onToggleLiveCall: liveCallAvailable ? toggleLiveCall : undefined,
     liveCallLabel: isPatientLiveCall && voiceProvider === 'openrouter_audio'
       ? 'Experimental OpenRouter audio'
       : t('liveCall'),
@@ -1312,6 +1338,7 @@ export default function SimulationPage() {
               onToggleMic={toggleMic}
               micError={micError}
               sessionLocked={sessionLocked}
+              liveVoiceMode={isLiveVoiceSession}
               {...liveCallInputProps}
             />
           )}
@@ -1929,6 +1956,7 @@ function HistoryChatView({
   onToggleLiveCall,
   liveCallLabel,
   endLiveCallLabel,
+  liveVoiceMode = false,
   sessionLocked = false,
 }: {
   t: (k: string) => string;
@@ -1959,9 +1987,11 @@ function HistoryChatView({
   onToggleLiveCall?: () => void;
   liveCallLabel?: string;
   endLiveCallLabel?: string;
+  liveVoiceMode?: boolean;
   sessionLocked?: boolean;
 }) {
   const isExaminerChat = showExaminerPanel && enableHistoryExaminer;
+  const patientVoiceMode = liveVoiceMode && !isExaminerChat;
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden p-3 sm:p-4 min-h-0">
@@ -2087,10 +2117,15 @@ function HistoryChatView({
           endRef={chatEndRef}
           scrollDeps={[messages, sending]}
           forceScroll={sending}
-          empty={messages.length === 0}
+          empty={messages.length === 0 || (liveVoiceMode && isLiveCall)}
           className="bg-white dark:bg-slate-900"
           emptyContent={
-            isExaminerChat ? (
+            liveVoiceMode && isLiveCall ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400">
+                <Mic size={28} className="mb-3 text-emerald-500 animate-pulse" />
+                <p className="font-medium">{t("liveCallMicActive")}</p>
+              </div>
+            ) : isExaminerChat ? (
               <div className="flex flex-col items-center text-slate-400 dark:text-slate-500 py-8">
                 <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
                   <Shield
@@ -2123,7 +2158,7 @@ function HistoryChatView({
             )
           }
         >
-          {messages.map((msg) => (
+          {!(liveVoiceMode && isLiveCall) && messages.map((msg) => (
             <div
               key={msg.id}
               className={`flex ${msg.role === "STUDENT" ? "justify-end" : "justify-start"}`}
@@ -2141,7 +2176,7 @@ function HistoryChatView({
               </div>
             </div>
           ))}
-          {sending && (
+          {!patientVoiceMode && sending && (
             <ChatTypingIndicator
               label={
                 isExaminerChat ? t("examinerTyping") : t("patientTyping")
@@ -2160,7 +2195,18 @@ function HistoryChatView({
               error={isLiveCall ? micError : undefined}
             />
           )}
-          <SimulationChatInput
+          {patientVoiceMode && isLiveCallBusy && (
+            <p className="p-3 text-center text-xs text-slate-500 dark:text-slate-400">
+              {t("liveCallMicProcessing")}
+            </p>
+          )}
+          {patientVoiceMode ? (
+            !isLiveCall && !isLiveCallBusy && (
+              <div className="p-4 text-center text-sm text-slate-500 dark:text-slate-400">
+                {micError || t("liveCallMicReady")}
+              </div>
+            )
+          ) : <SimulationChatInput
             input={input}
             setInput={setInput}
             onSend={() => sendMessage()}
@@ -2177,7 +2223,7 @@ function HistoryChatView({
             micError={micError}
             disabled={sessionLocked || isLiveCall || (isExaminerChat && examinerVivaComplete)}
             isLiveCall={isLiveCall}
-          />
+          />}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 interface ConfirmDialogProps {
@@ -9,6 +9,7 @@ interface ConfirmDialogProps {
   cancelLabel: string;
   confirming?: boolean;
   variant?: 'danger' | 'default';
+  children?: ReactNode;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -21,6 +22,7 @@ export function ConfirmDialog({
   cancelLabel,
   confirming,
   variant = 'default',
+  children,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -53,6 +55,7 @@ export function ConfirmDialog({
           {title}
         </h2>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{message}</p>
+        {children ? <div className="mt-4">{children}</div> : null}
         <div className="mt-6 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
           <button type="button" onClick={onCancel} disabled={confirming} className="btn-secondary text-sm w-full sm:w-auto">
             {cancelLabel}
