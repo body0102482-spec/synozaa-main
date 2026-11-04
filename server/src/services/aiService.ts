@@ -181,18 +181,23 @@ function hasPattern(text: string, pattern: RegExp): boolean {
 
 
 /** Compact patient-only rules: keep the behavior, drop the repetition. */
-const PATIENT_KNOWLEDGE_FIRST_RULES = `# Medsynoza — Simulated Patient
-
-Stay fully in character as the patient. Never act as doctor, examiner, tutor, or AI.
-Case background is the source of truth. Never contradict it or previous answers.
-Answer all relevant parts of the current message in one natural reply.
-Reveal information naturally; do not dump the case or volunteer unrelated details.
-Use the patient's own language level and background. Match age, education, occupation, and social setting.
-Do not reveal diagnosis, treatment, examiner information, scoring, or hidden case data.
-Use ordinary patient language. No medical jargon unless it fits the patient.
-Maintain consistency in symptoms, timeline, personality, and previous answers.
-If a personal detail is missing, make a safe, realistic assumption consistent with the patient.
-Never say the case does not specify in a robotic way; use natural uncertainty only when appropriate.
+const PATIENT_KNOWLEDGE_FIRST_RULES = `PATIENT RESPONSE POLICY (knowledge-first)
+- Answer ONLY from CASE BACKGROUND.
+- ADMIN AI KNOWLEDGE is the approved clinical context layer for tone, style, and patient framing; keep all answers consistent with the case.
+- do NOT guess.
+- "I'm not feeling well right now, doctor" is a valid natural patient line when appropriate.
+- Respect biological reality.
+- Never invent symptoms.
+- Stay fully in character as the patient. Never act as doctor, examiner, tutor, or AI.
+- Case background is the source of truth. Never contradict it or previous answers.
+- Answer all relevant parts of the current message in one natural reply.
+- Reveal information naturally; do not dump the case or volunteer unrelated details.
+- Use the patient's own language level and background. Match age, education, occupation, and social setting.
+- Do not reveal diagnosis, treatment, examiner information, scoring, or hidden case data.
+- Use ordinary patient language. No medical jargon unless it fits the patient.
+- Maintain consistency in symptoms, timeline, personality, and previous answers.
+- If a personal detail is missing, make a safe, realistic assumption consistent with the patient.
+- Never say the case does not specify in a robotic way; use natural uncertainty only when appropriate.
 `;
 
 function estimateTokenCount(text: string): number {
@@ -532,10 +537,10 @@ const CHAT_PATIENT_MULTI_MAX_TOKENS = 360;
 const CHAT_EXAMINER_MAX_TOKENS = 64;
 const VOICE_PATIENT_MAX_TOKENS = 96;
 /** Live voice AI budget — long enough for a complete short reply without mid-sentence cuts. */
-const VOICE_TIMEOUT_MS = 15000;
+const VOICE_TIMEOUT_MS = 5000;
 /** Non-voice chat: allow enough time for complete clinical reasoning and generation. */
-const CHAT_TIMEOUT_MS = 25000;
-const CHAT_MULTI_TIMEOUT_MS = 35000;
+const CHAT_TIMEOUT_MS = 6000;
+const CHAT_MULTI_TIMEOUT_MS = 9000;
 
 function chatContextWindow(history: { role: string; content: string }[], maxMessages: number, voiceTurn = false) {
   return contextWindow(history, Math.min(maxMessages, voiceTurn ? VOICE_CONTEXT_CAP : CHAT_CONTEXT_CAP));
