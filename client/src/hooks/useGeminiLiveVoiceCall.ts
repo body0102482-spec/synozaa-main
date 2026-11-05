@@ -3,17 +3,23 @@ import api from '../lib/api';
 
 interface LiveVoiceMessage {
   id: string;
-  role: 'STUDENT' | 'PATIENT';
+  role: 'STUDENT' | 'PATIENT' | 'EXAMINER';
   content: string;
   stage: string;
   createdAt: string;
 }
+
+export type GeminiLiveVoiceRole = 'PATIENT' | 'EXAMINER';
+export type GeminiLiveConnectionState = 'idle' | 'connecting' | 'connected' | 'error';
 
 interface GeminiLiveSetupConfig {
   responseModalities: ['AUDIO'];
   systemInstruction: { parts: Array<{ text: string }> };
   inputAudioTranscription: Record<string, never>;
   outputAudioTranscription: Record<string, never>;
+  speechConfig?: {
+    voiceConfig: { precomputedVoiceConfig: { voiceName: string } };
+  };
 }
 
 interface GeminiLiveTokenResponse {
@@ -24,10 +30,21 @@ interface GeminiLiveTokenResponse {
 
 interface UseGeminiLiveVoiceCallOptions {
   sessionId: string;
+  /**
+   * Which AI persona this call connects to. The server mints a token whose
+   * system instruction is built for this role — patient and examiner
+   * instructions are never mixed on a single connection.
+   */
+  role?: GeminiLiveVoiceRole;
+  /** Stage the transcript turns are persisted under (e.g. history / history:examiner / examination:palpation). */
+  stage?: string;
+  /** Explicit maneuver id when stage is `examination:<maneuverId>`. */
+  maneuverId?: string;
   disabled?: boolean;
   onMessage?: (message: LiveVoiceMessage) => void;
   onError?: (code: string) => void;
 }
+
 
 const GEMINI_LIVE_WS =
   'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained';
@@ -65,6 +82,9 @@ function decodePcmBase64(base64: string): Int16Array {
 
 export function useGeminiLiveVoiceCall({
   sessionId,
+  role = 'PATIENT',
+  stage = 'history',
+  maneuverId,
   disabled = false,
   onMessage,
   onError,
@@ -73,6 +93,10 @@ export function useGeminiLiveVoiceCall({
   const [isBusy, setIsBusy] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMicListening, setIsMicListening] = useState(false);
+  const [connectionState, setConnectionState] = useState<GeminiLiveConnectionState>('idle');
+  const [micLevel, setMicLevel] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [aiCaption, setAiCaption] = useState('');
   const socketRef = useRef<WebSocket | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -86,15 +110,25 @@ export function useGeminiLiveVoiceCall({
   const inputSpeechFramesRef = useRef(0);
   const inputQuietFramesRef = useRef(0);
   const pendingStudentTextRef = useRef('');
-  const pendingPatientTextRef = useRef('');
+  const pendingAiTextRef = useRef('');
   const persistenceQueueRef = useRef<Promise<void>>(Promise.resolve());
   const onMessageRef = useRef(onMessage);
   const onErrorRef = useRef(onError);
   const disabledRef = useRef(disabled);
+  const roleRef = useRef(role);
+  const stageRef = useRef(stage);
+  const maneuverIdRef = useRef(maneuverId);
+  const mutedRef = useRef(false);
+  const lastMicLevelUpdateRef = useRef(0);
+  const activeContextRef = useRef<string | null>(null);
+
 
   onMessageRef.current = onMessage;
   onErrorRef.current = onError;
   disabledRef.current = disabled;
+  roleRef.current = role;
+  stageRef.current = stage;
+  maneuverIdRef.current = maneuverId;
 
   const stopPlayback = useCallback(() => {
     for (const node of playbackNodesRef.current) {
@@ -128,26 +162,33 @@ export function useGeminiLiveVoiceCall({
   const stopCall = useCallback(() => {
     const socket = socketRef.current;
     socketRef.current = null;
+    activeContextRef.current = null;
     if (socket && socket.readyState < WebSocket.CLOSING) socket.close();
     stopPlayback();
     releaseAudio();
     pendingStudentTextRef.current = '';
-    pendingPatientTextRef.current = '';
+    pendingAiTextRef.current = '';
     userSpeakingRef.current = false;
     inputSpeechFramesRef.current = 0;
     inputQuietFramesRef.current = 0;
+    mutedRef.current = false;
+    lastMicLevelUpdateRef.current = 0;
+    setIsMuted(false);
+    setMicLevel(0);
+    setAiCaption('');
+    setConnectionState('idle');
     setIsLiveCall(false);
     setIsBusy(false);
     setIsMicListening(false);
   }, [releaseAudio, stopPlayback]);
 
   const persistMessage = useCallback(
-    async (role: 'STUDENT' | 'PATIENT', content: string) => {
+    async (messageRole: 'STUDENT' | 'PATIENT' | 'EXAMINER', content: string) => {
       const text = content.trim();
       if (!text) return;
       const response = await api.post<{ message: LiveVoiceMessage }>(
         `/sessions/${sessionId}/live-voice/message`,
-        { role, content: text },
+        { role: messageRole, content: text, stage: stageRef.current },
       );
       onMessageRef.current?.(response.data.message);
     },
@@ -199,7 +240,9 @@ export function useGeminiLiveVoiceCall({
 
       const outputTranscription = serverContent.outputTranscription as { text?: unknown } | undefined;
       if (typeof outputTranscription?.text === 'string') {
-        pendingPatientTextRef.current += outputTranscription.text;
+        pendingAiTextRef.current += outputTranscription.text;
+        // Live caption of what the AI is currently saying.
+        setAiCaption(pendingAiTextRef.current);
       }
 
       const modelTurn = serverContent.modelTurn as { parts?: Array<Record<string, unknown>> } | undefined;
@@ -211,15 +254,17 @@ export function useGeminiLiveVoiceCall({
       if (serverContent.turnComplete === true) {
         setIsBusy(false);
         const studentText = pendingStudentTextRef.current;
-        const patientText = pendingPatientTextRef.current;
+        const aiText = pendingAiTextRef.current;
         pendingStudentTextRef.current = '';
-        pendingPatientTextRef.current = '';
+        pendingAiTextRef.current = '';
+        const aiRole = roleRef.current;
         const queuedPersistence = persistenceQueueRef.current
           .catch(() => undefined)
           .then(async () => {
             if (studentText.trim()) await persistMessage('STUDENT', studentText);
-            if (patientText.trim()) await persistMessage('PATIENT', patientText);
+            if (aiText.trim()) await persistMessage(aiRole, aiText);
           });
+
         persistenceQueueRef.current = queuedPersistence;
         try {
           await queuedPersistence;
@@ -239,10 +284,22 @@ export function useGeminiLiveVoiceCall({
 
     processor.onaudioprocess = (event) => {
       if (socket.readyState !== WebSocket.OPEN) return;
-      const samples = event.inputBuffer.getChannelData(0);
+      const rawSamples = event.inputBuffer.getChannelData(0);
+      const muted = mutedRef.current;
+      // When muted, send true silence so nothing is captured or transcribed.
+      const samples = muted ? new Float32Array(rawSamples.length) : rawSamples;
+
       let squareSum = 0;
       for (let i = 0; i < samples.length; i += 1) squareSum += samples[i] * samples[i];
       const rms = Math.sqrt(squareSum / samples.length);
+
+      // Throttled mic-level meter for the audio activity visualization.
+      const now = performance.now();
+      if (now - lastMicLevelUpdateRef.current > 90) {
+        lastMicLevelUpdateRef.current = now;
+        setMicLevel(muted ? 0 : Math.min(1, rms * 6));
+      }
+
       if (rms > 0.045) {
         inputSpeechFramesRef.current += 1;
         inputQuietFramesRef.current = 0;
@@ -282,6 +339,7 @@ export function useGeminiLiveVoiceCall({
     }
 
     setIsBusy(true);
+    setConnectionState('connecting');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
@@ -293,7 +351,13 @@ export function useGeminiLiveVoiceCall({
 
       const response = await api.post<GeminiLiveTokenResponse>(
         `/sessions/${sessionId}/live-voice/token`,
+        {
+          role: roleRef.current,
+          stage: stageRef.current,
+          ...(stageRef.current.startsWith('examination:') ? { maneuverId: maneuverIdRef.current } : {}),
+        },
       );
+
       const { token, model, config } = response.data;
       const socket = new WebSocket(`${GEMINI_LIVE_WS}?access_token=${encodeURIComponent(token)}`);
       socketRef.current = socket;
@@ -355,10 +419,13 @@ export function useGeminiLiveVoiceCall({
         return;
       }
       startAudioCapture(socket, context, stream);
+      activeContextRef.current = `${roleRef.current}:${stageRef.current}`;
+      setConnectionState('connected');
       setIsLiveCall(true);
       setIsMicListening(true);
       setIsBusy(false);
     } catch (error) {
+      setConnectionState('error');
       stopCall();
       const name = error instanceof DOMException ? error.name : '';
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
@@ -378,6 +445,27 @@ export function useGeminiLiveVoiceCall({
     else void startCall();
   }, [isBusy, isLiveCall, startCall, stopCall]);
 
+  const toggleMute = useCallback(() => {
+    const next = !mutedRef.current;
+    mutedRef.current = next;
+    setIsMuted(next);
+    if (next) {
+      userSpeakingRef.current = false;
+      setMicLevel(0);
+    }
+  }, []);
+
+  // A live connection is bound to exactly one role+stage. When the stage or
+  // role changes (e.g. switching patient → examiner panel, or maneuver
+  // transitions), terminate the previous connection — the student starts a
+  // fresh call (free, no extra credits) for the new context.
+  useEffect(() => {
+    const key = `${role}:${stage}`;
+    if (activeContextRef.current && activeContextRef.current !== key) {
+      stopCall();
+    }
+  }, [role, stage, stopCall]);
+
   useEffect(() => {
     if (disabled) stopCall();
   }, [disabled, stopCall]);
@@ -389,8 +477,16 @@ export function useGeminiLiveVoiceCall({
     isBusy,
     isSpeaking,
     isMicListening,
+    connectionState,
+    micLevel,
+    isMuted,
+    aiCaption,
+    role,
+    stage,
     isSupported: typeof window !== 'undefined' && !!navigator.mediaDevices?.getUserMedia,
     toggleLiveCall,
+    toggleMute,
     stopCall,
   };
 }
+

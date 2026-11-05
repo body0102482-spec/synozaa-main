@@ -1312,6 +1312,26 @@ export default {
       endLiveCall: "End call",
       liveCallNotSupported:
         "Live call needs a microphone and works best in Chrome or Safari on your phone",
+      liveVoiceTitle: "Live Voice",
+      liveVoiceStart: "Start voice call",
+      liveVoiceConnecting: "Connecting…",
+      liveVoiceConnected: "Connected",
+      liveVoiceDisconnected: "Disconnected",
+      liveVoiceListening: "Microphone open — speak now",
+      liveVoiceMute: "Mute",
+      liveVoiceUnmute: "Unmute",
+      liveVoiceMuted: "Muted",
+      liveVoiceYou: "You",
+      liveVoicePatientSpeaking: "Patient speaking",
+      liveVoiceExaminerSpeaking: "Examiner speaking",
+      liveVoiceCaptionLabel: "Transcript",
+      liveVoicePatientHint:
+        "This is a real-time voice call. Speak to the patient as you would in a real OSCE station — there is no text chat in this mode.",
+      liveVoiceExaminerHint:
+        "This is a real-time voice call with the examiner. Answer verbally.",
+      liveVivaComplete: "Viva completed",
+      liveManeuverIncomplete:
+        "Describe your findings in more detail before completing this step.",
     },
   },
   ar: {
@@ -2582,6 +2602,26 @@ export default {
       endLiveCall: "إنهاء المكالمة",
       liveCallNotSupported:
         "المكالمة المباشرة تحتاج ميكروفون وتشتغل أحسن على Chrome أو Safari من الموبايل",
+      liveVoiceTitle: "مكالمة صوتية",
+      liveVoiceStart: "ابدأ المكالمة الصوتية",
+      liveVoiceConnecting: "جاري الاتصال…",
+      liveVoiceConnected: "متصل",
+      liveVoiceDisconnected: "غير متصل",
+      liveVoiceListening: "الميكروفون مفتوح — تكلّم دلوقتي",
+      liveVoiceMute: "كتم",
+      liveVoiceUnmute: "إلغاء الكتم",
+      liveVoiceMuted: "مكتوم",
+      liveVoiceYou: "أنت",
+      liveVoicePatientSpeaking: "المريض بيتكلم",
+      liveVoiceExaminerSpeaking: "الممتحِن بيتكلم",
+      liveVoiceCaptionLabel: "النص",
+      liveVoicePatientHint:
+        "دي مكالمة صوتية فورية. اتكلم مع المريض زي محطة OSCE حقيقية — مفيش شات كتابي في الوضع ده.",
+      liveVoiceExaminerHint:
+        "دي مكالمة صوتية فورية مع الممتحِن. جاوب على أسئلة الـ viva بصوتك.",
+      liveVivaComplete: "خلصت الأسئلة الشفوية",
+      liveManeuverIncomplete:
+        "اوصف ملاحظاتك بتفصيل أكتر قبل إنهاء الخطوة.",
     },
   },
 };

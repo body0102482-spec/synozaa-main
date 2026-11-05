@@ -33,12 +33,20 @@ import {
 import { createOpenRouterPatientAudioTurn, isOpenRouterAudioEnabled, OpenRouterAudioError, openRouterAudioInputFormat, transcribeOpenRouterAudio } from '../services/openRouterAudioService.js';
 import {
   buildExaminerVivaOpening,
+  getCurrentVivaQuestionNumber,
+  getVivaClosing,
   HISTORY_EXAMINER_STAGE,
+  isExaminerVivaComplete,
   isHistoryExaminerVivaStage,
+  pickVivaQuestionsForSession,
   respondToHistoryVivaAnswer,
 } from '../services/examinerVivaService.js';
+import {
+  buildRealtimeManeuverExaminerInstructions,
+  buildRealtimeVivaExaminerInstructions,
+} from '../services/examinerLiveService.js';
 import { Language, MessageRole } from '@prisma/client';
-import { getSessionStationConfig, isManeuverEnabled, parseStationConfig, resolveManeuverOpeningMessage } from '../lib/stationConfig.js';
+import { getSessionStationConfig, isManeuverEnabled, MANEUVER_LABELS, parseStationConfig, resolveManeuverOpeningMessage } from '../lib/stationConfig.js';
 
 const router = Router();
 
@@ -86,6 +94,18 @@ router.get('/:id/voice-provider', (_req, res) => {
 
 router.post('/:id/live-voice/token', async (req, res) => {
   try {
+    const { role = 'PATIENT', stage, maneuverId } = (req.body ?? {}) as {
+      role?: 'PATIENT' | 'EXAMINER';
+      stage?: string;
+      maneuverId?: string;
+    };
+    if (role !== 'PATIENT' && role !== 'EXAMINER') {
+      return res.status(400).json({ error: 'Invalid live voice role' });
+    }
+    if (stage !== undefined && typeof stage !== 'string') {
+      return res.status(400).json({ error: 'Invalid live voice stage' });
+    }
+
     const session = await prisma.session.findFirst({
       where: { id: req.params.id, userId: req.user!.id, status: 'IN_PROGRESS' },
       include: { case: true },
@@ -96,11 +116,74 @@ router.post('/:id/live-voice/token', async (req, res) => {
     }
 
     const stationConfig = getSessionStationConfig(session);
-    const config = buildGeminiLiveSessionConfig(
-      session.case,
-      session.language,
-      stationConfig.patientBehavior,
-    );
+    let config;
+
+    if (role === 'PATIENT') {
+      if (stage && stage !== 'history') {
+        return res.status(400).json({ error: 'Patient voice is only available in the history stage' });
+      }
+      config = buildGeminiLiveSessionConfig(
+        session.case,
+        session.language,
+        stationConfig.patientBehavior,
+        { role: 'PATIENT' },
+      );
+    } else if (stage === HISTORY_EXAMINER_STAGE) {
+      if (!stationConfig.enableHistoryExaminer) {
+        return res.status(400).json({ error: 'History examiner is not enabled for this case' });
+      }
+      const vivaMessages = await prisma.message.findMany({
+        where: { sessionId: session.id, stage: HISTORY_EXAMINER_STAGE },
+        orderBy: { createdAt: 'asc' },
+      });
+      const questions = pickVivaQuestionsForSession(session.id, session.case);
+      config = buildGeminiLiveSessionConfig(
+        session.case,
+        session.language,
+        stationConfig.patientBehavior,
+        {
+          role: 'EXAMINER',
+          examinerInstructions: buildRealtimeVivaExaminerInstructions(session.case, {
+            questions,
+            currentQuestionNumber: getCurrentVivaQuestionNumber(
+              vivaMessages,
+              HISTORY_EXAMINER_STAGE,
+              questions,
+            ),
+            completed: isExaminerVivaComplete(vivaMessages, HISTORY_EXAMINER_STAGE),
+            opening: buildExaminerVivaOpening(session.id, session.case),
+            closing: getVivaClosing(session.language),
+          }),
+        },
+      );
+    } else if (typeof stage === 'string' && stage.startsWith('examination:')) {
+      const resolvedManeuverId = maneuverId || stage.slice('examination:'.length);
+      if (!EXAM_MANEUVER_ORDER.includes(resolvedManeuverId as (typeof EXAM_MANEUVER_ORDER)[number])) {
+        return res.status(400).json({ error: 'Invalid examination maneuver' });
+      }
+      if (!isManeuverEnabled(stationConfig, resolvedManeuverId)) {
+        return res.status(400).json({ error: 'Maneuver not enabled for this case' });
+      }
+      const maneuverLabel =
+        stationConfig.maneuverLabels?.[resolvedManeuverId as keyof typeof stationConfig.maneuverLabels]?.en ||
+        MANEUVER_LABELS[resolvedManeuverId as keyof typeof MANEUVER_LABELS].en;
+      config = buildGeminiLiveSessionConfig(
+        session.case,
+        session.language,
+        stationConfig.patientBehavior,
+        {
+          role: 'EXAMINER',
+          examinerInstructions: buildRealtimeManeuverExaminerInstructions(session.case, session.language, {
+            maneuverId: resolvedManeuverId,
+            maneuverLabel,
+            openingMessage: resolveManeuverOpeningMessage(resolvedManeuverId, stationConfig),
+          }),
+        },
+      );
+    } else {
+      return res.status(400).json({ error: 'Invalid examiner voice stage' });
+    }
+
     const token = await createGeminiLiveEphemeralToken(config);
     return res.json(token);
   } catch (error) {
@@ -116,14 +199,17 @@ router.post('/:id/live-voice/token', async (req, res) => {
   }
 });
 
+
 router.post('/:id/live-voice/message', async (req, res) => {
   try {
-    const { content, role } = req.body as {
+    const { content, role, stage } = req.body as {
       content?: string;
-      role?: 'STUDENT' | 'PATIENT';
+      role?: 'STUDENT' | 'PATIENT' | 'EXAMINER';
+      stage?: string;
     };
     const text = content?.trim();
-    if (!text || (role !== 'STUDENT' && role !== 'PATIENT')) {
+    const validRoles: Array<'STUDENT' | 'PATIENT' | 'EXAMINER'> = ['STUDENT', 'PATIENT', 'EXAMINER'];
+    if (!text || !role || !validRoles.includes(role)) {
       return res.status(400).json({ error: 'Valid voice transcript and role required' });
     }
 
@@ -134,6 +220,39 @@ router.post('/:id/live-voice/message', async (req, res) => {
     if (!session) return res.status(404).json({ error: 'Active session not found' });
     if (session.sessionType !== 'LIVE_VOICE') {
       return res.status(403).json({ error: 'LIVE_VOICE_SESSION_REQUIRED' });
+    }
+
+    const stationConfig = getSessionStationConfig(session);
+
+    // Resolve and whitelist the target stage for this transcript turn.
+    let targetStage = 'history';
+    if (typeof stage === 'string' && stage !== 'history') {
+      if (stage === HISTORY_EXAMINER_STAGE) {
+        if (!stationConfig.enableHistoryExaminer) {
+          return res.status(400).json({ error: 'History examiner is not enabled for this case' });
+        }
+        if (role === 'PATIENT') {
+          return res.status(400).json({ error: 'Patient voice is only available in the history stage' });
+        }
+        targetStage = stage;
+      } else if (stage.startsWith('examination:')) {
+        const maneuverId = stage.slice('examination:'.length);
+        if (
+          !EXAM_MANEUVER_ORDER.includes(maneuverId as (typeof EXAM_MANEUVER_ORDER)[number]) ||
+          !isManeuverEnabled(stationConfig, maneuverId)
+        ) {
+          return res.status(400).json({ error: 'Invalid examination maneuver' });
+        }
+        if (role === 'PATIENT') {
+          return res.status(400).json({ error: 'Patient voice is only available in the history stage' });
+        }
+        targetStage = stage;
+      } else {
+        return res.status(400).json({ error: 'Invalid live voice stage' });
+      }
+    } else if (role === 'EXAMINER') {
+      // Examiner turns are stage-specific; they must never be stored as history.
+      return res.status(400).json({ error: 'Examiner voice transcripts require a valid stage' });
     }
 
     let contentToSave = text;
@@ -152,9 +271,14 @@ router.post('/:id/live-voice/message', async (req, res) => {
     const message = await prisma.message.create({
       data: {
         sessionId: session.id,
-        role: role === 'PATIENT' ? MessageRole.PATIENT : MessageRole.STUDENT,
+        role:
+          role === 'PATIENT'
+            ? MessageRole.PATIENT
+            : role === 'EXAMINER'
+              ? MessageRole.EXAMINER
+              : MessageRole.STUDENT,
         content: contentToSave,
-        stage: 'history',
+        stage: targetStage,
       },
     });
     return res.json({ message });
@@ -163,6 +287,7 @@ router.post('/:id/live-voice/message', async (req, res) => {
     return res.status(500).json({ error: 'Failed to save Live Voice transcript' });
   }
 });
+
 
 router.post('/start', async (req, res) => {
   const { caseId, language = 'AUTO' } = req.body ?? {};

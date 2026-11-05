@@ -1,37 +1,84 @@
 import type { PatientBehavior } from '../lib/stationConfig.js';
 import { buildRealtimePatientInstructions, type RealtimePatientCase } from './aiService.js';
+import type { Case } from '@prisma/client';
+import {
+  buildRealtimeManeuverExaminerInstructions,
+  buildRealtimeVivaExaminerInstructions,
+  type ExaminerLiveManeuverContext,
+  type ExaminerLiveVivaContext,
+} from './examinerLiveService.js';
 
 export const GEMINI_LIVE_MODEL = 'gemini-3.8-live';
+
+export type GeminiLiveRole = 'PATIENT' | 'EXAMINER';
 
 export interface GeminiLiveSessionConfig {
   responseModalities: ['AUDIO'];
   systemInstruction: { parts: Array<{ text: string }> };
   inputAudioTranscription: Record<string, never>;
   outputAudioTranscription: Record<string, never>;
+  speechConfig?: {
+    voiceConfig: { precomputedVoiceConfig: { voiceName: string } };
+  };
 }
 
 export function isLiveVoiceSessionType(value: unknown): value is 'LIVE_VOICE' {
   return value === 'LIVE_VOICE';
 }
 
+/** Optional distinct Gemini Live voices per role (env-configured). */
+function resolveLiveVoiceName(role: GeminiLiveRole): string | undefined {
+  const raw =
+    role === 'EXAMINER'
+      ? process.env.GEMINI_LIVE_EXAMINER_VOICE
+      : process.env.GEMINI_LIVE_PATIENT_VOICE;
+  const name = raw?.trim();
+  return name || undefined;
+}
+
+export interface GeminiLiveConfigOptions {
+  role?: GeminiLiveRole;
+  /** Required when role is EXAMINER. */
+  examinerInstructions?: string;
+}
+
 export function buildGeminiLiveSessionConfig(
   caseData: RealtimePatientCase,
   sessionLanguage: string,
   patientBehavior: PatientBehavior,
+  options: GeminiLiveConfigOptions = {},
 ): GeminiLiveSessionConfig {
-  return {
+  const role = options.role ?? 'PATIENT';
+  const instructions =
+    role === 'EXAMINER'
+      ? options.examinerInstructions?.trim()
+      : buildRealtimePatientInstructions(caseData, sessionLanguage, patientBehavior);
+  if (!instructions) {
+    throw new Error('gemini-live-instructions-missing');
+  }
+
+  const config: GeminiLiveSessionConfig = {
     responseModalities: ['AUDIO'],
-    systemInstruction: {
-      parts: [
-        {
-          text: buildRealtimePatientInstructions(caseData, sessionLanguage, patientBehavior),
-        },
-      ],
-    },
+    systemInstruction: { parts: [{ text: instructions }] },
     inputAudioTranscription: {},
     outputAudioTranscription: {},
   };
+  const voiceName = resolveLiveVoiceName(role);
+  if (voiceName) {
+    config.speechConfig = {
+      voiceConfig: { precomputedVoiceConfig: { voiceName } },
+    };
+  }
+  return config;
 }
+
+export {
+  buildRealtimeManeuverExaminerInstructions,
+  buildRealtimeVivaExaminerInstructions,
+};
+export type { ExaminerLiveManeuverContext, ExaminerLiveVivaContext };
+export type { Case as GeminiLiveCase };
+
 
 export async function createGeminiLiveEphemeralToken(
   config: GeminiLiveSessionConfig,

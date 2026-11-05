@@ -60,6 +60,9 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useSpeechInput } from '../hooks/useSpeechInput';
 import { useLiveVoiceCall } from '../hooks/useLivePatientCall';
 import { useGeminiLiveVoiceCall } from '../hooks/useGeminiLiveVoiceCall';
+import { LiveVoiceStageShell, type LiveVoiceCallControls } from '../components/live/LiveVoiceStageShell';
+import { LivePatientHistoryView } from '../components/live/LivePatientHistoryView';
+import { LiveExaminerVivaView } from '../components/live/LiveExaminerVivaView';
 import { stopSpeaking } from '../lib/speech';
 import { IS_MOBILE, unlockMobileAudio } from '../lib/mobileAudio';
 import type { VoiceTurnResponse } from '../lib/voiceTurn';
@@ -307,6 +310,20 @@ export default function SimulationPage() {
           : null;
   const isLiveVoiceSession = session?.sessionType === 'LIVE_VOICE';
 
+  // LIVE_VOICE sessions get dedicated voice-only interfaces. Which AI persona
+  // + stage is available right now is derived from the backend sessionType —
+  // never from local UI state alone. Investigations / diagnosis / feedback have
+  // no voice connection at all (shared chat-style UI stays for those stages).
+  const liveVoiceContext = !isLiveVoiceSession
+    ? null
+    : activeStage === 'history' && (!showExaminerPanel || !enableHistoryExaminer)
+      ? { role: 'PATIENT' as const, stage: 'history' }
+      : activeStage === 'history' && showExaminerPanel && enableHistoryExaminer
+        ? { role: 'EXAMINER' as const, stage: HISTORY_EXAMINER_STAGE }
+        : activeStage === 'examination' && activeManeuver && !solvedManeuver
+          ? { role: 'EXAMINER' as const, stage: maneuverStage(activeManeuver) }
+          : null;
+
   // Always honor the speech-language toggle for mic + live call STT.
   // Previously patient context hardcoded ar-EG/AR, so EN speech was transcribed as Arabic letters.
   const listenLang =
@@ -537,14 +554,48 @@ export default function SimulationPage() {
   });
 
   const isPatientLiveCall = voiceCallContext === 'patient';
+
+  // LIVE_VOICE examination: the server-side completion judge decides from the
+  // persisted STUDENT transcripts of the maneuver stage. After each examiner
+  // voice turn we silently attempt completion (409 = findings not sufficient).
+  const attemptLiveManeuverComplete = useCallback(
+    async (maneuverId: string, options?: { silent?: boolean }) => {
+      if (!maneuverId || solvedManeuver === maneuverId) return;
+      try {
+        const res = await api.post(`/sessions/${sessionId}/maneuver/complete`, { maneuverId });
+        setCompletedManeuvers(res.data.completedManeuvers as string[]);
+        setVivaActive(false);
+        setSolvedManeuver(maneuverId);
+      } catch (err) {
+        if (options?.silent) return;
+        if (axios.isAxiosError(err) && err.response?.status === 409) {
+          setChatError(t('liveManeuverIncomplete'));
+        } else if (!axios.isAxiosError(err)) {
+          setChatError(t('chatErrorOffline'));
+        }
+      }
+    },
+    [sessionId, solvedManeuver, t],
+  );
+
   const geminiLiveCall = useGeminiLiveVoiceCall({
     sessionId: sessionId || '',
-    disabled: !isLiveVoiceSession || voiceCallContext !== 'patient' || sessionLocked,
+    role: liveVoiceContext?.role ?? 'PATIENT',
+    stage: liveVoiceContext?.stage ?? 'history',
+    maneuverId: activeManeuver ?? undefined,
+    disabled: !isLiveVoiceSession || !liveVoiceContext || sessionLocked,
     onMessage: (message) => {
       setSession((current) => {
         if (!current || current.messages.some((item) => item.id === message.id)) return current;
         return { ...current, messages: [...current.messages, message] };
       });
+      if (
+        isLiveVoiceSession &&
+        message.role === 'EXAMINER' &&
+        message.stage.startsWith('examination:')
+      ) {
+        void attemptLiveManeuverComplete(message.stage.slice('examination:'.length), { silent: true });
+      }
     },
     onError: handleLiveCallError,
   });
@@ -554,7 +605,7 @@ export default function SimulationPage() {
       ? patientLiveCall
       : examinerLiveCall;
   const liveCallAvailable = isLiveVoiceSession
-    ? voiceCallContext === 'patient'
+    ? !!liveVoiceContext
     : !!voiceCallContext;
 
   useEffect(() => {
@@ -566,10 +617,10 @@ export default function SimulationPage() {
   }, [isLiveVoiceSession, voiceCallContext, patientLiveCall.stopCall, examinerLiveCall.stopCall, stopListening]);
 
   useEffect(() => {
-    if (sessionLocked || (isLiveVoiceSession && voiceCallContext !== 'patient')) {
+    if (sessionLocked || !liveVoiceContext) {
       geminiLiveCall.stopCall();
     }
-  }, [geminiLiveCall.stopCall, isLiveVoiceSession, sessionLocked, voiceCallContext]);
+  }, [geminiLiveCall.stopCall, liveVoiceContext, sessionLocked]);
 
   useEffect(() => {
     // Language toggle must never leave STT running or auto-accept phantom results.
@@ -986,6 +1037,9 @@ export default function SimulationPage() {
     (m) => m.role === "EXAMINER" && isVivaClosingMessage(m.content),
   );
 
+  // Client-side estimate of viva progress: each student answer counts once.
+  const vivaAnsweredCount = historyExaminerMessages.filter((m) => m.role === "STUDENT").length;
+
   const maneuverMessages = activeManeuver
     ? session.messages.filter(
         (m) =>
@@ -1295,6 +1349,28 @@ export default function SimulationPage() {
                 onStartManeuver={startManeuver}
                 caseManeuvers={caseManeuvers}
                 sessionLocked={sessionLocked}
+                liveVoicePanel={
+                  isLiveVoiceSession && activeManeuver && solvedManeuver !== activeManeuver ? (
+                    <LiveVoiceStageShell
+                      aiIcon="examiner"
+                      aiName={t("clinicalExaminer")}
+                      call={geminiLiveCall}
+                      error={micError}
+                      disabled={sessionLocked}
+                      startHint={t("liveVoiceExaminerHint")}
+                      extraActions={
+                        <button
+                          type="button"
+                          onClick={() => void attemptLiveManeuverComplete(activeManeuver!, { silent: false })}
+                          disabled={sending || sessionLocked}
+                          className="h-11 px-5 rounded-full bg-teal-700 hover:bg-teal-800 disabled:opacity-40 text-white font-bold text-xs transition-colors"
+                        >
+                          {t("completeStep")}
+                        </button>
+                      }
+                    />
+                  ) : undefined
+                }
                 {...liveCallInputProps}
               />
             </>
@@ -1315,6 +1391,26 @@ export default function SimulationPage() {
               completeError={completeError}
               sessionLocked={sessionLocked}
             />
+          ) : activeStage === "history" && isLiveVoiceSession ? (
+            showExaminerPanel && enableHistoryExaminer ? (
+              <LiveExaminerVivaView
+                call={geminiLiveCall}
+                error={micError}
+                sessionLocked={sessionLocked}
+                answeredCount={vivaAnsweredCount}
+                totalQuestions={5}
+                vivaComplete={examinerVivaComplete}
+              />
+            ) : (
+              <LivePatientHistoryView
+                patientName={session.case.patientName}
+                patientAge={session.case.patientAge}
+                patientGender={session.case.patientGender}
+                call={geminiLiveCall}
+                error={micError}
+                sessionLocked={sessionLocked}
+              />
+            )
           ) : (
             <HistoryChatView
               t={t}
@@ -1430,6 +1526,7 @@ function ExaminationView({
   onToggleLiveCall,
   liveCallLabel,
   endLiveCallLabel,
+  liveVoicePanel,
   sessionLocked = false,
 }: {
   session: Session;
@@ -1467,6 +1564,8 @@ function ExaminationView({
   onToggleLiveCall?: () => void;
   liveCallLabel?: string;
   endLiveCallLabel?: string;
+  /** LIVE_VOICE sessions: voice-only examiner panel replaces the chat area. */
+  liveVoicePanel?: React.ReactNode;
   sessionLocked?: boolean;
 }) {
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
@@ -1663,8 +1762,16 @@ function ExaminationView({
             )}
           </div>
 
-          <div className="space-y-3 max-h-95 overflow-y-auto pr-1">
-            {activeChatMessages.length === 0 ? (
+          <div
+            className={
+              liveVoicePanel
+                ? 'flex flex-col min-h-0'
+                : 'space-y-3 max-h-95 overflow-y-auto pr-1'
+            }
+          >
+            {liveVoicePanel ? (
+              liveVoicePanel
+            ) : activeChatMessages.length === 0 ? (
               <div className="rounded-2xl bg-slate-50 dark:bg-slate-800/40 p-5 text-center border border-dashed border-slate-200 dark:border-slate-700">
                 <p className="text-xs sm:text-sm font-semibold leading-relaxed text-slate-500 dark:text-slate-400" dir="auto">
                   {isAr
@@ -1711,18 +1818,22 @@ function ExaminationView({
               })
             )}
 
-            {sending && (
-              <div className="flex items-end gap-2 justify-start">
-                <div className="w-7 h-7 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0 mb-1 text-[10px] font-black uppercase">
-                  Ex
-                </div>
-                <div className="rounded-2xl rounded-bl-xs bg-slate-100 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 px-4 py-2.5 flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 shadow-xs">
-                  <Loader2 size={15} className="animate-spin text-teal-600" />
-                  <span>{t("examinerTyping")}</span>
-                </div>
-              </div>
+            {!liveVoicePanel && (
+              <>
+                {sending && (
+                  <div className="flex items-end gap-2 justify-start">
+                    <div className="w-7 h-7 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 flex items-center justify-center shrink-0 mb-1 text-[10px] font-black uppercase">
+                      Ex
+                    </div>
+                    <div className="rounded-2xl rounded-bl-xs bg-slate-100 dark:bg-slate-800/90 border border-slate-200/60 dark:border-slate-700/60 px-4 py-2.5 flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 shadow-xs">
+                      <Loader2 size={15} className="animate-spin text-teal-600" />
+                      <span>{t("examinerTyping")}</span>
+                    </div>
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </>
             )}
-            <div ref={chatEndRef} />
           </div>
         </div>
 
@@ -1783,7 +1894,7 @@ function ExaminationView({
               <ChevronRight size={18} />
             </button>
           </div>
-        ) : (
+        ) : liveVoicePanel ? null : (
           /* Observation Input & Actions Box */
           <div className="space-y-3 pt-1">
             {(isLiveCall || micError) && (
