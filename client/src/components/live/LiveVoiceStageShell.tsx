@@ -9,10 +9,12 @@ export interface LiveVoiceCallControls {
   isSpeaking: boolean;
   isMicListening: boolean;
   connectionState: 'idle' | 'connecting' | 'connected' | 'error';
+  micStatus: 'idle' | 'requesting-permission' | 'mic-active' | 'connecting' | 'connected' | 'failed';
   micLevel: number;
   isMuted: boolean;
   aiCaption: string;
   isSupported: boolean;
+  isSecure: boolean;
   toggleLiveCall: () => void;
   toggleMute: () => void;
   stopCall: () => void;
@@ -63,6 +65,23 @@ export function LiveVoiceStageShell({
   const AiIcon = aiIcon === 'patient' ? UserCircle : Shield;
   const connecting = call.isBusy && !call.isLiveCall;
 
+  if (!call.isSecure) {
+    // Browsers block getUserMedia entirely on insecure (http://) origins.
+    return (
+      <div className="flex-1 flex items-center justify-center p-6">
+        <div className="max-w-md text-center space-y-3">
+          <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 flex items-center justify-center mx-auto">
+            <MicOff size={30} className="text-red-500" />
+          </div>
+          <p className="font-bold text-slate-900 dark:text-white">{t('liveVoiceTitle')}</p>
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium leading-relaxed">
+            {t('liveVoiceInsecureContext')}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (!call.isSupported) {
     return (
       <div className="flex-1 flex items-center justify-center p-6">
@@ -75,6 +94,7 @@ export function LiveVoiceStageShell({
   }
 
   if (!call.isLiveCall && !connecting) {
+    const failed = call.micStatus === 'failed';
     return (
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="max-w-sm w-full text-center space-y-4">
@@ -87,8 +107,21 @@ export function LiveVoiceStageShell({
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{startHint}</p>
             )}
           </div>
+          <p
+            className={`inline-flex items-center gap-1.5 text-[11px] font-bold rounded-full px-2.5 py-1 border ${
+              failed
+                ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900 text-red-700 dark:text-red-300'
+                : 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900 text-emerald-700 dark:text-emerald-300'
+            }`}
+          >
+            <span
+              className={`w-1.5 h-1.5 rounded-full ${failed ? 'bg-red-500' : 'bg-emerald-500 animate-pulse'}`}
+              aria-hidden
+            />
+            {failed ? t('liveVoiceStatusFailed') : t('liveVoiceStatusReady')}
+          </p>
           {error && (
-            <p className="text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl p-2.5">
+            <p className="text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl p-2.5 text-start leading-relaxed">
               {error}
             </p>
           )}
@@ -101,6 +134,9 @@ export function LiveVoiceStageShell({
             <Phone size={18} />
             {t('liveVoiceStart')}
           </button>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
+            {t('liveVoiceMicPermissionHint')}
+          </p>
         </div>
       </div>
     );
@@ -109,27 +145,46 @@ export function LiveVoiceStageShell({
   const aiSpeaking = call.isLiveCall && call.isSpeaking;
   const studentSpeaking = call.isLiveCall && call.isMicListening && !call.isMuted && call.micLevel > 0.05;
 
+  // Explicit microphone / connection lifecycle shown to the user.
+  let statusLabel = t('liveVoiceDisconnected');
+  let statusClass = 'text-slate-600 dark:text-slate-300';
+  let dotClass = 'bg-red-500';
+  if (call.micStatus === 'requesting-permission') {
+    statusLabel = t('liveVoiceStatusRequesting');
+    statusClass = 'text-amber-700 dark:text-amber-300';
+    dotClass = 'bg-amber-500 animate-pulse';
+  } else if (call.micStatus === 'mic-active') {
+    statusLabel = t('liveVoiceStatusMicActive');
+    statusClass = 'text-sky-700 dark:text-sky-300';
+    dotClass = 'bg-sky-500';
+  } else if (call.micStatus === 'connecting') {
+    statusLabel = t('liveVoiceStatusConnecting');
+    statusClass = 'text-amber-700 dark:text-amber-300';
+    dotClass = 'bg-amber-500 animate-pulse';
+  } else if (call.micStatus === 'failed') {
+    statusLabel = t('liveVoiceStatusFailed');
+    statusClass = 'text-red-600 dark:text-red-400';
+    dotClass = 'bg-red-500';
+  } else if (call.isLiveCall && call.connectionState === 'connected') {
+    if (aiSpeaking) {
+      statusLabel = aiIcon === 'patient' ? t('liveVoicePatientSpeaking') : t('liveVoiceExaminerSpeaking');
+      statusClass = 'text-teal-600 dark:text-teal-400';
+      dotClass = 'bg-teal-500 animate-pulse';
+    } else {
+      statusLabel = t('liveVoiceListening');
+      statusClass = 'text-emerald-700 dark:text-emerald-300';
+      dotClass = 'bg-emerald-500 animate-pulse';
+    }
+  }
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Connection status bar */}
       <div className="shrink-0 px-4 py-2 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center gap-2 min-w-0">
-          <span
-            className={`w-2 h-2 rounded-full shrink-0 ${
-              connecting
-                ? 'bg-amber-500 animate-pulse'
-                : call.connectionState === 'connected'
-                  ? 'bg-emerald-500 animate-pulse'
-                  : 'bg-red-500'
-            }`}
-            aria-hidden
-          />
-          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300 truncate">
-            {connecting
-              ? t('liveVoiceConnecting')
-              : call.connectionState === 'connected'
-                ? t('liveVoiceConnected')
-                : t('liveVoiceDisconnected')}
+          <span className={`w-2 h-2 rounded-full shrink-0 ${dotClass}`} aria-hidden />
+          <p className={`text-[11px] font-bold uppercase tracking-wide truncate ${statusClass}`}>
+            {statusLabel}
           </p>
         </div>
         <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">
@@ -206,7 +261,9 @@ export function LiveVoiceStageShell({
 
       {error && (
         <div className="shrink-0 px-4 pb-2">
-          <p className="text-[11px] font-medium text-red-600 dark:text-red-400 text-center">{error}</p>
+          <p className="text-[11px] font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl px-3 py-2 leading-relaxed">
+            {error}
+          </p>
         </div>
       )}
 

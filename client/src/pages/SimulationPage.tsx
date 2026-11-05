@@ -516,10 +516,18 @@ export default function SimulationPage() {
   const handleLiveCallError = useCallback(
     (code: string) => {
       if (code === 'not-supported') setMicError(t('liveCallNotSupported'));
+      else if (code === 'insecure-context') setMicError(t('liveVoiceInsecureContext'));
       else if (code === 'not-allowed') setMicError(t('micPermissionDenied'));
+      else if (code === 'no-microphone') setMicError(t('liveVoiceNoMicrophone'));
+      else if (code === 'mic-in-use') setMicError(t('liveVoiceMicInUse'));
       else if (code === 'no-speech') setMicError('');
       else if (code === 'network') setMicError(t('voiceRecognitionUnavailable'));
       else if (code === 'audio-capture') setMicError(t('micCaptureError'));
+      else if (code === 'audio-start-failed') setMicError(t('micStartFailed'));
+      else if (code === 'gemini-not-configured') setMicError(t('liveVoiceGeminiUnavailable'));
+      else if (code === 'gemini-token-failed') setMicError(t('liveVoiceGeminiUnavailable'));
+      else if (code === 'session-missing') setMicError(t('liveVoiceSessionMissing'));
+      else if (code === 'live-voice-session-required') setMicError(t('liveVoiceSessionRequired'));
       else if (code === 'start-failed') setMicError(t('micStartFailed'));
       else if (code === 'stt-provider-unavailable') setMicError(t('voiceRecognitionUnavailable'));
       else if (code === 'unintelligible-audio') setMicError(t('micTranscriptionFailed'));
@@ -528,6 +536,7 @@ export default function SimulationPage() {
       else if (code === 'transcription-auth-failed') setMicError(t('micTranscriptionAuthFailed'));
       else if (code === 'transcription-quota-exceeded') setMicError(t('micTranscriptionQuotaExceeded'));
       else if (code === 'tts-failed') setMicError(t('ttsPlaybackFailed'));
+      else if (code === 'transcript-save-failed') setMicError(t('liveVoiceTranscriptSaveFailed'));
       else setMicError(t('micError'));
     },
     [t],
@@ -584,6 +593,7 @@ export default function SimulationPage() {
     stage: liveVoiceContext?.stage ?? 'history',
     maneuverId: activeManeuver ?? undefined,
     disabled: !isLiveVoiceSession || !liveVoiceContext || sessionLocked,
+    onStartAttempt: () => setMicError(''),
     onMessage: (message) => {
       setSession((current) => {
         if (!current || current.messages.some((item) => item.id === message.id)) return current;

@@ -12,6 +12,19 @@ interface LiveVoiceMessage {
 export type GeminiLiveVoiceRole = 'PATIENT' | 'EXAMINER';
 export type GeminiLiveConnectionState = 'idle' | 'connecting' | 'connected' | 'error';
 
+/**
+ * Microphone lifecycle shown to the user. The permission request is ALWAYS
+ * initiated from the Start-call click (never from an effect), so the browser
+ * treats it as a direct user interaction.
+ */
+export type GeminiMicStatus =
+  | 'idle'
+  | 'requesting-permission'
+  | 'mic-active'
+  | 'connecting'
+  | 'connected'
+  | 'failed';
+
 interface GeminiLiveSetupConfig {
   responseModalities: ['AUDIO'];
   systemInstruction: { parts: Array<{ text: string }> };
@@ -41,6 +54,8 @@ interface UseGeminiLiveVoiceCallOptions {
   /** Explicit maneuver id when stage is `examination:<maneuverId>`. */
   maneuverId?: string;
   disabled?: boolean;
+  /** Invoked at the top of startCall (the user's click) — e.g. to clear stale errors. */
+  onStartAttempt?: () => void;
   onMessage?: (message: LiveVoiceMessage) => void;
   onError?: (code: string) => void;
 }
@@ -80,12 +95,59 @@ function decodePcmBase64(base64: string): Int16Array {
   return new Int16Array(bytes.buffer);
 }
 
+/**
+ * Map any startup failure to a stable error code the UI can explain.
+ * Never swallowed — every category gets a distinct, actionable message.
+ */
+function mapStartError(error: unknown): string {
+  if (error instanceof DOMException) {
+    switch (error.name) {
+      case 'NotAllowedError':
+      case 'PermissionDeniedError':
+        return 'not-allowed';
+      case 'NotFoundError':
+      case 'DevicesNotFoundError':
+        return 'no-microphone';
+      case 'NotReadableError':
+      case 'TrackStartError':
+        return 'mic-in-use';
+      case 'SecurityError':
+        return 'insecure-context';
+      case 'OverconstrainedError':
+      case 'ConstraintNotSatisfiedError':
+        return 'audio-capture';
+      default:
+        break;
+    }
+  }
+  if (error instanceof Error) {
+    if (error.message === 'connection-timeout') return 'network';
+    if (error.message === 'audio-context-suspended') return 'audio-start-failed';
+    if (error.message === 'no-microphone-track') return 'no-microphone';
+  }
+  // Axios errors from the /live-voice/token request.
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'isAxiosError' in error &&
+    (error as { isAxiosError?: boolean }).isAxiosError
+  ) {
+    const status = (error as { response?: { status?: number } }).response?.status;
+    if (status === 404) return 'session-missing';
+    if (status === 403) return 'live-voice-session-required';
+    if (status === 503) return 'gemini-not-configured';
+    if (status === 502) return 'gemini-token-failed';
+  }
+  return 'start-failed';
+}
+
 export function useGeminiLiveVoiceCall({
   sessionId,
   role = 'PATIENT',
   stage = 'history',
   maneuverId,
   disabled = false,
+  onStartAttempt,
   onMessage,
   onError,
 }: UseGeminiLiveVoiceCallOptions) {
@@ -94,6 +156,7 @@ export function useGeminiLiveVoiceCall({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMicListening, setIsMicListening] = useState(false);
   const [connectionState, setConnectionState] = useState<GeminiLiveConnectionState>('idle');
+  const [micStatus, setMicStatus] = useState<GeminiMicStatus>('idle');
   const [micLevel, setMicLevel] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [aiCaption, setAiCaption] = useState('');
@@ -114,6 +177,7 @@ export function useGeminiLiveVoiceCall({
   const persistenceQueueRef = useRef<Promise<void>>(Promise.resolve());
   const onMessageRef = useRef(onMessage);
   const onErrorRef = useRef(onError);
+  const onStartAttemptRef = useRef(onStartAttempt);
   const disabledRef = useRef(disabled);
   const roleRef = useRef(role);
   const stageRef = useRef(stage);
@@ -125,6 +189,7 @@ export function useGeminiLiveVoiceCall({
 
   onMessageRef.current = onMessage;
   onErrorRef.current = onError;
+  onStartAttemptRef.current = onStartAttempt;
   disabledRef.current = disabled;
   roleRef.current = role;
   stageRef.current = stage;
@@ -177,6 +242,7 @@ export function useGeminiLiveVoiceCall({
     setMicLevel(0);
     setAiCaption('');
     setConnectionState('idle');
+    setMicStatus('idle');
     setIsLiveCall(false);
     setIsBusy(false);
     setIsMicListening(false);
@@ -332,22 +398,67 @@ export function useGeminiLiveVoiceCall({
   }, [stopPlayback]);
 
   const startCall = useCallback(async () => {
+    // Permission is only ever requested from this function, which is invoked
+    // directly by the Start-call button (a real user interaction).
+    onStartAttemptRef.current?.();
     if (disabledRef.current) return;
     if (!navigator.mediaDevices?.getUserMedia || typeof WebSocket === 'undefined') {
+      setMicStatus('failed');
       onErrorRef.current?.('not-supported');
+      return;
+    }
+    if (typeof window !== 'undefined' && window.isSecureContext === false) {
+      // Browsers disable getUserMedia entirely on insecure origins.
+      setMicStatus('failed');
+      setConnectionState('error');
+      onErrorRef.current?.('insecure-context');
       return;
     }
 
     setIsBusy(true);
     setConnectionState('connecting');
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      });
-      streamRef.current = stream;
-      const context = new AudioContext();
+      // Create + resume the AudioContext SYNCHRONOUSLY inside the user
+      // gesture, BEFORE the first await. On iOS Safari the transient
+      // activation is consumed by getUserMedia, and a context created after
+      // it stays suspended — and a suspended context never fires
+      // onaudioprocess, so no PCM would ever be captured.
+      const AudioCtx =
+        window.AudioContext ||
+        (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) throw new Error('audio-context-suspended');
+      const context = new AudioCtx();
       audioContextRef.current = context;
+      context.resume().catch(() => undefined);
+
+      setMicStatus('requesting-permission');
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        });
+      } catch (constraintError) {
+        // Some devices reject the processing constraints — retry with the
+        // bare minimum so no supported microphone is turned away.
+        const name = constraintError instanceof DOMException ? constraintError.name : '';
+        if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } else {
+          throw constraintError;
+        }
+      }
+      const audioTracks = stream.getAudioTracks();
+      if (audioTracks.length === 0 || audioTracks[0].readyState !== 'live') {
+        stream.getTracks().forEach((track) => track.stop());
+        throw new Error('no-microphone-track');
+      }
+      streamRef.current = stream;
+
+      // The capture graph must run on a RUNNING context.
       if (context.state === 'suspended') await context.resume();
+      if (context.state !== 'running') throw new Error('audio-context-suspended');
+
+      setMicStatus('mic-active');
 
       const response = await api.post<GeminiLiveTokenResponse>(
         `/sessions/${sessionId}/live-voice/token`,
@@ -358,6 +469,7 @@ export function useGeminiLiveVoiceCall({
         },
       );
 
+      setMicStatus('connecting');
       const { token, model, config } = response.data;
       const socket = new WebSocket(`${GEMINI_LIVE_WS}?access_token=${encodeURIComponent(token)}`);
       socketRef.current = socket;
@@ -421,21 +533,17 @@ export function useGeminiLiveVoiceCall({
       startAudioCapture(socket, context, stream);
       activeContextRef.current = `${roleRef.current}:${stageRef.current}`;
       setConnectionState('connected');
+      setMicStatus('connected');
       setIsLiveCall(true);
       setIsMicListening(true);
       setIsBusy(false);
     } catch (error) {
       setConnectionState('error');
+      setMicStatus('failed');
       stopCall();
-      const name = error instanceof DOMException ? error.name : '';
-      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        onErrorRef.current?.('not-allowed');
-      } else if (name === 'NotFoundError' || name === 'NotReadableError') {
-        onErrorRef.current?.('audio-capture');
-      } else if (error instanceof Error && error.message === 'connection-timeout') {
-        onErrorRef.current?.('network');
-      } else {
-        onErrorRef.current?.('start-failed');
+      onErrorRef.current?.(mapStartError(error));
+      if (import.meta.env.DEV) {
+        console.error('[gemini-live] call start failed:', error);
       }
     }
   }, [handleServerMessage, sessionId, startAudioCapture, stopCall]);
@@ -478,12 +586,14 @@ export function useGeminiLiveVoiceCall({
     isSpeaking,
     isMicListening,
     connectionState,
+    micStatus,
     micLevel,
     isMuted,
     aiCaption,
     role,
     stage,
     isSupported: typeof window !== 'undefined' && !!navigator.mediaDevices?.getUserMedia,
+    isSecure: typeof window === 'undefined' || window.isSecureContext !== false,
     toggleLiveCall,
     toggleMute,
     stopCall,

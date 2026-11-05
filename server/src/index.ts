@@ -57,8 +57,25 @@ app.use(
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "frame-src": ["'self'", "https://*.kashier.io"],
+        // Real-Time Voice OSCE: the browser connects to the Gemini Live
+        // WebSocket at wss://generativelanguage.googleapis.com. Without this,
+        // the default-src 'self' fallback blocks the call in production
+        // (the SPA is served from this same Express server).
+        "connect-src": [
+          "'self'",
+          "wss://generativelanguage.googleapis.com",
+          "https://generativelanguage.googleapis.com",
+          "wss://*.googleapis.com",
+        ],
+        // Voice playback may use blob: URLs (PCM playback); AudioWorklet
+        // workers may be created from blob: URLs.
+        "media-src": ["'self'", "blob:", "data:"],
+        "worker-src": ["'self'", "blob:"],
       },
     },
+    // Note: helmet 8 no longer ships a Permissions-Policy middleware, so no
+    // "microphone=()" header is sent — the browser microphone is not blocked
+    // by these headers.
   }),
 );
 const configuredOrigins = (process.env.CLIENT_URL || "")

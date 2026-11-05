@@ -1332,6 +1332,27 @@ export default {
       liveVivaComplete: "Viva completed",
       liveManeuverIncomplete:
         "Describe your findings in more detail before completing this step.",
+      liveVoiceStatusReady: "Ready to start",
+      liveVoiceStatusRequesting: "Requesting microphone permission…",
+      liveVoiceStatusMicActive: "Microphone active",
+      liveVoiceStatusConnecting: "Connecting to Gemini…",
+      liveVoiceStatusFailed: "Connection failed",
+      liveVoiceMicPermissionHint:
+        "Tap Start, then choose Allow when your browser asks for microphone access.",
+      liveVoiceInsecureContext:
+        "Microphone requires a secure connection. Open Synoza over HTTPS (https://…) — browsers block the microphone on insecure (http://) pages. localhost works for testing.",
+      liveVoiceNoMicrophone:
+        "No working microphone was found. Connect a microphone or enable it in your device settings, then try again.",
+      liveVoiceMicInUse:
+        "Your microphone is busy. Close other apps or tabs using the microphone, then try again.",
+      liveVoiceGeminiUnavailable:
+        "The voice service is not configured on the server yet (GEMINI_API_KEY). Please contact support.",
+      liveVoiceSessionMissing:
+        "This exam session was not found or is no longer active. Go back and start the exam again.",
+      liveVoiceSessionRequired:
+        "Voice calls are only available in Real-Time Live Call sessions.",
+      liveVoiceTranscriptSaveFailed:
+        "The last spoken turn could not be saved. Check your connection — your evaluation depends on the saved conversation.",
     },
   },
   ar: {
@@ -2622,6 +2643,27 @@ export default {
       liveVivaComplete: "خلصت الأسئلة الشفوية",
       liveManeuverIncomplete:
         "اوصف ملاحظاتك بتفصيل أكتر قبل إنهاء الخطوة.",
+      liveVoiceStatusReady: "جاهز للبدء",
+      liveVoiceStatusRequesting: "بنطلب إذن الميكروفون…",
+      liveVoiceStatusMicActive: "الميكروفون شغال",
+      liveVoiceStatusConnecting: "جاري الاتصال بـ Gemini…",
+      liveVoiceStatusFailed: "فشل الاتصال",
+      liveVoiceMicPermissionHint:
+        "دوس على ابدأ واختار «سماح» لما المتصفح يطلب إذن الميكروفون.",
+      liveVoiceInsecureContext:
+        "الميكروفون محتاج اتصال آمن. افتح Synoza من خلال HTTPS — المتصفحات بتمنع الميكروفون على الصفحات غير الآمنة (http://). localhost يصلح للتجربة.",
+      liveVoiceNoMicrophone:
+        "مفيش ميكروفون شغال. وصّل ميكروفون أو شغّله من إعدادات الجهاز وحاول تاني.",
+      liveVoiceMicInUse:
+        "الميكروفون مستخدم في تطبيق أو تاب تاني. اقفل اللي بيستخدمه وحاول تاني.",
+      liveVoiceGeminiUnavailable:
+        "خدمة الصوت لسه مش متظبطة على السيرفر (GEMINI_API_KEY). كلم الدعم من فضلك.",
+      liveVoiceSessionMissing:
+        "الامتحان ده مش موجود أو مش شغال. ارجع وابدأ الامتحان من جديد.",
+      liveVoiceSessionRequired:
+        "المكالمات الصوتية متاحة في جلسات المكالمة المباشرة بس.",
+      liveVoiceTranscriptSaveFailed:
+        "آخر كلام متسجلش. اتأكد من الاتصال — تقييمك بيعتمد على المحادثة المتسجلة.",
     },
   },
 };
