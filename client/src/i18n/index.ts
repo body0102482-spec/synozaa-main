@@ -1347,6 +1347,8 @@ export default {
         "Your microphone is busy. Close other apps or tabs using the microphone, then try again.",
       liveVoiceGeminiUnavailable:
         "The voice service is not configured on the server yet (GEMINI_API_KEY). Please contact support.",
+      liveVoiceRealtimeUnavailable:
+        "Live voice could not start (OPENAI_API_KEY / OPENAI_REALTIME_MODEL on the server). Trying the alternate voice transport — start the call again.",
       liveVoiceSessionMissing:
         "This exam session was not found or is no longer active. Go back and start the exam again.",
       liveVoiceSessionRequired:
@@ -2664,6 +2666,8 @@ export default {
         "المكالمات الصوتية متاحة في جلسات المكالمة المباشرة بس.",
       liveVoiceTranscriptSaveFailed:
         "آخر كلام متسجلش. اتأكد من الاتصال — تقييمك بيعتمد على المحادثة المتسجلة.",
+      liveVoiceRealtimeUnavailable:
+        "المكالمة الصوتية المباشرة مش قادرة تبدأ (إعدادات OPENAI_API_KEY على السيرفر). بيتم التحويل لطريقة الصوت البديلة — ابدأ المكالمة تاني.",
     },
   },
 };

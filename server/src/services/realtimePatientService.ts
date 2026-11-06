@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { Case } from '@prisma/client';
 import { buildRealtimePatientInstructions } from './aiService.js';
 
@@ -6,7 +7,7 @@ function resolveRealtimeModel(): string {
   if (explicit) return explicit;
   const shared = process.env.OPENAI_MODEL?.trim();
   if (shared && /realtime/i.test(shared)) return shared;
-  return 'gpt-realtime-mini';
+  return 'gpt-realtime-2.1-mini';
 }
 
 function resolveRealtimeLanguage(sessionLanguage: string): 'en' | 'ar' | undefined {
@@ -63,76 +64,42 @@ export function buildRealtimeSessionConfig(caseData: Case, sessionLanguage: stri
   };
 }
 
-export async function mintRealtimeClientSecret(
-  apiKey: string,
-  sessionConfig: ReturnType<typeof buildRealtimeSessionConfig>,
-): Promise<string> {
-  const response = await fetch('https://api.openai.com/v1/realtime/client_secrets', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      expires_after: {
-        anchor: 'created_at',
-        seconds: 600,
-      },
-      session: sessionConfig,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text();
-    const err = new Error('realtime-call-failed') as Error & { detail?: string; status?: number };
-    err.detail = detail;
-    err.status = response.status;
-    throw err;
+/** Typed transport error so routes can forward the right HTTP status. */
+export class RealtimeCallError extends Error {
+  status: number;
+  constructor(message: string, status = 502) {
+    super(message);
+    this.status = status;
   }
-
-  const data = (await response.json()) as { value?: string };
-  if (!data.value) {
-    throw new Error('realtime-call-failed');
-  }
-  return data.value;
 }
 
-async function exchangeRealtimeSdp(ephemeralKey: string, sdpOffer: string): Promise<string> {
-  const normalizedSdp = normalizeSdp(sdpOffer);
-  const form = new FormData();
-  form.set('sdp', normalizedSdp);
-
-  const response = await fetch('https://api.openai.com/v1/realtime/calls', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${ephemeralKey}`,
-    },
-    body: form,
-  });
-
-  const answerSdp = await response.text();
-  if (!response.ok) {
-    console.error('[realtime] OpenAI call failed:', response.status, answerSdp);
-    throw new Error('realtime-call-failed');
-  }
-
-  return answerSdp;
+/** Stable, privacy-preserving safety identifier (hashed user id — not the raw id). */
+export function realtimesafetyIdentifier(userId: string): string {
+  return createHash('sha256').update(`synoza-realtime:${userId}`).digest('hex');
 }
 
+/**
+ * Unified WebRTC server-side connection flow (official guide):
+ * the application server posts the browser SDP offer together with its session
+ * configuration as a multipart form to `POST /v1/realtime/calls`, authenticated
+ * with the standard OPENAI_API_KEY. No ephemeral client secrets are minted —
+ * the permanent key never leaves this server and the browser never sees it.
+ */
 export async function createRealtimePatientCallAnswer(
   caseData: Case,
   sessionLanguage: string,
   sdpOffer: string,
+  userId?: string,
 ): Promise<string> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
-  if (!apiKey) {
-    throw new Error('realtime-unavailable');
+  if (!isRealtimeConfigured()) {
+    throw new RealtimeCallError('realtime-unavailable', 503);
   }
 
   const normalizedSdp = normalizeSdp(sdpOffer);
   if (normalizedSdp.length < 100 || !normalizedSdp.includes('m=audio')) {
     console.warn('[realtime] rejected invalid SDP', { length: normalizedSdp.length });
-    throw new Error('invalid-sdp');
+    throw new RealtimeCallError('invalid-sdp', 400);
   }
 
   const sessionConfig = buildRealtimeSessionConfig(caseData, sessionLanguage);
@@ -143,16 +110,42 @@ export async function createRealtimePatientCallAnswer(
     sdpLength: normalizedSdp.length,
   });
 
-  const ephemeralKey = await mintRealtimeClientSecret(apiKey, sessionConfig);
-  return exchangeRealtimeSdp(ephemeralKey, normalizedSdp);
+  const form = new FormData();
+  form.set('sdp', normalizedSdp);
+  form.set('session', JSON.stringify(sessionConfig));
+
+  const response = await fetch('https://api.openai.com/v1/realtime/calls', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      ...(userId
+        ? { 'OpenAI-Safety-Identifier': realtimesafetyIdentifier(userId) }
+        : {}),
+    },
+    body: form,
+  });
+
+  const answerSdp = await response.text();
+  if (!response.ok) {
+    console.error('[realtime] OpenAI call failed:', response.status, answerSdp);
+    if (response.status === 401 || response.status === 403) {
+      // Request reached OpenAI but was rejected — usually an invalid/revoked
+      // server key. Surface it as "not configured" so the UI explains the fix.
+      throw new RealtimeCallError('realtime-unavailable', 503);
+    }
+    throw new RealtimeCallError('realtime-call-failed', 502);
+  }
+
+  return answerSdp;
 }
 
+/**
+ * Realtime must be independently configurable: only OPENAI_API_KEY decides.
+ * The global AI_PROVIDER (openrouter for text AI) never gates voice calls.
+ */
 export function isRealtimeConfigured(): boolean {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey || apiKey.startsWith('your-') || apiKey === 'sk-dummy' || apiKey.length < 20) {
-    return false;
-  }
-  if ((process.env.AI_PROVIDER || '').toLowerCase() === 'openrouter' && !process.env.OPENAI_REALTIME_MODEL) {
     return false;
   }
   return true;

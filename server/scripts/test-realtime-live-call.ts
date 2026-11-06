@@ -1,5 +1,5 @@
 /**
- * Realtime live-call tests: config + live OpenAI client_secrets verification.
+ * Realtime live-call tests: config + unified OpenAI /v1/realtime/calls guards.
  * Run: npm run test:realtime
  */
 import dotenv from 'dotenv';
@@ -7,7 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import {
   buildRealtimeSessionConfig,
-  mintRealtimeClientSecret,
+  createRealtimePatientCallAnswer,
+  isRealtimeConfigured,
   resolveRealtimeVoice,
 } from '../src/services/realtimePatientService.js';
 import { sanitizeRealtimePatientTranscript } from '../src/services/aiService.js';
@@ -51,10 +52,10 @@ function assert(condition: boolean, label: string, detail?: string) {
 }
 
 console.log('\n=== Realtime session config (Nova-compatible) ===\n');
-process.env.OPENAI_REALTIME_MODEL = 'gpt-realtime-mini';
+process.env.OPENAI_REALTIME_MODEL = 'gpt-realtime-2.1-mini';
 const config = buildRealtimeSessionConfig(mockCase, 'AR');
 
-assert(config.model === 'gpt-realtime-mini', 'model gpt-realtime-mini', config.model);
+assert(config.model === 'gpt-realtime-2.1-mini', 'model gpt-realtime-2.1-mini', config.model);
 assert(config.audio?.output?.voice === 'alloy', 'output voice alloy', config.audio?.output?.voice);
 assert(config.audio?.output?.format === undefined, 'no output format (WebRTC)');
 assert(config.audio?.input?.format === undefined, 'no input format (WebRTC)');
@@ -136,18 +137,43 @@ assert(containsWrongScriptForArabic('你好世界这是一个测试'), 'blocks c
 assert(!isValidArabicSessionTranscript('你好世界', true), 'invalid chinese session transcript');
 assert(isValidArabicSessionTranscript('عندك كم سنة', true), 'valid arabic transcript');
 
-console.log('\n=== Live OpenAI client_secrets test ===\n');
-const apiKey = process.env.OPENAI_API_KEY?.trim();
-if (!apiKey) {
-  console.log('  ⚠ SKIP live test — OPENAI_API_KEY not set');
-} else {
+console.log('\n=== Realtime configuration & unified flow guards ===\n');
+const originalKey = process.env.OPENAI_API_KEY;
+try {
+  process.env.OPENAI_API_KEY = 'your-openai-api-key-here';
+  assert(!isRealtimeConfigured(), 'placeholder OPENAI_API_KEY is not "configured"');
+
+  // Realtime is independent from the global text-AI provider setting.
+  process.env.OPENAI_API_KEY = 'sk-test-synoza-realtime-key-0123456789abcdef';
+  process.env.AI_PROVIDER = 'openrouter';
+  assert(isRealtimeConfigured(), 'Realtime works while AI_PROVIDER is openrouter (independent config)');
+
+  const placeholderConst = process.env.OPENAI_REALTIME_MODEL;
+  const originalOpenAIModel = process.env.OPENAI_MODEL;
+  process.env.OPENAI_REALTIME_MODEL = '';
+  process.env.OPENAI_MODEL = 'gpt-realtime-2.1-mini';
+  assert(buildRealtimeSessionConfig(mockCase, 'AR').model === 'gpt-realtime-2.1-mini', 'OPENAI_MODEL realtime fallback resolves');
+  process.env.OPENAI_REALTIME_MODEL = placeholderConst;
+  if (originalOpenAIModel === undefined) delete process.env.OPENAI_MODEL;
+  else process.env.OPENAI_MODEL = originalOpenAIModel;
+
+  // A real browser SDP offer is required to exercise /v1/realtime/calls live.
+  // Locally, verify the server-side guard rejects malformed offers without
+  // calling OpenAI at all:
   try {
-    const ephemeral = await mintRealtimeClientSecret(apiKey, config);
-    assert(typeof ephemeral === 'string' && ephemeral.length > 20, 'OpenAI client_secrets OK');
+    await createRealtimePatientCallAnswer(mockCase as never, 'AR', 'v=0\r\nm=text\r\n');
+    assert(false, 'malformed SDP is rejected locally');
   } catch (err) {
-    const detail = (err as { detail?: string })?.detail || String(err);
-    assert(false, 'OpenAI client_secrets', detail.slice(0, 200));
+    assert(
+      err instanceof Error && err.message === 'invalid-sdp',
+      'malformed SDP is rejected locally (invalid-sdp)',
+      String(err),
+    );
   }
+} finally {
+  process.env.OPENAI_API_KEY = originalKey;
+  delete process.env.OPENAI_REALTIME_MODEL;
+  delete process.env.AI_PROVIDER;
 }
 
 console.log('\n=== Summary ===\n');

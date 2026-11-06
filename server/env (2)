@@ -22,6 +22,9 @@ EXAMINER_MODEL=gpt-6-luna-pro
 # Speech-to-text: openai (recommended) | local (on-server Whisper; needs working ffmpeg)
 # On Windows, prefer openai — bundled ffmpeg-static often fails with spawn EFTYPE.
 STT_PROVIDER=openai
+# Real-Time Voice Call (browser WebRTC → OpenAI Realtime). Independent of
+# AI_PROVIDER — set a real OPENAI_API_KEY above to enable the Live Call UI.
+OPENAI_REALTIME_MODEL=gpt-realtime-2.1-mini
 # LOCAL_WHISPER_MODEL=Xenova/whisper-small
 # Optional: path to a working ffmpeg binary if using STT_PROVIDER=local
 # FFMPEG_PATH=C:\ffmpeg\bin\ffmpeg.exe

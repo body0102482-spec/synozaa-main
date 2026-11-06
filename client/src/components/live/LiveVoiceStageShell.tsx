@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { Loader2, Mic, MicOff, Phone, PhoneOff, Shield, UserCircle, Volume2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-/** Shape returned by useGeminiLiveVoiceCall — one active voice connection. */
+/** One active voice connection — the contract both voice transports
+ * (useGeminiLiveVoiceCall / useOpenAIRealtimeCall) implement for this UI. */
 export interface LiveVoiceCallControls {
   isLiveCall: boolean;
   isBusy: boolean;

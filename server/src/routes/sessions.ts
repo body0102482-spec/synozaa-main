@@ -24,7 +24,7 @@ import {
 import { serializeResolvedStationConfigForUser } from '../services/caseResolveService.js';
 import { applySessionXp, getRankProgress } from '../services/xpService.js';
 import { processTextTurn, processVoiceTurn } from '../services/voiceTurnService.js';
-import { createRealtimePatientCallAnswer, isRealtimeConfigured } from '../services/realtimePatientService.js';
+import { createRealtimePatientCallAnswer, isRealtimeConfigured, RealtimeCallError } from '../services/realtimePatientService.js';
 import {
   buildGeminiLiveSessionConfig,
   createGeminiLiveEphemeralToken,
@@ -572,15 +572,20 @@ router.post(
         session.case,
         session.language,
         sdpOffer,
+        req.user!.id,
       );
       res.type('application/sdp').send(answerSdp);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Realtime call failed';
+      const status = error instanceof RealtimeCallError ? error.status : undefined;
       if (message === 'realtime-unavailable') {
         return res.status(503).json({ error: 'Realtime API is not configured' });
       }
       if (message === 'invalid-sdp') {
         return res.status(400).json({ error: 'Incomplete WebRTC offer. Refresh and try again.' });
+      }
+      if (message === 'realtime-call-failed') {
+        return res.status(status ?? 502).json({ error: 'Realtime call failed' });
       }
       console.error('[realtime/call]', error);
       res.status(500).json({ error: 'Realtime call failed' });
