@@ -1,4 +1,7 @@
 import { containsWrongScriptForArabic, fixArabicSpeechTranscript, looksLikeSttHallucination } from './arabicSttFix.js';
+import type { Case } from '@prisma/client';
+import { buildRealtimePatientInstructions } from './aiService.js';
+import type { PatientBehavior } from '../lib/stationConfig.js';
 
 export const OPENROUTER_TTS_MODEL = 'x-ai/grok-voice-tts-1.0';
 // Whisper Turbo accepts the WebM/Opus container emitted by Chrome's
@@ -30,6 +33,41 @@ export class OpenRouterAudioError extends Error {
     super(code);
   }
 }
+
+export interface OpenRouterAudioChatHistoryMessage {
+  role: string;
+  content: string;
+}
+
+export interface OpenRouterAudioChatTurnInput {
+  audioBase64: string;
+  format: string;
+  studentTranscript: string;
+  caseData: Case;
+  sessionLanguage: string;
+  patientBehavior: PatientBehavior;
+  history: OpenRouterAudioChatHistoryMessage[];
+}
+
+export interface OpenRouterAudioChatTurnResult {
+  transcript: string;
+  patientText: string;
+  audioBase64: string;
+  audioFormat: 'wav';
+  latencyMs: number;
+}
+
+type OpenRouterAudioChatResponse = {
+  choices?: Array<{
+    message?: {
+      content?: unknown;
+      audio?: {
+        data?: unknown;
+        transcript?: unknown;
+      };
+    };
+  }>;
+};
 
 export type OpenRouterTranscriptionDiagnostics = {
   transcript: string;
@@ -140,6 +178,215 @@ function openRouterHeaders(key: string) {
     'Content-Type': 'application/json',
     'HTTP-Referer': process.env.OPENROUTER_SITE_URL || 'https://synozaa.com',
     'X-Title': process.env.OPENROUTER_APP_NAME || 'Synoza OSCE',
+  };
+}
+
+function extractTextContent(content: unknown): string {
+  if (typeof content === 'string') return content.trim();
+  if (!Array.isArray(content)) return '';
+  return content
+    .map((part) => {
+      if (!part || typeof part !== 'object') return '';
+      const text = (part as { text?: unknown }).text;
+      return typeof text === 'string' ? text : '';
+    })
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+}
+
+export async function transcribeOpenRouterAudioChatInput(input: {
+  audioBase64: string;
+  format: string;
+  language: string;
+  forceArabic?: boolean;
+  speechDurationMs?: number;
+  byteSize?: number;
+}): Promise<string> {
+  const key = process.env.OPENROUTER_API_KEY?.trim();
+  if (!key) throw new Error('openrouter-audio-unavailable');
+  const model = process.env.OPENROUTER_AUDIO_MODEL?.trim();
+  if (!model) throw new Error('openrouter-audio-model-unconfigured');
+  if (input.format !== 'wav') {
+    throw new OpenRouterAudioError('transcription', 'openrouter-audio-unsupported-format');
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30_000);
+  let response: Response;
+  try {
+    response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: openRouterHeaders(key),
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        modalities: ['text'],
+        messages: [
+          {
+            role: 'system',
+            content: 'Transcribe the user audio exactly as spoken. Return only the transcript, without translation, correction, commentary, or an answer.',
+          },
+          {
+            role: 'user',
+            content: [{
+              type: 'input_audio',
+              input_audio: { data: input.audioBase64, format: input.format },
+            }],
+          },
+        ],
+      }),
+    });
+  } catch {
+    clearTimeout(timeout);
+    throw new OpenRouterAudioError('transcription', 'openrouter-transcription-network-failed');
+  }
+  clearTimeout(timeout);
+
+  if (!response.ok) {
+    throw new OpenRouterAudioError('transcription', 'openrouter-transcription-failed', response.status);
+  }
+  let payload: OpenRouterAudioChatResponse;
+  try {
+    payload = await response.json() as OpenRouterAudioChatResponse;
+  } catch {
+    throw new OpenRouterAudioError('transcription', 'openrouter-transcription-invalid', response.status);
+  }
+  const transcript = extractTextContent(payload.choices?.[0]?.message?.content);
+  if (!transcript) {
+    throw new OpenRouterAudioError('transcription', 'openrouter-transcription-invalid', response.status);
+  }
+  try {
+    return normalizeOpenRouterTranscript(
+      transcript,
+      input.language,
+      input.forceArabic,
+      input.speechDurationMs,
+      input.byteSize,
+    );
+  } catch {
+    throw new OpenRouterAudioError('transcription', 'openrouter-transcription-invalid', response.status);
+  }
+}
+
+/**
+ * One turn-based OpenRouter audio chat completion for LIVE_VOICE patient
+ * history. The model receives the student's WAV audio and grounded patient
+ * context, then returns both an answer transcript and WAV audio.
+ */
+export async function createOpenRouterAudioChatTurn(
+  input: OpenRouterAudioChatTurnInput,
+): Promise<OpenRouterAudioChatTurnResult> {
+  const key = process.env.OPENROUTER_API_KEY?.trim();
+  if (!key) throw new Error('openrouter-audio-unavailable');
+  const model = process.env.OPENROUTER_AUDIO_MODEL?.trim();
+  if (!model) throw new Error('openrouter-audio-model-unconfigured');
+  if (input.format !== 'wav') {
+    throw new OpenRouterAudioError('audio-generation', 'openrouter-audio-unsupported-format');
+  }
+
+  const instructions = buildRealtimePatientInstructions(
+    input.caseData,
+    input.sessionLanguage,
+    input.patientBehavior,
+  );
+  const messages = [
+    { role: 'system', content: instructions },
+    ...input.history
+      .filter((message) => message.content.trim())
+      .map((message) => ({
+        role: message.role === 'PATIENT' ? 'assistant' : 'user',
+        content: message.content,
+      })),
+    {
+      role: 'user',
+      content: [
+        {
+          type: 'text',
+          text: `The student's spoken question was transcribed as: ${input.studentTranscript}. Answer that question as the patient.`,
+        },
+        {
+          type: 'input_audio',
+          input_audio: { data: input.audioBase64, format: input.format },
+        },
+      ],
+    },
+  ];
+  const startedAt = Date.now();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 90_000);
+  let response: Response;
+  try {
+    response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: openRouterHeaders(key),
+      signal: controller.signal,
+      body: JSON.stringify({
+        model,
+        modalities: ['text', 'audio'],
+        audio: {
+          voice: process.env.OPENROUTER_AUDIO_VOICE?.trim() || 'alloy',
+          format: 'wav',
+        },
+        messages,
+      }),
+    });
+  } catch (error) {
+    clearTimeout(timeout);
+    logOpenRouterFailure({
+      stage: 'audio-generation',
+      model,
+      metadata: {
+        mimeType: 'audio/wav',
+        byteSize: Math.floor(input.audioBase64.length * 0.75),
+        format: 'wav',
+        base64Length: input.audioBase64.length,
+      },
+      providerMessage: error instanceof Error ? error.message : 'network failure',
+      timedOut: controller.signal.aborted,
+    });
+    throw new OpenRouterAudioError('audio-generation', 'openrouter-audio-failed');
+  }
+  clearTimeout(timeout);
+
+  if (!response.ok) {
+    logOpenRouterFailure({
+      stage: 'audio-generation',
+      status: response.status,
+      model,
+      metadata: {
+        mimeType: 'audio/wav',
+        byteSize: Math.floor(input.audioBase64.length * 0.75),
+        format: 'wav',
+        base64Length: input.audioBase64.length,
+      },
+      providerMessage: 'upstream error body omitted',
+    });
+    throw new OpenRouterAudioError('audio-generation', 'openrouter-audio-failed', response.status);
+  }
+
+  let payload: OpenRouterAudioChatResponse;
+  try {
+    payload = await response.json() as OpenRouterAudioChatResponse;
+  } catch {
+    throw new OpenRouterAudioError('audio-generation', 'openrouter-audio-invalid-response', response.status);
+  }
+  const message = payload.choices?.[0]?.message;
+  const audioBase64 =
+    typeof message?.audio?.data === 'string' ? message.audio.data.trim() : '';
+  const transcript =
+    typeof message?.audio?.transcript === 'string' ? message.audio.transcript.trim() : '';
+  const patientText = transcript || extractTextContent(message?.content);
+  if (!audioBase64 || !patientText) {
+    throw new OpenRouterAudioError('audio-generation', 'openrouter-audio-no-output', response.status);
+  }
+
+  return {
+    transcript: patientText,
+    patientText,
+    audioBase64,
+    audioFormat: 'wav',
+    latencyMs: Date.now() - startedAt,
   };
 }
 

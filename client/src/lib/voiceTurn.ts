@@ -69,6 +69,7 @@ export async function postVoiceTurn(
   sessionLang: string,
   meta: VoiceTurnMeta,
   recordingMeta?: { durationMs: number; speechDurationMs: number },
+  timeoutMs = VOICE_TURN_TIMEOUT_MS,
 ): Promise<VoiceTurnResponse> {
   const recordingFinishedAt = performance.now();
   const expectArabic = shouldForceArabicTranscription(sessionLang);
@@ -91,7 +92,7 @@ export async function postVoiceTurn(
       recordingDurationMs: recordingMeta?.durationMs,
       speechDurationMs: recordingMeta?.speechDurationMs,
     },
-    { timeout: VOICE_TURN_TIMEOUT_MS },
+    { timeout: timeoutMs },
   );
 
   if (res.data.audioBase64) {

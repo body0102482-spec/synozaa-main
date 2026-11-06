@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import express from 'express';
 import { prisma } from '../lib/prisma.js';
 import { authenticate } from '../middleware/auth.js';
 import {
@@ -24,13 +23,13 @@ import {
 import { serializeResolvedStationConfigForUser } from '../services/caseResolveService.js';
 import { applySessionXp, getRankProgress } from '../services/xpService.js';
 import { processTextTurn, processVoiceTurn } from '../services/voiceTurnService.js';
-import { createRealtimePatientCallAnswer, isRealtimeConfigured, RealtimeCallError } from '../services/realtimePatientService.js';
 import {
   buildGeminiLiveSessionConfig,
   createGeminiLiveEphemeralToken,
   isLiveVoiceSessionType,
 } from '../services/geminiLiveService.js';
-import { createOpenRouterPatientAudioTurn, isOpenRouterAudioEnabled, OpenRouterAudioError, openRouterAudioInputFormat, transcribeOpenRouterAudio } from '../services/openRouterAudioService.js';
+import { createOpenRouterAudioChatTurn, createOpenRouterPatientAudioTurn, isOpenRouterAudioEnabled, OpenRouterAudioError, openRouterAudioInputFormat, transcribeOpenRouterAudio, transcribeOpenRouterAudioChatInput } from '../services/openRouterAudioService.js';
+import { resolveVoiceProvider } from '../services/voiceProvider.js';
 import {
   buildExaminerVivaOpening,
   getCurrentVivaQuestionNumber,
@@ -71,25 +70,40 @@ function canStartManeuver(_maneuverId: string, _completed: string[]) {
 
 router.use(authenticate);
 
-// Configuration endpoint: exposes whether openrouter_audio, openai_realtime, or live_call is enabled.
+// Configuration endpoint: exposes the live-voice TRANSPORT availability.
+// Response contract (see server/src/services/voiceProvider.ts):
+//   provider  — 'openrouter_audio' | 'live_call'
+//   transport — unambiguous family: 'openrouter' | 'gemini'
+// `provider`/`transport` describe the AI transport only. They never overlap
+// with the Prisma sessionType (`LIVE_VOICE` vs `CHAT`), which keeps session
+// billing/UI concerns separate from which AI stack carries the audio.
 router.get('/voice-provider', (_req, res) => {
-  if (isOpenRouterAudioEnabled()) {
-    return res.json({ provider: 'openrouter_audio' });
-  }
-  if (isRealtimeConfigured()) {
-    return res.json({ provider: 'openai_realtime' });
-  }
-  return res.json({ provider: 'live_call' });
+  return res.json(resolveVoiceProvider());
 });
 
-router.get('/:id/voice-provider', (_req, res) => {
-  if (isOpenRouterAudioEnabled()) {
-    return res.json({ provider: 'openrouter_audio' });
+router.get('/:id/voice-provider', async (req, res) => {
+  // Same transport truth as the generic endpoint; the per-session shape also
+  // echoes sessionType + sessionId so consumers can never conflate the
+  // transport (`provider`) with the session kind (`sessionType`). The lookup
+  // is deliberately tolerant: a bad/unknown session id must not turn the
+  // transport config endpoint into a hard 404 for legacy clients.
+  let sessionType: string | null = null;
+  try {
+    const session = await prisma.session.findFirst({
+      where: { id: req.params.id, userId: req.user!.id },
+      select: { id: true, sessionType: true },
+    });
+    if (session) {
+      sessionType = session.sessionType;
+    }
+  } catch {
+    sessionType = null;
   }
-  if (isRealtimeConfigured()) {
-    return res.json({ provider: 'openai_realtime' });
-  }
-  return res.json({ provider: 'live_call' });
+  return res.json({
+    ...resolveVoiceProvider(),
+    sessionId: req.params.id,
+    sessionType,
+  });
 });
 
 router.post('/:id/live-voice/token', async (req, res) => {
@@ -552,101 +566,6 @@ router.post('/:id/maneuver/complete', async (req, res) => {
   res.json({ session: updated, completedManeuvers: completed, completion });
 });
 
-router.post(
-  '/:id/realtime/call',
-  express.text({ type: ['application/sdp', 'text/plain'] }),
-  async (req, res) => {
-    try {
-      const sdpOffer = typeof req.body === 'string' ? req.body.trim() : '';
-      if (!sdpOffer) {
-        return res.status(400).json({ error: 'SDP offer required' });
-      }
-
-      const session = await prisma.session.findFirst({
-        where: { id: req.params.id, userId: req.user!.id, status: 'IN_PROGRESS' },
-        include: { case: true },
-      });
-      if (!session) return res.status(404).json({ error: 'Active session not found' });
-
-      const answerSdp = await createRealtimePatientCallAnswer(
-        session.case,
-        session.language,
-        sdpOffer,
-        req.user!.id,
-      );
-      res.type('application/sdp').send(answerSdp);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Realtime call failed';
-      const status = error instanceof RealtimeCallError ? error.status : undefined;
-      if (message === 'realtime-unavailable') {
-        return res.status(503).json({ error: 'Realtime API is not configured' });
-      }
-      if (message === 'invalid-sdp') {
-        return res.status(400).json({ error: 'Incomplete WebRTC offer. Refresh and try again.' });
-      }
-      if (message === 'realtime-call-failed') {
-        return res.status(status ?? 502).json({ error: 'Realtime call failed' });
-      }
-      console.error('[realtime/call]', error);
-      res.status(500).json({ error: 'Realtime call failed' });
-    }
-  },
-);
-
-router.post('/:id/realtime/message', async (req, res) => {
-  try {
-    const { content, role = 'STUDENT', stage = 'history', orderIndex } = req.body as {
-      content?: string;
-      role?: 'STUDENT' | 'PATIENT';
-      stage?: string;
-      orderIndex?: number;
-    };
-
-    const text = content?.trim();
-    if (!text) return res.status(400).json({ error: 'Message content required' });
-
-    const session = await prisma.session.findFirst({
-      where: { id: req.params.id, userId: req.user!.id, status: 'IN_PROGRESS' },
-      include: { case: true },
-    });
-    if (!session) return res.status(404).json({ error: 'Active session not found' });
-
-    let messageContent = text;
-    if (role === 'PATIENT') {
-      const lastStudent = await prisma.message.findFirst({
-        where: { sessionId: session.id, role: MessageRole.STUDENT },
-        orderBy: { createdAt: 'desc' },
-      });
-      messageContent = sanitizeRealtimePatientTranscript(
-        session.case,
-        lastStudent?.content ?? '',
-        text,
-        session.language,
-      );
-    }
-
-    const createdAt =
-      typeof orderIndex === 'number' && Number.isFinite(orderIndex)
-        ? new Date(session.startedAt.getTime() + orderIndex * 1000)
-        : undefined;
-
-    const message = await prisma.message.create({
-      data: {
-        sessionId: session.id,
-        role: role === 'PATIENT' ? MessageRole.PATIENT : MessageRole.STUDENT,
-        content: messageContent,
-        stage,
-        ...(createdAt ? { createdAt } : {}),
-      },
-    });
-
-    res.json({ message });
-  } catch (error) {
-    console.error('[realtime/message]', error);
-    res.status(500).json({ error: 'Failed to save realtime message' });
-  }
-});
-
 router.patch('/:id/language', async (req, res) => {
   const languageRaw = String(req.body?.language ?? '').toUpperCase();
   if (languageRaw !== 'AUTO' && languageRaw !== 'AR' && languageRaw !== 'EN') {
@@ -738,39 +657,90 @@ router.post('/:id/voice-turn', async (req, res) => {
           });
           throw new Error('openrouter-audio-unsupported-format');
         }
-        const transcript = await transcribeOpenRouterAudio({
-          audioBase64, format, language, forceArabic: !!forceArabic, mimeType, byteSize: buffer.length,
-          recordingDurationMs: Number.isFinite(recordingDurationMs) ? recordingDurationMs : undefined,
-          speechDurationMs: Number.isFinite(speechDurationMs) ? speechDurationMs : undefined,
-        });
-        // Keep the written patient engine authoritative. The audio model is a
-        // renderer only and never sees case prose, expected findings, or the
-        // student's question as material it could answer from.
-        const stageHistory = session.messages
-          .filter((message) => message.stage === stage)
-          .map((message) => ({ role: message.role, content: message.content }));
-        const patientText = await getPatientResponse(
-          session.case,
-          stageHistory,
-          transcript,
-          session.language,
-          {
-            voiceTurn: true,
-            userId: session.userId,
-            sessionId: session.id,
-            stationConfig: getSessionStationConfig(session),
-          },
-        );
-        const audio = await createOpenRouterPatientAudioTurn({
-          patientText,
-          language: session.language,
-          patientGender: session.case.patientGender,
-          mimeType,
-          byteSize: buffer.length,
-        });
-        const studentMessage = await prisma.message.create({ data: { sessionId: session.id, role: MessageRole.STUDENT, content: transcript, stage } });
-        const replyMessage = await prisma.message.create({ data: { sessionId: session.id, role: MessageRole.PATIENT, content: patientText, stage } });
-        result = { transcript, studentMessage, replyMessage, audioBase64: audio.audioBase64, audioFormat: audio.format, latencyMs: audio.latencyMs, firstResponseMs: audio.firstResponseMs };
+        if (isLiveVoiceSessionType(session.sessionType)) {
+          if (stage !== 'history') {
+            return res.status(400).json({ error: 'Patient audio is only available in the history stage' });
+          }
+          const studentTranscript = await transcribeOpenRouterAudioChatInput({
+              audioBase64,
+              format,
+              language,
+              forceArabic: !!forceArabic,
+              byteSize: buffer.length,
+              speechDurationMs: Number.isFinite(speechDurationMs) ? speechDurationMs : undefined,
+          });
+          const audioTurn = await createOpenRouterAudioChatTurn({
+            audioBase64,
+            format,
+            studentTranscript,
+            caseData: session.case,
+            sessionLanguage: session.language,
+            patientBehavior: getSessionStationConfig(session).patientBehavior,
+            history: session.messages
+              .filter(
+                (message) =>
+                  message.stage === 'history' &&
+                  (message.role === MessageRole.STUDENT || message.role === MessageRole.PATIENT),
+              )
+              .map((message) => ({ role: message.role, content: message.content })),
+          });
+          const studentMessage = await prisma.message.create({
+            data: {
+              sessionId: session.id,
+              role: MessageRole.STUDENT,
+              content: studentTranscript,
+              stage,
+            },
+          });
+          const replyMessage = await prisma.message.create({
+            data: {
+              sessionId: session.id,
+              role: MessageRole.PATIENT,
+              content: audioTurn.patientText,
+              stage,
+            },
+          });
+          result = {
+            transcript: studentTranscript,
+            studentMessage,
+            replyMessage,
+            audioBase64: audioTurn.audioBase64,
+            audioFormat: audioTurn.audioFormat,
+            latencyMs: audioTurn.latencyMs,
+            firstResponseMs: audioTurn.latencyMs,
+          };
+        } else {
+          const transcript = await transcribeOpenRouterAudio({
+            audioBase64, format, language, forceArabic: !!forceArabic, mimeType, byteSize: buffer.length,
+            recordingDurationMs: Number.isFinite(recordingDurationMs) ? recordingDurationMs : undefined,
+            speechDurationMs: Number.isFinite(speechDurationMs) ? speechDurationMs : undefined,
+          });
+          const stageHistory = session.messages
+            .filter((message) => message.stage === stage)
+            .map((message) => ({ role: message.role, content: message.content }));
+          const patientText = await getPatientResponse(
+            session.case,
+            stageHistory,
+            transcript,
+            session.language,
+            {
+              voiceTurn: true,
+              userId: session.userId,
+              sessionId: session.id,
+              stationConfig: getSessionStationConfig(session),
+            },
+          );
+          const audio = await createOpenRouterPatientAudioTurn({
+            patientText,
+            language: session.language,
+            patientGender: session.case.patientGender,
+            mimeType,
+            byteSize: buffer.length,
+          });
+          const studentMessage = await prisma.message.create({ data: { sessionId: session.id, role: MessageRole.STUDENT, content: transcript, stage } });
+          const replyMessage = await prisma.message.create({ data: { sessionId: session.id, role: MessageRole.PATIENT, content: patientText, stage } });
+          result = { transcript, studentMessage, replyMessage, audioBase64: audio.audioBase64, audioFormat: audio.format, latencyMs: audio.latencyMs, firstResponseMs: audio.firstResponseMs };
+        }
       } else result = await processVoiceTurn({
         ...turnMeta,
         audioBuffer: buffer,
@@ -845,6 +815,9 @@ router.post('/:id/voice-turn', async (req, res) => {
     }
     if (message === 'openrouter-audio-unavailable') {
       return res.status(503).json({ error: 'Experimental OpenRouter audio is not configured', code: message });
+    }
+    if (message === 'openrouter-audio-model-unconfigured') {
+      return res.status(503).json({ error: 'OpenRouter patient audio model is not configured', code: message });
     }
     if (message === 'openrouter-transcription-failed') {
       return res.status(502).json({ error: 'Experimental OpenRouter transcription failed — please try again', code: message });

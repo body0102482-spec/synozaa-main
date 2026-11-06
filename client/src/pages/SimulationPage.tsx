@@ -60,12 +60,14 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { useSpeechInput } from '../hooks/useSpeechInput';
 import { useLiveVoiceCall } from '../hooks/useLivePatientCall';
 import { useGeminiLiveVoiceCall } from '../hooks/useGeminiLiveVoiceCall';
-import { useOpenAIRealtimeCall } from '../hooks/useOpenAIRealtimeCall';
+import { useOpenRouterPatientAudio } from '../hooks/useOpenRouterPatientAudio';
 import { LiveVoiceStageShell, type LiveVoiceCallControls } from '../components/live/LiveVoiceStageShell';
 import { LivePatientHistoryView } from '../components/live/LivePatientHistoryView';
 import { LiveExaminerVivaView } from '../components/live/LiveExaminerVivaView';
+import { TurnBasedPatientHistoryView } from '../components/live/TurnBasedPatientHistoryView';
 import { stopSpeaking } from '../lib/speech';
 import { IS_MOBILE, unlockMobileAudio } from '../lib/mobileAudio';
+import { readVoiceProvider, type VoiceProvider } from '../lib/voiceTransport';
 import type { VoiceTurnResponse } from '../lib/voiceTurn';
 import { isVivaClosingMessage } from '../lib/vivaClosing';
 import {
@@ -256,8 +258,8 @@ export default function SimulationPage() {
   const [lang, setLang] = useState<"AUTO" | "AR" | "EN">("AR");
   const [sending, setSending] = useState(false);
   const [chatError, setChatError] = useState("");
-  const [realtimeFallback, setRealtimeFallback] = useState(false);
-  const [voiceProvider, setVoiceProvider] = useState<'openai_realtime' | 'openrouter_audio' | 'live_call'>('live_call');
+  // Which patient-audio transport the backend has configured.
+  const [voiceProvider, setVoiceProvider] = useState<VoiceProvider>('live_call');
   const [secondsLeft, setSecondsLeft] = useState(STATION_SECONDS);
   const [timerInitializedSessionId, setTimerInitializedSessionId] = useState<string | null>(null);
   const [result, setResult] = useState<Record<string, unknown> | null>(null);
@@ -325,18 +327,15 @@ export default function SimulationPage() {
           ? { role: 'EXAMINER' as const, stage: maneuverStage(activeManeuver) }
           : null;
 
-  // Which voice transport the backend has configured. The generic endpoint is
-  // server-derived truth: 'openai_realtime' (OpenAI Realtime WebRTC),
-  // 'openrouter_audio' (experimental turn-based audio) or 'live_call' (Gemini
-  // Live). Text AI (AI_PROVIDER=openrouter) is independent of this choice.
+  // Patient History uses turn-based OpenRouter audio when explicitly enabled.
+  // Gemini remains the patient fallback and continues to serve examiner flows.
   const voiceProviderFetch = useCallback(async () => {
     try {
-      const res = await api.get<{ provider: 'openai_realtime' | 'openrouter_audio' | 'live_call' }>(
-        '/sessions/voice-provider',
-      );
-      if (res.data?.provider) setVoiceProvider(res.data.provider);
+      const res = await api.get('/sessions/voice-provider');
+      const provider = readVoiceProvider(res.data);
+      if (provider) setVoiceProvider(provider);
     } catch {
-      // Unknown → keep the default transport selection.
+      // Unknown → keep the default Gemini fallback selection.
     }
   }, []);
 
@@ -546,13 +545,6 @@ export default function SimulationPage() {
       else if (code === 'audio-start-failed') setMicError(t('micStartFailed'));
       else if (code === 'gemini-not-configured') setMicError(t('liveVoiceGeminiUnavailable'));
       else if (code === 'gemini-token-failed') setMicError(t('liveVoiceGeminiUnavailable'));
-      else if (code === 'realtime-not-configured' || code === 'realtime-call-failed') {
-        // OpenAI Realtime cannot serve this session — fall back to the Gemini
-        // Live transport so the exam is never blocked by voice-provider config.
-        setRealtimeFallback(true);
-        setVoiceProvider('live_call');
-        setMicError(t('liveVoiceRealtimeUnavailable'));
-      }
       else if (code === 'session-missing') setMicError(t('liveVoiceSessionMissing'));
       else if (code === 'live-voice-session-required') setMicError(t('liveVoiceSessionRequired'));
       else if (code === 'start-failed') setMicError(t('micStartFailed'));
@@ -614,7 +606,7 @@ export default function SimulationPage() {
     [sessionId, solvedManeuver, t],
   );
 
-  /** Shared transcript handler for every live-voice transport (Gemini + OpenAI). */
+  /** Shared transcript handler for every live-voice transport (Gemini + OpenRouter). */
   const handleLiveVoiceMessage = useCallback(
     (message: { id: string; role: Message['role']; content: string; stage: string; createdAt: string }) => {
       setSession((current) => {
@@ -637,39 +629,31 @@ export default function SimulationPage() {
     role: liveVoiceContext?.role ?? 'PATIENT',
     stage: liveVoiceContext?.stage ?? 'history',
     maneuverId: activeManeuver ?? undefined,
-    disabled: !isLiveVoiceSession || !liveVoiceContext || sessionLocked,
+    disabled:
+      !isLiveVoiceSession ||
+      !liveVoiceContext ||
+      sessionLocked ||
+      (voiceProvider === 'openrouter_audio' && liveVoiceContext.role === 'PATIENT'),
     onStartAttempt: () => setMicError(''),
     onMessage: handleLiveVoiceMessage,
     onError: handleLiveCallError,
   });
 
-  // OpenAI Realtime (WebRTC) transport — used for the patient-history voice
-  // call when the server reports it configured. The OPENAI_API_KEY stays on
-  // the server: the browser only speaks WebRTC with the SDP answer it gets
-  // from POST /sessions/:id/realtime/call.
-  const openaiRealtimeCall = useOpenAIRealtimeCall({
+  const openRouterPatientAudioCall = useOpenRouterPatientAudio({
     sessionId: sessionId || '',
-    stage: liveVoiceContext?.stage ?? 'history',
-    disabled: !isLiveVoiceSession || !liveVoiceContext || sessionLocked,
-    onStartAttempt: () => setMicError(''),
-    onStudentMessage: handleLiveVoiceMessage,
-    onPatientMessage: handleLiveVoiceMessage,
-    onError: handleLiveCallError,
+    sessionLang: micSessionLang,
+    language: listenLang,
+    disabled:
+      !isLiveVoiceSession ||
+      voiceProvider !== 'openrouter_audio' ||
+      liveVoiceContext?.role !== 'PATIENT' ||
+      liveVoiceContext.stage !== 'history' ||
+      sessionLocked,
+    onTurnComplete: appendVoiceTurnMessages,
   });
 
-  // Patient history rides the OpenAI Realtime transport when configured;
-  // examiner stages (viva / maneuvers) stay on Gemini Live — their examiner
-  // instruction flow is not served by the OpenAI patient path yet.
-  const liveVoiceSessionCall =
-    voiceProvider === 'openai_realtime' &&
-    !realtimeFallback &&
-    liveVoiceContext?.role === 'PATIENT' &&
-    liveVoiceContext?.stage === 'history'
-      ? openaiRealtimeCall
-      : geminiLiveCall;
-
   const activeLiveCall = isLiveVoiceSession
-    ? liveVoiceSessionCall
+    ? geminiLiveCall
     : isPatientLiveCall
       ? patientLiveCall
       : examinerLiveCall;
@@ -688,9 +672,8 @@ export default function SimulationPage() {
   useEffect(() => {
     if (sessionLocked || !liveVoiceContext) {
       geminiLiveCall.stopCall();
-      openaiRealtimeCall.stopCall();
     }
-  }, [geminiLiveCall.stopCall, openaiRealtimeCall.stopCall, liveVoiceContext, sessionLocked]);
+  }, [geminiLiveCall.stopCall, liveVoiceContext, sessionLocked]);
 
   useEffect(() => {
     // Language toggle must never leave STT running or auto-accept phantom results.
@@ -735,10 +718,7 @@ export default function SimulationPage() {
     stopListening();
     patientLiveCall.stopCall();
     examinerLiveCall.stopCall();
-    // Only ONE live transport may hold the mic — stop the inactive one too
-    // (e.g. Gemini when OpenAI Realtime is about to start, and vice versa).
     if (activeLiveCall !== geminiLiveCall) geminiLiveCall.stopCall();
-    if (activeLiveCall !== openaiRealtimeCall) openaiRealtimeCall.stopCall();
     setInput('');
     window.setTimeout(() => activeLiveCall.toggleLiveCall(), IS_MOBILE ? 400 : 200);
   }, [
@@ -746,7 +726,6 @@ export default function SimulationPage() {
     examinerLiveCall,
     forceReleaseMic,
     geminiLiveCall,
-    openaiRealtimeCall,
     patientLiveCall,
     stopListening,
   ]);
@@ -758,9 +737,7 @@ export default function SimulationPage() {
     isLiveCallSpeaking: activeLiveCall.isSpeaking,
     isLiveCallSupported: activeLiveCall.isSupported && liveCallAvailable,
     onToggleLiveCall: liveCallAvailable ? toggleLiveCall : undefined,
-    liveCallLabel: isPatientLiveCall && voiceProvider === 'openrouter_audio'
-      ? 'Experimental OpenRouter audio'
-      : t('liveCall'),
+    liveCallLabel: t('liveCall'),
     endLiveCallLabel: t('endLiveCall'),
   };
 
@@ -1478,14 +1455,24 @@ export default function SimulationPage() {
                 vivaComplete={examinerVivaComplete}
               />
             ) : (
-              <LivePatientHistoryView
-                patientName={session.case.patientName}
-                patientAge={session.case.patientAge}
-                patientGender={session.case.patientGender}
-                call={liveVoiceSessionCall}
-                error={micError}
-                sessionLocked={sessionLocked}
-              />
+              voiceProvider === 'openrouter_audio' ? (
+                <TurnBasedPatientHistoryView
+                  patientName={session.case.patientName}
+                  patientAge={session.case.patientAge}
+                  patientGender={session.case.patientGender}
+                  call={openRouterPatientAudioCall}
+                  sessionLocked={sessionLocked}
+                />
+              ) : (
+                <LivePatientHistoryView
+                  patientName={session.case.patientName}
+                  patientAge={session.case.patientAge}
+                  patientGender={session.case.patientGender}
+                  call={geminiLiveCall}
+                  error={micError}
+                  sessionLocked={sessionLocked}
+                />
+              )
             )
           ) : (
             <HistoryChatView

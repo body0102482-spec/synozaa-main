@@ -1339,6 +1339,19 @@ export default {
       liveVoiceStatusFailed: "Connection failed",
       liveVoiceMicPermissionHint:
         "Tap Start, then choose Allow when your browser asks for microphone access.",
+      patientAudioRecord: "Record question",
+      patientAudioStop: "Send question",
+      patientAudioHint: "Ask your question out loud, then wait for the patient's spoken reply.",
+      patientAudioRecording: "Recording — speak your question, then tap Send.",
+      patientAudioProcessing: "Preparing the patient's response…",
+      patientAudioPermissionHint:
+        "Tap Record question, allow microphone access, then tap Send when you finish speaking.",
+      patientAudioQuestion: "Your question",
+      patientAudioAnswer: "Patient response",
+      patientAudioPlayback: "Patient audio response",
+      patientAudioTooShort: "Please record a longer question and try again.",
+      patientAudioNotConfigured: "Patient audio is not configured on the server.",
+      patientAudioFailed: "The audio response could not be generated. Please try again.",
       liveVoiceInsecureContext:
         "Microphone requires a secure connection. Open Synoza over HTTPS (https://…) — browsers block the microphone on insecure (http://) pages. localhost works for testing.",
       liveVoiceNoMicrophone:
@@ -1347,8 +1360,6 @@ export default {
         "Your microphone is busy. Close other apps or tabs using the microphone, then try again.",
       liveVoiceGeminiUnavailable:
         "The voice service is not configured on the server yet (GEMINI_API_KEY). Please contact support.",
-      liveVoiceRealtimeUnavailable:
-        "Live voice could not start (OPENAI_API_KEY / OPENAI_REALTIME_MODEL on the server). Trying the alternate voice transport — start the call again.",
       liveVoiceSessionMissing:
         "This exam session was not found or is no longer active. Go back and start the exam again.",
       liveVoiceSessionRequired:
@@ -2652,6 +2663,19 @@ export default {
       liveVoiceStatusFailed: "فشل الاتصال",
       liveVoiceMicPermissionHint:
         "دوس على ابدأ واختار «سماح» لما المتصفح يطلب إذن الميكروفون.",
+      patientAudioRecord: "سجّل سؤالك",
+      patientAudioStop: "إرسال السؤال",
+      patientAudioHint: "اسأل سؤالك بصوتك واستنى رد المريض الصوتي.",
+      patientAudioRecording: "جاري التسجيل — اتكلم وبعدين دوس إرسال.",
+      patientAudioProcessing: "جاري تجهيز رد المريض…",
+      patientAudioPermissionHint:
+        "دوس سجّل سؤالك واسمح باستخدام الميكروفون، وبعد ما تخلص دوس إرسال.",
+      patientAudioQuestion: "سؤالك",
+      patientAudioAnswer: "رد المريض",
+      patientAudioPlayback: "الرد الصوتي للمريض",
+      patientAudioTooShort: "سجّل سؤال أطول وحاول تاني.",
+      patientAudioNotConfigured: "الصوت للمريض مش متظبط على السيرفر.",
+      patientAudioFailed: "مقدرناش نجهز الرد الصوتي. حاول تاني.",
       liveVoiceInsecureContext:
         "الميكروفون محتاج اتصال آمن. افتح Synoza من خلال HTTPS — المتصفحات بتمنع الميكروفون على الصفحات غير الآمنة (http://). localhost يصلح للتجربة.",
       liveVoiceNoMicrophone:
@@ -2666,8 +2690,6 @@ export default {
         "المكالمات الصوتية متاحة في جلسات المكالمة المباشرة بس.",
       liveVoiceTranscriptSaveFailed:
         "آخر كلام متسجلش. اتأكد من الاتصال — تقييمك بيعتمد على المحادثة المتسجلة.",
-      liveVoiceRealtimeUnavailable:
-        "المكالمة الصوتية المباشرة مش قادرة تبدأ (إعدادات OPENAI_API_KEY على السيرفر). بيتم التحويل لطريقة الصوت البديلة — ابدأ المكالمة تاني.",
     },
   },
 };

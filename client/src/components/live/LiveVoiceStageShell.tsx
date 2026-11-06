@@ -2,8 +2,7 @@ import type { ReactNode } from 'react';
 import { Loader2, Mic, MicOff, Phone, PhoneOff, Shield, UserCircle, Volume2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-/** One active voice connection — the contract both voice transports
- * (useGeminiLiveVoiceCall / useOpenAIRealtimeCall) implement for this UI. */
+/** One active Gemini Live connection for examiner and fallback patient calls. */
 export interface LiveVoiceCallControls {
   isLiveCall: boolean;
   isBusy: boolean;

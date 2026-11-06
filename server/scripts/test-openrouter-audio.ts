@@ -56,7 +56,10 @@ if (originalProvider === undefined) delete process.env.VOICE_PROVIDER; else proc
 
 const instructions = buildRealtimePatientInstructions(testCase, 'AR');
 assert(instructions.includes('Egyptian colloquial Arabic'), 'Arabic/Egyptian persona instruction is present');
-assert(instructions.includes('Residence: NOT DOCUMENTED'), 'unknown structured demographics remain unknown');
+assert(
+  /Residence: Not specified.*realistic, safe assumption/.test(instructions),
+  'unspecified structured demographics retain the configured safe-assumption behavior',
+);
 assert(!instructions.includes('Diagnosis: Mitral regurgitation'), 'diagnosis is not supplied as patient-answer context');
 assert(instructions.includes('Sex: Female'), 'case sex is present in grounded context');
 
@@ -227,7 +230,12 @@ try {
   assert(!routesSource.includes("from '../services/transcriptionService.js'"), 'OpenRouter route does not invoke the OpenAI transcription service');
   assert(routesSource.includes('role: MessageRole.STUDENT') && routesSource.includes('role: MessageRole.PATIENT'), 'route persists separate STUDENT and PATIENT transcript roles');
   assert(routesSource.includes('const patientText = await getPatientResponse(') && routesSource.includes('content: patientText'), 'PATIENT persistence comes from authoritative grounded text, not the audio-model transcript');
-  assert(routesSource.includes('const transcript = await transcribeOpenRouterAudio(') && routesSource.includes('getPatientResponse(\n          session.case,\n          stageHistory,\n          transcript,'), 'a cleaned/salvaged transcript is the only student text passed to the grounded Patient AI');
+  assert(
+    routesSource.includes('transcribeOpenRouterAudioChatInput') &&
+      routesSource.includes('createOpenRouterAudioChatTurn') &&
+      routesSource.includes('studentTranscript,'),
+    'LIVE_VOICE transcribes the question and generates the patient answer through OpenRouter audio chat completions',
+  );
   assert(!routesSource.includes('content: audio.text'), 'TTS audio can never overwrite persisted patient facts');
   assert(routesSource.includes("message === 'openrouter-transcription-failed'"), 'route exposes failed transcription as a recoverable response');
   assert(routesSource.includes("openrouter-transcription-network-failed") && routesSource.includes('code: error.code'), 'route returns distinct exhausted-provider and rejected-transcript error codes');
